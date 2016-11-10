@@ -107,6 +107,12 @@ class CoursController extends Controller
                     ->all();
                 $new = Yii::$app->request->post();
             }
+            
+//            echo "<pre>";
+//            print_r($new);
+//            echo "</pre>";
+//            exit;
+            
             if (!empty($new['new_participant'])) {
                 // soit on ajoute un participant
                 if (empty($modelDate)) {
@@ -128,17 +134,21 @@ class CoursController extends Controller
                 
                 // on passe la personne au statut inscrit
                 $participant = Personnes::findOne(['personne_id' => $new['new_participant']]);
-                if (in_array($participant->fk_statut, array(Yii::$app->params['persStatutInactif'], Yii::$app->params['persStatutStandby']))) {
+                if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
                     $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
                     $participant->save();
-                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en actif.');
+                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
                 }
-            } else {
+            } elseif (!empty($new['Parametres'])) {
                 // soit on envoi un email !
                 // on le fait après avoir cherché la liste des participants
                 $sendEmail = true;
                 $alerte['class'] = 'info';
                 $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
+            } else {
+                // dans ce cas on ajoute un participant sans en avoir sélectionné
+                $alerte['class'] = 'warning';
+                $alerte['message'] = Yii::t('app', 'Vous devez sélectionner un participant pour pouvoir l\'ajouter.');
             }
 	    }
 

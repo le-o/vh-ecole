@@ -299,6 +299,11 @@ class PersonnesController extends Controller
                     $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
                 }
             }
+            if (in_array($model->fk_statut, Yii::$app->params['groupePersStatutNonActif']) && $alerte['class'] == 'success') {
+                $model->fk_statut = Yii::$app->params['persStatutInscrit'];
+                $model->save();
+                $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
+            }
         }
         
         $coursDateDataProvider = [];
@@ -308,15 +313,6 @@ class PersonnesController extends Controller
                 $listeCoursDate[] = $mcd->fk_cours_date;
             }
             $coursDate = CoursDate::find()->where(['in', 'cours_date_id', $listeCoursDate])->orderBy(['date' => SORT_DESC]);
-//            $test = $coursDate->all();
-//            foreach ($test as $t) {
-//                if ($t->cours_date_id == 98) {
-//                    echo "<pre>";
-//                    print_r($t->fkCours);
-//                    echo "</pre>";
-//                    exit;
-//                }
-//            }
             $coursDateDataProvider = new ActiveDataProvider([
                 'query' => $coursDate,
                 'pagination' => [

@@ -98,10 +98,10 @@ class CoursDateController extends Controller
                 
                 // on passe la personne au statut inscrit
                 $participant = Personnes::findOne(['personne_id' => $post['new_participant']]);
-                if (in_array($participant->fk_statut, array(Yii::$app->params['persStatutInactif'], Yii::$app->params['persStatutStandby']))) {
+                if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
                     $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
                     $participant->save();
-                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en actif.');
+                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
                 }
             } else {
                 // soit on envoi un email !
