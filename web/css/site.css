@@ -95,6 +95,12 @@ a.desc:after {
     min-width: 67px;
 }
 
+h3 {
+    color: rgb(130,54,140);
+    font-size: 1.1428em;
+    margin-bottom: 10px;
+}
+
 @media print {
   a[href]:after {
     content: none !important;

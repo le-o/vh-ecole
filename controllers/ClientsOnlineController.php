@@ -213,7 +213,7 @@ class ClientsOnlineController extends Controller
         $p->fk_statut = Yii::$app->params['persStatutStandby'];
         $p->fk_type = Yii::$app->params['typeADefinir'];
         $p->nom = $model->nom;
-        $p->prenom = $model->prenom;
+        $p->prenom = ($model->prenom != '') ? $model->prenom : 'non renseigné';
         $p->adresse1 = $model->adresse;
         $p->npa = $model->npa;
         $p->localite = $model->localite;
@@ -228,34 +228,37 @@ class ClientsOnlineController extends Controller
         
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            $p->save();
-            foreach ($clients as $client) {
-                $c = new \app\models\Personnes;
-                $c->fk_statut = Yii::$app->params['persStatutStandby'];
-                $c->fk_type = Yii::$app->params['typeADefinir'];
-                $c->nom = $client->nom;
-                $c->prenom = $client->prenom;
-                $c->adresse1 = $client->adresse;
-                $c->npa = $client->npa;
-                $c->localite = $client->localite;
-                $c->telephone = $client->telephone;
-                $c->email = $client->email;
-                $c->date_naissance = $client->date_naissance;
-                $c->informations = $p->informations;
-                $c->save();
-                $client->is_actif = false;
-                $client->save(false);
+            if ($p->save()) {
+                foreach ($clients as $client) {
+                    $c = new \app\models\Personnes;
+                    $c->fk_statut = Yii::$app->params['persStatutStandby'];
+                    $c->fk_type = Yii::$app->params['typeADefinir'];
+                    $c->nom = $client->nom;
+                    $c->prenom = $client->prenom;
+                    $c->adresse1 = $client->adresse;
+                    $c->npa = $client->npa;
+                    $c->localite = $client->localite;
+                    $c->telephone = $client->telephone;
+                    $c->email = $client->email;
+                    $c->date_naissance = $client->date_naissance;
+                    $c->informations = $p->informations;
+                    $c->save();
+                    $client->is_actif = false;
+                    $client->save(false);
 
-                $i = new \app\models\PersonnesHasInterlocuteurs;
-                $i->fk_personne = $c->personne_id;
-                $i->fk_interlocuteur = $p->personne_id;
-                $i->save();
+                    $i = new \app\models\PersonnesHasInterlocuteurs;
+                    $i->fk_personne = $c->personne_id;
+                    $i->fk_interlocuteur = $p->personne_id;
+                    $i->save();
+                }
+                $model->is_actif = false;
+                $model->save(false);
+
+                $transaction->commit();
+                return $this->redirect(['index']);
+            } else {
+                throw new \Exception(Yii::t('app', 'Problème lors de la transformation de la personne.'));
             }
-            $model->is_actif = false;
-            $model->save(false);
-            
-            $transaction->commit();
-            return $this->redirect(['index']);
         } catch (Exception $e) {
             $transaction->rollBack();
             exit('error');

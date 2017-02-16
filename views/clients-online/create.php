@@ -6,6 +6,9 @@ use yii\helpers\Html;
 /* @var $model app\models\ClientsOnline */
 ?>
 <div class="clients-online-create">
+    
+    <h3>Attention : pour les inscription à - de 72h , merci de nous contacter par téléphone</h3>
+    <br /><br />
 
     <?= $this->render('_form', [
         'model' => $model,
