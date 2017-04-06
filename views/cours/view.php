@@ -28,17 +28,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?php if (Yii::$app->user->identity->id < 1000) { ?>
-    <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->cours_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Vous allez supprimer le cours ainsi que tous les participants et toutes les planifications. OK?'),
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-    <?php } ?>
+    
+     <?= $this->render('_form', [
+	    'alerte' => '',
+        'model' => $model,
+        'modelParams' => $modelParams,
+    ]) ?>
+    
+    <?php } else { ?>
 
     <?= DetailView::widget([
         'model' => $model,
@@ -69,6 +66,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'description:ntext',
         ],
     ]) ?>
+    
+    <?php } ?>
 
     <?php if ($model->fk_type == Yii::$app->params['coursPlanifie']) { ?>
         <?= $this->render('/personnes/_participant', [
@@ -121,19 +120,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>'{coursDateView} {coursDateUpdate} {coursDateDelete}',
                 'visibleButtons'=>[
-                    'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
                     'coursDateDelete' => (Yii::$app->user->identity->id < 1000) ? true : false,
                 ],
                 'buttons'=>[
                     'coursDateView' => function ($url, $model, $key) {
-//                        if ($model->fkCours->fk_type == Yii::$app->params['coursPlanifie']) return '';
                         return Html::a('<span class="glyphicon glyphicon-user"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
                             'title' => Yii::t('yii', 'View'),
-                        ]);
-                    },
-                    'coursDateUpdate' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours-date/update', 'id' => $key]), [
-                            'title' => Yii::t('yii', 'Update'),
                         ]);
                     },
                     'coursDateDelete' => function ($url, $model, $key) use ($coursDateProvider) {

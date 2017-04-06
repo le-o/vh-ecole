@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'participant_min',
             'participant_max',
             [
-                'label' => Yii::t('app', 'Nombre participant'),
+                'label' => Yii::t('app', 'Nb Part'),
                 'value' => function ($model) {
                     return ($model->fk_type == Yii::$app->params['coursPlanifie']) ? $model->nombreClientsInscrits : Yii::t('app', 'n/a');
                 }

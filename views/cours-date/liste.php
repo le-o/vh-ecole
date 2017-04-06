@@ -16,8 +16,15 @@ $this->params['breadcrumbs'][] = $this->title;
 $gridColumns = [
     ['class' => 'kartik\grid\SerialColumn'],
     'date',
-    'fkCours.fkNom.nom',
-    'fkCours.session',
+    [
+        'label' => Yii::t('app', 'Nom du cours'),
+        'attribute' => 'fkNom',
+        'value' => 'fkCours.fkNom.nom',
+    ],
+    [
+        'attribute' => 'session',
+        'value' => 'fkCours.session',
+    ],
     [
         'label' => Yii::t('app', 'Fk Moniteur'),
         'value' => function($data) {
@@ -40,23 +47,31 @@ $gridColumns = [
         'attribute' => 'prix',
         'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
     ],
+    [
+        'label' => Yii::t('app', 'Nb Part'),
+        'value' => function($data) {
+            return $data->nombreClientsInscrits;
+        },
+    ],
     'remarque',
 
     ['class' => 'yii\grid\ActionColumn',
-        'template'=>'{coursDateView} {coursDateUpdate}',
+        'template'=>'{coursPresence} {coursDateView} {coursDateUpdate}',
         'visibleButtons'=>[
             'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
         ],
         'buttons'=>[
+            'coursPresence' => function ($url, $model, $key) {
+                return Html::a('<span class="glyphicon glyphicon-print"></span>', Url::to(['/cours/presence', 'id' => $model->fk_cours]), [
+                    'title' => Yii::t('yii', 'Imprimer'),
+                ]);
+            },
             'coursDateView' => function ($url, $model, $key) {
                 if ($model->fkCours->fk_type == Yii::$app->params['coursPlanifie']) {
-                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours/view', 'id' => $model->fk_cours]), [
+                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
                         'title' => Yii::t('yii', 'View'),
                     ]);
                 }
-                return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
-                    'title' => Yii::t('yii', 'View'),
-                ]);
             },
             'coursDateUpdate' => function ($url, $model, $key) {
                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours-date/update', 'id' => $key]), [
@@ -111,6 +126,7 @@ $gridColumns = [
         },
         'columns' => $gridColumns,
         'summary' => '',
+        'tableOptions' => ['class' => 'cours-date-liste']
     ]); ?>
 
 </div>

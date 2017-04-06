@@ -12,15 +12,6 @@ use yii\bootstrap\Alert;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<?php if (!empty($alerte)) {
-    echo Alert::widget([
-        'options' => [
-            'class' => 'alert-'.$alerte['class'],
-        ],
-        'body' => $alerte['message'],
-    ]);
-} ?>
-
 <div class="cours-date-form">
 
     <?php $form = ActiveForm::begin(); ?>
@@ -34,6 +25,12 @@ use yii\bootstrap\Alert;
 			        'allowClear' => true
 			    ],
 			]) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model->fkCours, 'participant_min')->textInput(['disabled' => true]) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model->fkCours, 'participant_max')->textInput(['disabled' => true]) ?>
         </div>
     </div>
     <div class="row">
@@ -99,6 +96,15 @@ use yii\bootstrap\Alert;
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?php if (!$model->isNewRecord) { ?>
+        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_date_id], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                'method' => 'post',
+            ],
+        ]) ?>
+        <?php } ?>
     </div>
 
     <?php ActiveForm::end(); ?>

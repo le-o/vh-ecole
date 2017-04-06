@@ -22,9 +22,9 @@ class CoursSearch extends Cours
     public function rules()
     {
         return [
-            [['cours_id', 'participant_min', 'participant_max', 'session', 'is_actif'], 'integer'],
+            [['cours_id', 'participant_min', 'participant_max', 'is_actif'], 'integer'],
             [['duree', 'prix'], 'double'],
-            [['description', 'annee', 'fkNiveau', 'fkType', 'fkNom'], 'safe'],
+            [['description', 'annee', 'session', 'fkNiveau', 'fkType', 'fkNom'], 'safe'],
         ];
     }
 
@@ -47,11 +47,9 @@ class CoursSearch extends Cours
     public function search($params)
     {
         $query = Cours::find();
-//        $query->joinWith(['fkNiveau', 'fkType', 'fkNom']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['is_actif'=>SORT_DESC, 'fkNom'=>SORT_ASC]],
             'pagination' => [
                 'pagesize' => 80,
             ],
@@ -64,17 +62,17 @@ class CoursSearch extends Cours
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        
         $query->andFilterWhere([
             'cours_id' => $this->cours_id,
             'duree' => $this->duree,
-            'session' => $this->session,
             'annee' => $this->annee,
             'prix' => $this->prix,
             'participant_min' => $this->participant_min,
             'participant_max' => $this->participant_max,
             'is_actif' => $this->is_actif,
-        ]);
+        ])
+        ->andFilterWhere(['like', 'session', $this->session]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);
         
@@ -108,6 +106,7 @@ class CoursSearch extends Cours
             'asc' => ['nom.nom' => SORT_ASC],
             'desc' => ['nom.nom' => SORT_DESC],
         ];
+        $dataProvider->sort->defaultOrder = ['is_actif'=>SORT_DESC, 'fkNom'=>SORT_ASC];
 
         return $dataProvider;
     }

@@ -18,6 +18,13 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
             'authKey' => 'test100key',
             'accessToken' => '100-token',
         ],
+        '201' => [
+            'id' => '201',
+            'username' => 'benoit',
+            'password' => 'm0t2Pa$$e',
+            'authKey' => 'test201key',
+            'accessToken' => '201-token',
+        ],
         '413' => [
             'id' => '413',
             'username' => 'michael',

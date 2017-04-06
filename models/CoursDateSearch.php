@@ -19,6 +19,8 @@ class CoursDateSearch extends CoursDate
     public $depuis;
     public $dateA;
     public $homepage = false;
+    
+    public $fkNom;
 	
     /**
      * @inheritdoc
@@ -27,7 +29,7 @@ class CoursDateSearch extends CoursDate
     {
         return [
             [['cours_date_id', 'fk_cours'], 'integer'],
-            [['date', 'heure_debut', 'lieu', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA'], 'safe'],
+            [['date', 'heure_debut', 'lieu', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA', 'fkNom'], 'safe'],
         ];
     }
 
@@ -60,19 +62,13 @@ class CoursDateSearch extends CoursDate
             ],
         ]);
         
-        $dataProvider->sort->attributes['fkCours'] = [
-            // The tables are the ones our relation are configured to
-            // in my case they are prefixed with "tbl_"
-            'asc' => ['cours.nom' => SORT_ASC],
-            'desc' => ['cours.nom' => SORT_DESC],
+        $dataProvider->sort->attributes['fkNom'] = [
+            'asc' => ['parametres.nom' => SORT_ASC, 'cours.session' => SORT_ASC],
+            'desc' => ['parametres.nom' => SORT_DESC, 'cours.session' => SORT_DESC],
         ];
-        $dataProvider->sort->attributes['participantMin'] = [
-            'asc' => ['cours.participant_min' => SORT_ASC],
-            'desc' => ['cours.participant_min' => SORT_DESC],
-        ];
-        $dataProvider->sort->attributes['participantMax'] = [
-            'asc' => ['cours.participant_max' => SORT_ASC],
-            'desc' => ['cours.participant_max' => SORT_DESC],
+        $dataProvider->sort->attributes['session'] = [
+            'asc' => ['cours.session' => SORT_ASC, 'parametres.nom' => SORT_ASC],
+            'desc' => ['cours.session' => SORT_DESC, 'parametres.nom' => SORT_DESC],
         ];
 
         $this->load($params);

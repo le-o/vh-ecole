@@ -434,6 +434,16 @@ class PersonnesController extends Controller
             
             $transaction = \Yii::$app->db->beginTransaction();
             try {
+                // on traite le changement de statut pour les activités de la personne
+                $changedArray = array_diff_assoc($model->attributes, $model->oldAttributes);
+                foreach($changedArray as $key => $value){
+                    if ($key == 'fk_statut' && $value == Yii::$app->params['persStatutInscrit']) {
+                        foreach ($model->clientsHasCoursDate as $date) {
+                            $date->fk_statut = Yii::$app->params['persStatutInscrit'];
+                            $date->save();
+                        }
+                    }
+                }
                 if (!$model->save()) {
                     throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
                 }

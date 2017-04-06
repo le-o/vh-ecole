@@ -36,6 +36,12 @@ use \DateTime;
  */
 class Personnes extends \yii\db\ActiveRecord
 {
+    // Stores old attributes on afterFind() so we can compare
+    // against them before/after save
+    protected $oldAttributes;
+    
+    public $statutPart;
+    
     /**
      * @inheritdoc
      */
@@ -99,6 +105,7 @@ class Personnes extends \yii\db\ActiveRecord
     public function afterFind()
     {
         $this->date_naissance = ($this->date_naissance == '0000-00-00') ? '' : date('d.m.Y', strtotime($this->date_naissance));
+        $this->oldAttributes = $this->attributes;
         parent::afterFind();
     }
     

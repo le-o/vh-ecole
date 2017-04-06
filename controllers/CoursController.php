@@ -47,6 +47,7 @@ class CoursController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
+                            if ($action->id == 'presence' && Yii::$app->user->identity->id == 1001) return true;
                             return (Yii::$app->user->identity->id < 1000) ? true : false;
                         }
                     ],
@@ -108,11 +109,6 @@ class CoursController extends Controller
                 $new = Yii::$app->request->post();
             }
             
-//            echo "<pre>";
-//            print_r($new);
-//            echo "</pre>";
-//            exit;
-            
             if (!empty($new['new_participant'])) {
                 // soit on ajoute un participant
                 if (empty($modelDate)) {
@@ -121,23 +117,24 @@ class CoursController extends Controller
                     $alerte['message'] .= '<a class="btn btn-link" href="'.Url::to(['/cours/view', 'id' => $id]).'">'.Yii::t('app', 'Forcer l\'inscription à toutes les dates ?').'</a>';
                     $session->setFlash('newParticipant', $new['new_participant']);
                 } else {
+                    $participant = Personnes::findOne(['personne_id' => $new['new_participant']]);
                     foreach ($modelDate as $date) {
                         $modelClientsHasCoursDate = new ClientsHasCoursDate();
                         $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
                         $modelClientsHasCoursDate->fk_personne = $new['new_participant'];
                         $modelClientsHasCoursDate->is_present = true;
+                        $modelClientsHasCoursDate->fk_statut = (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) ? Yii::$app->params['persStatutInscrit'] : $participant->fk_statut;
                         $modelClientsHasCoursDate->save(false);
                     }
                     $alerte['class'] = 'success';
                     $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
-                }
-                
-                // on passe la personne au statut inscrit
-                $participant = Personnes::findOne(['personne_id' => $new['new_participant']]);
-                if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
-                    $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
-                    $participant->save();
-                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
+                    
+                    // on passe la personne au statut inscrit si non actif
+                    if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
+                        $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
+                        $participant->save();
+                        $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
+                    }
                 }
             } elseif (!empty($new['Parametres'])) {
                 // soit on envoi un email !
@@ -145,6 +142,13 @@ class CoursController extends Controller
                 $sendEmail = true;
                 $alerte['class'] = 'info';
                 $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
+            } elseif (!empty($new['Cours'])) {
+                $alerte = '';
+                if ($model->load(Yii::$app->request->post())) {
+                    if (!$model->save()) {
+                        $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
+                    }
+                }
             } else {
                 // dans ce cas on ajoute un participant sans en avoir sélectionné
                 $alerte['class'] = 'warning';
@@ -158,7 +162,7 @@ class CoursController extends Controller
         foreach ($coursDate->all() as $date) {
             $listeCoursDate[] = $date->cours_date_id;
         }
-	    $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate]);
+	    $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->orderBy('clients_has_cours_date.fk_statut ASC');
 	    $listParticipants = $participants->all();
 	    $excludePart = [];
         $listeEmails = [];
@@ -194,6 +198,15 @@ class CoursController extends Controller
 		        'pageSize' => 20,
 		    ],
 		]);
+        foreach($participantDataProvider->models as $part) {
+            foreach ($coursDate->all() as $date) {
+                $pres = $date->getForPresence($part->personne_id);
+                if (isset($pres->fk_statut)) {
+                    $part->statutPart = $pres->fkStatut->nom;
+                    break;
+                }
+            }
+        }
 
         $parametre = new Parametres();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
@@ -202,10 +215,14 @@ class CoursController extends Controller
         $displayActions = (Yii::$app->user->identity->id < 1000) ? '' : ' hidden';
         // gestion affichage bouton recursive
         $createR = ($participantDataProvider->totalCount == 0) ? '' : ' hidden';
+        
+        // pour l'affichage des paramètres en mode édition
+        $modelParams = new Parametres;
 	    
         return $this->render('view', [
 	        'alerte' => $alerte,
             'model' => $model,
+            'modelParams' => $modelParams,
             'coursDateProvider' => $coursDateProvider,
             'dataClients' => $dataClients,
             'participantDataProvider' => $participantDataProvider,
@@ -286,6 +303,9 @@ class CoursController extends Controller
                         ->andWhere(['>=', 'date', date('Y-m-d')])
                         ->all();
                     $from = 'cours';
+                    $coursDateAll = CoursDate::find()
+                        ->where(['=', 'fk_cours', $cours_ou_date_id])
+                        ->all();
                 } elseif ($from == 'cours-datefutur') {
                     $coursDateBase = CoursDate::find()
                         ->where(['=', 'cours_date_id', $cours_ou_date_id])
@@ -295,15 +315,25 @@ class CoursController extends Controller
                         ->andWhere(['>=', 'date', date('Y-m-d', strtotime($coursDateBase->date))])
                         ->all();
                     $from = 'cours-date';
+                    $coursDateAll = CoursDate::find()
+                        ->where(['=', 'fk_cours', $coursDateBase->fk_cours])
+                        ->all();
                 } else {
                     $coursDate = CoursDate::find()
                         ->where(['=', 'fk_cours', $cours_ou_date_id])
                         ->all();
+                    $coursDateAll = [];
+                }
+                // on modifie le statut de toutes les dates du client
+                foreach($coursDateAll as $c) {
+                    ClientsHasCoursDate::updateAll(['fk_statut' => Yii::$app->params['persStatutDesinscritFutur']], ['fk_personne' => $personne_id, 'fk_cours_date' => $c->cours_date_id]);
                 }
                 foreach ($coursDate as $date) {
                     ClientsHasCoursDate::deleteAll(['fk_personne' => $personne_id, 'fk_cours_date' => $date->cours_date_id]);
                 }
             }
+            
+            // on modifie le statut 
             $transaction->commit();
             $msg = 'supp';
         } catch (Exception $e) {
@@ -364,7 +394,7 @@ class CoursController extends Controller
             $listeCoursDate[] = $date->cours_date_id;
             $todec[] = $date;
             $i++;
-            if ($i == $nbmax) {
+            if ($i == $nbmax && $i < $coursDate->count()) {
                 $i = 0;
                 $decoupage[] = $todec;
                 $todec = [];
@@ -375,7 +405,7 @@ class CoursController extends Controller
             $todec[] = new CoursDate();
         }
         $decoupage[] = $todec;
-        $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate')->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate]);
+        $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate')->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->orderBy('clients_has_cours_date.fk_statut ASC');
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('_presence', [

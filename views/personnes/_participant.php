@@ -113,9 +113,9 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             ['class' => 'yii\grid\SerialColumn'],
             
             [
-                'attribute' => 'fkStatut.nom',
+                'attribute' => 'statutPart',
                 'label' => 'Statut',
-                'visible' => (isset($model->fk_type) && $model->fk_type == Yii::$app->params['coursPlanifie']) ? true : false,
+                'visible' => (!isset($model->fk_type) || (isset($model->fk_type) && $model->fk_type == Yii::$app->params['coursPlanifie'])) ? true : false,
             ],
             'societe',
             'nom',

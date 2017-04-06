@@ -46,6 +46,7 @@ class CoursDateController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
+                            if ($action->id == 'presence' && Yii::$app->user->identity->id == 1001) return true;
                             return (Yii::$app->user->identity->id < 1000) ? true : false;
                         }
                     ],
@@ -88,20 +89,59 @@ class CoursDateController extends Controller
         if ($post = Yii::$app->request->post()) {
             if (!empty($post['new_participant'])) {
                 // soit on ajoute un participant
+                $participant = Personnes::findOne(['personne_id' => $post['new_participant']]);
                 $modelClientsHasCoursDate = new ClientsHasCoursDate();
                 $modelClientsHasCoursDate->fk_cours_date = $model->cours_date_id;
                 $modelClientsHasCoursDate->fk_personne = $post['new_participant'];
                 $modelClientsHasCoursDate->is_present = true;
+                $modelClientsHasCoursDate->fk_statut = (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) ? Yii::$app->params['persStatutInscrit'] : $participant->fk_statut;
                 $modelClientsHasCoursDate->save(false);
                 $alerte['class'] = 'success';
                 $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
                 
                 // on passe la personne au statut inscrit
-                $participant = Personnes::findOne(['personne_id' => $post['new_participant']]);
                 if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
                     $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
                     $participant->save();
                     $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
+                }
+            } elseif (!empty($post['CoursDate'])) {
+                $model->load(Yii::$app->request->post());
+                $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
+
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if (!$model->save()) {
+                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
+                    }
+
+                    CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
+                    foreach ($moniteurs as $moniteur_id) {
+                        $addMoniteur = new CoursHasMoniteurs();
+                        $addMoniteur->fk_cours_date = $model->cours_date_id;
+                        $addMoniteur->fk_moniteur = $moniteur_id;
+                        $addMoniteur->is_responsable = 0;
+                        if (!($flag = $addMoniteur->save(false))) {
+                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
+                        }
+                    }
+                    
+                    $myCours = Cours::findOne($model->fk_cours);
+                    // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
+                    if ($myCours->is_actif == false && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
+                        $myCours->is_actif = true;
+                        $myCours->save();
+                    }
+
+                    $transaction->commit();
+                    if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
+                        return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
+                    } else {
+                        return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
+                    }
+                } catch (Exception $e) {
+                    $alerte = $e->getMessage();
+                    $transaction->rollBack();
                 }
             } else {
                 // soit on envoi un email !
@@ -115,10 +155,10 @@ class CoursDateController extends Controller
         foreach ($model->coursHasMoniteurs as $myMoniteur) {
             $moniteurs[] = $myMoniteur->fkMoniteur->nomPrenom;
         }
-        $selectedMoniteurs = implode(', ', $moniteurs);
+        $listeMoniteurs = implode(', ', $moniteurs);
 
         // Gestion des participants
-        $participants = Personnes::find()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $model->cours_date_id]);
+        $participants = Personnes::find()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $model->cours_date_id])->orderBy('clients_has_cours_date.fk_statut ASC');
         $listParticipants = $participants->all();
         $excludePart = [];
         $listeEmails = [];
@@ -140,12 +180,6 @@ class CoursDateController extends Controller
         
         $dataClients = Personnes::getClientsNotInCours($excludePart);
         
-//        $participantDataProvider = new ActiveDataProvider([
-//            'query' => $participants,
-//            'pagination' => [
-//                'pageSize' => 20,
-//            ],
-//        ]);
         $arrayParticipants = $participants->all();
         for ($i=0; $i<$model->nb_client_non_inscrit; $i++) {
             $fake = new Personnes();
@@ -155,6 +189,17 @@ class CoursDateController extends Controller
             $arrayParticipants[] = $fake;
         }
         
+        $myCours = Cours::findOne($model->fk_cours);
+        $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
+        $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
+        foreach ($myMoniteurs as $moniteur) {
+	        $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
+        }
+        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrant']])->orderBy('nom, prenom')->all();
+        foreach ($modelMoniteurs as $moniteur) {
+            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
+        }
+        
         $participantDataProvider = new ArrayDataProvider([
             'allModels' => $arrayParticipants,
             'key' => 'personne_id',
@@ -162,13 +207,24 @@ class CoursDateController extends Controller
                 'pageSize' => 20,
             ],
         ]);
+        foreach($participantDataProvider->allModels as $part) {
+            $pres = $model->getForPresence($part->personne_id);
+            if (isset($pres->fk_statut)) {
+                $part->statutPart = $pres->fkStatut->nom;
+            }
+        }
+        
         $parametre = new Parametres();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
 
         return $this->render('view', [
             'alerte' => $alerte,
             'model' => $model,
-            'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : '',
+            'listeMoniteurs' => (isset($listeMoniteurs)) ? $listeMoniteurs : '',
+            
+            'dataCours' => $dataCours,
+            'dataMoniteurs' => $dataMoniteurs,
+            'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : [],
 
             'isInscriptionOk' => ($participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
             'dataClients' => $dataClients,
@@ -526,7 +582,7 @@ class CoursDateController extends Controller
             //Testing
             $Event = new \yii2fullcalendar\models\Event();
             $Event->id = $time->cours_date_id;
-            $Event->url = ($time->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? Url::to(['/cours-date/view', 'id' => $time->cours_date_id]) : Url::to(['/cours/view', 'id' => $time->fk_cours]);
+            $Event->url = Url::to(['/cours-date/view', 'id' => $time->cours_date_id]);
             
             if ($time->fkCours->fk_type == Yii::$app->params['coursPonctuel'] && $time->fkCours->fk_nom != Yii::$app->params['nomCoursDecouverte']) {
                 $Event->title = (isset($time->clientsHasCoursDate[0]) ? $time->clientsHasCoursDate[0]->fkPersonne->societe.' '.$time->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));

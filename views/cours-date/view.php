@@ -27,17 +27,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?php if (Yii::$app->user->identity->id < 1000) { ?>
-    <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->cours_date_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_date_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-    <?php } ?>
+    
+    <?= $this->render('_form', [
+	    'alerte' => $alerte,
+        'model' => $model,
+        'dataCours' => $dataCours,
+        'dataMoniteurs' => $dataMoniteurs,
+        'selectedMoniteurs' => $selectedMoniteurs,
+    ]) ?>
+    
+    <?php } else { ?>
     
     <?= DetailView::widget([
         'model' => $model,
@@ -76,13 +75,15 @@ $this->params['breadcrumbs'][] = $this->title;
             'lieu',
             [
                 'attribute' => 'coursHasMoniteurs',
-                'value' => $selectedMoniteurs,
+                'value' => $listeMoniteurs,
             ],
             'fkCours.participant_min',
             'fkCours.participant_max',
             'remarque',
         ],
     ]) ?>
+    
+    <?php } ?>
 
     <?php /*if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) { */ ?>
         <?= $this->render('/personnes/_participant', [
