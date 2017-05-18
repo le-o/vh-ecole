@@ -12,6 +12,8 @@ use app\models\Personnes;
  */
 class PersonnesSearch extends Personnes
 {
+    public $fkStatut;
+    
     /**
      * @inheritdoc
      */
@@ -95,6 +97,11 @@ class PersonnesSearch extends Personnes
             'pagination' => $withPagination,
             'sort'=> ['defaultOrder' => ['nom'=>SORT_ASC]]
         ]);
+        
+        $dataProvider->sort->attributes['fkStatut'] = [
+            'asc' => ['parametres.nom' => SORT_ASC, 'cours.session' => SORT_ASC],
+            'desc' => ['parametres.nom' => SORT_DESC, 'cours.session' => SORT_DESC],
+        ];
 
         $this->load($params);
 

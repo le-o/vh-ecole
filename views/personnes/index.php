@@ -60,6 +60,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                         $.each( response, function( key, val ) {
                             $('#parametres-nom').attr('value', val.sujet);
                             $('.redactor-editor').html(val.contenu);
+                            $('#parametres-valeur').val(val.contenu);
                         });
                     }
                 });return false;",

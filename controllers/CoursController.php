@@ -10,7 +10,6 @@ use app\models\CoursSearch;
 use app\models\CoursDate;
 use app\models\Personnes;
 use app\models\Parametres;
-use app\models\ClientsHasCours;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -38,6 +37,11 @@ class CoursController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['getcoursjson'],
+//                        'ips' => ['127.0.0.1'],
+                    ],
                     [
                         'allow' => true,
                         'actions' => ['view'],
@@ -123,7 +127,7 @@ class CoursController extends Controller
                         $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
                         $modelClientsHasCoursDate->fk_personne = $new['new_participant'];
                         $modelClientsHasCoursDate->is_present = true;
-                        $modelClientsHasCoursDate->fk_statut = (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) ? Yii::$app->params['persStatutInscrit'] : $participant->fk_statut;
+                        $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
                         $modelClientsHasCoursDate->save(false);
                     }
                     $alerte['class'] = 'success';
@@ -285,7 +289,7 @@ class CoursController extends Controller
     }
 
     /**
-     * Deletes an existing ClientsHasCours model.
+     * Deletes an existing ClientsHasCoursDate model.
      * If deletion is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -326,7 +330,7 @@ class CoursController extends Controller
                 }
                 // on modifie le statut de toutes les dates du client
                 foreach($coursDateAll as $c) {
-                    ClientsHasCoursDate::updateAll(['fk_statut' => Yii::$app->params['persStatutDesinscritFutur']], ['fk_personne' => $personne_id, 'fk_cours_date' => $c->cours_date_id]);
+                    ClientsHasCoursDate::updateAll(['fk_statut' => Yii::$app->params['partStatutDesinscritFutur']], ['fk_personne' => $personne_id, 'fk_cours_date' => $c->cours_date_id]);
                 }
                 foreach ($coursDate as $date) {
                     ClientsHasCoursDate::deleteAll(['fk_personne' => $personne_id, 'fk_cours_date' => $date->cours_date_id]);
@@ -354,10 +358,10 @@ class CoursController extends Controller
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            ClientsHasCours::deleteAll(['fk_cours' => $id]);
             $dates = CoursDate::findAll(['fk_cours' => $id]);
             foreach ($dates as $date) {
                 CoursHasMoniteurs::deleteAll(['fk_cours_date' => $date->cours_date_id]);
+                ClientsHasCoursDate::deleteAll(['fk_cours_date' => $date->cours_date_id]);
             }
             CoursDate::deleteAll(['fk_cours' => $id]);
 
@@ -466,5 +470,41 @@ class CoursController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+    
+    public function actionGetcoursjson() {
+        $searchModel = new CoursSearch();
+        $searchModel->is_actif = 1;
+        $searchModel->is_publie = 1;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        if ($dataProvider->count == 0) {
+            $data = ["Aucune donnée trouvée"];
+        } else {
+            foreach ($dataProvider->getModels() as $c) {
+                $data[] = [
+                    'id' => $c->cours_id,
+                    'nom' => $c->fkNom->nom,
+                    'niveau' => $c->fkNiveau->nom,
+                    'session' => $c->session,
+                    'type' => $c->fkType->nom,
+                    'annee' => $c->annee,
+                    'duree' => $c->duree,
+                    'prix' => $c->prix,
+                    'participant_max' => $c->participant_max,
+                    'nombre_inscrit' => $c->NombreClientsInscrits,
+                    'tranche_age' => $c->fkAge->nom,
+                    'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
+                    'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
+                    'offre_speciale' => $c->offre_speciale,
+                    'premier_jour_session' => $c->FirstCoursDate->date,
+                ];
+            }
+        }
+        
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        header('Content-Type: application/json; charset=utf-8');
+        return $data;
+        exit;
     }
 }

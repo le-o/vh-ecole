@@ -94,7 +94,7 @@ class CoursDateController extends Controller
                 $modelClientsHasCoursDate->fk_cours_date = $model->cours_date_id;
                 $modelClientsHasCoursDate->fk_personne = $post['new_participant'];
                 $modelClientsHasCoursDate->is_present = true;
-                $modelClientsHasCoursDate->fk_statut = (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) ? Yii::$app->params['persStatutInscrit'] : $participant->fk_statut;
+                $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
                 $modelClientsHasCoursDate->save(false);
                 $alerte['class'] = 'success';
                 $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
@@ -235,13 +235,23 @@ class CoursDateController extends Controller
         ]);
     }
     
-    public function actionListe()
+    public function actionListe($msg = '')
     {
         $searchModel = new CoursDateSearch();
         $searchModel->depuis = date('d.m.Y');
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $alerte = [];
+        
+        if ($msg === 'suppdate') {
+            $alerte['class'] = 'success';
+            $alerte['message'] = Yii::t('app', 'La planification a bien été supprimée !');
+        } elseif ($msg !== '') {
+            $alerte['class'] = 'danger';
+            $alerte['message'] = $msg;
+        }
         
         return $this->render('liste', [
+	        'alerte' => $alerte,
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
         ]);
@@ -527,7 +537,7 @@ class CoursDateController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete($id, $from = null)
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
@@ -542,7 +552,11 @@ class CoursDateController extends Controller
             exit($e->getMessage());
         }
 
-        return $this->redirect(['/cours/view', 'id' => $fk_cours, 'msg' => 'suppdate']);
+        if ($from == '/cours-date/liste') {
+            return $this->redirect([$from, 'msg' => 'suppdate']);
+        } else {
+            return $this->redirect(['/cours/view', 'id' => $fk_cours, 'msg' => 'suppdate']);
+        }
     }
 
     /**

@@ -108,11 +108,27 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return array options nom cours for drop-down
+     * @return array options niveau formation for drop-down
      */
     public function optsNiveauFormation()
     {
         return $this->optsDropDown(8);
+    }
+
+    /**
+     * @return array options statut participant for drop-down
+     */
+    public function optsStatutPart()
+    {
+        return $this->optsDropDown(9);
+    }
+    
+    /**
+     * @return array options tranche âge for drop-down
+     */
+    public function optsTrancheAge()
+    {
+        return $this->optsDropDown(10);
     }
 
     /**
@@ -142,6 +158,8 @@ class Parametres extends \yii\db\ActiveRecord
             '6' => 'Type de cours',
             '7' => 'Nom de cours',
             '8' => 'Niveau de formation',
+            '9' => 'Statut de participation',
+            '10' => 'Tranche d\'âge',
         );
     }
 }

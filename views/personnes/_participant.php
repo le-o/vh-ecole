@@ -63,46 +63,47 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 <?php ActiveForm::end(); ?>
             <?php } ?>
 
-            <?php if (!$forPresenceOnly) { ?>
-                <?php $form = ActiveForm::begin(); ?>
-                <div class="col-sm-4">
-                    <?php Modal::begin([
-                        'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
-                        'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],
-                    ]);
+            <?php $form = ActiveForm::begin(); ?>
+            <div class="col-sm-4">
+                <?php Modal::begin([
+                    'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
+                    'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],
+                ]);
 
-                    echo '<a id="toggleEmail" href="#">'.Yii::t('app', 'Voir email(s)').'</a>';
-                    echo '<div id="item" style="display:none;">';
-                    echo implode(', ', $listeEmails);
-                    echo '</div>';
+                echo '<a id="toggleEmail" href="#">'.Yii::t('app', 'Voir email(s)').'</a>';
+                echo '<div id="item" style="display:none;">';
+                echo implode(', ', $listeEmails);
+                echo '</div>';
 
-                    echo $form->field($parametre, 'parametre_id')->dropDownList(
-                        $emails,
-                        ['onchange'=>"$.ajax({
-                            type: 'POST',
-                            cache: false,
-                            url: '".Url::toRoute('/parametres/getemail')."',
-                            data: {id: $(this).val()},
-                            dataType: 'json',
-                            success: function(response) {
-                                $.each( response, function( key, val ) {
-                                    $('#parametres-nom').attr('value', val.sujet);
-                                    $('.redactor-editor').html(val.contenu);
-                                });
-                            }
-                        });return false;",
-                        ])->label(Yii::t('app', 'Modèle'));
+                echo $form->field($parametre, 'parametre_id')->dropDownList(
+                    $emails,
+                    ['onchange'=>"$.ajax({
+                        type: 'POST',
+                        cache: false,
+                        url: '".Url::toRoute('/parametres/getemail')."',
+                        data: {id: $(this).val()},
+                        dataType: 'json',
+                        success: function(response) {
+                            $.each( response, function( key, val ) {
+                                $('#parametres-nom').attr('value', val.sujet);
+                                $('.redactor-editor').html(val.contenu);
+                                $('#parametres-valeur').val(val.contenu);
+                            });
+                        }
+                    });return false;",
+                    ])->label(Yii::t('app', 'Modèle'));
 
-                    echo $form->field($parametre, 'nom')->textInput()->label(Yii::t('app', 'Sujet'));
-                    echo $form->field($parametre, 'valeur')->widget(\yii\redactor\widgets\Redactor::className())->label(Yii::t('app', 'Texte'));
+                echo $form->field($parametre, 'nom')->textInput()->label(Yii::t('app', 'Sujet'));
+                echo $form->field($parametre, 'valeur')->widget(\yii\redactor\widgets\Redactor::className())->label(Yii::t('app', 'Texte'));
 
-                    echo Html::submitButton(Yii::t('app', 'Envoyer'), ['class' => 'btn btn-primary']);
-                    Modal::end(); ?>
-
+                echo Html::submitButton(Yii::t('app', 'Envoyer'), ['class' => 'btn btn-primary']);
+                Modal::end(); ?>
+                    
+                <?php if (!$forPresenceOnly) { ?>
                     <?= Html::a(Yii::t('app', 'Imprimer'), ['/cours/presence', 'id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => 'btn btn-default']) ?>
-                </div>
-                <?php ActiveForm::end(); ?>
-            <?php } ?>
+                <?php } ?>
+            </div>
+            <?php ActiveForm::end(); ?>
         </div>
     <?php } ?>
     
@@ -150,9 +151,10 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             ],
             
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{partView} {partDeleteFutur} {partDelete}',
+                'template'=>'{partView} {partUpdate} {partDeleteFutur} {partDelete}',
                 'visibleButtons'=>[
                     'partView' => (Yii::$app->user->identity->id < 1100) ? true : false,
+                    'partUpdate' => (Yii::$app->user->identity->id < 1100 && $viewAndId[0] != 'cours-date') ? true : false,
                     'partDeleteFutur' => (Yii::$app->user->identity->id < 1000) ? (isset($model->fk_type) ? $model->fk_type == Yii::$app->params['coursPlanifie'] : $model->fkCours->fk_type  == Yii::$app->params['coursPlanifie']) : false,
                     'partDelete' => (Yii::$app->user->identity->id < 1000) ? true : false,
                 ],
@@ -161,6 +163,13 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                         if ($key->personne_id != '') {
                             return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/personnes/view', 'id' => $key->personne_id]), [
                                 'title' => Yii::t('app', 'Voir'),
+                            ]);
+                        }
+                    },
+                    'partUpdate' => function ($model, $key, $index) use ($viewAndId) {
+                        if ($key->personne_id != '') {
+                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours-date/update', 'fk_personne' => $key->personne_id, 'fk_cours' => $viewAndId[1]]), [
+                                'title' => Yii::t('app', 'Modifier statut'),
                             ]);
                         }
                     },
@@ -176,7 +185,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                         if ($key->personne_id != '') {
                             return Html::a('<span class="glyphicon glyphicon-trash"></span>', Url::to(['/cours/participant-delete', 'personne_id' => $key->personne_id, 'cours_ou_date_id' => $viewAndId[1], 'from' => $viewAndId[0]]), [
                                 'title' => Yii::t('yii', 'Delete'),
-                                'data-confirm' => Yii::t('app', 'Vous allez supprimer le participant de toutes les planifications. OK?'),
+                                'data-confirm' => Yii::t('app', 'Vous allez supprimer le participant uniquement sur cette date. OK?'),
                             ]);
                         }
                     }

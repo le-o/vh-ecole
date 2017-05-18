@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
+use yii\bootstrap\Alert;
 use kartik\export\ExportMenu;
 
 /* @var $this yii\web\View */
@@ -56,8 +57,9 @@ $gridColumns = [
     'remarque',
 
     ['class' => 'yii\grid\ActionColumn',
-        'template'=>'{coursPresence} {coursDateView} {coursDateUpdate}',
+        'template'=>'{coursPresence} {coursDateView} {coursDateUpdate} {coursDateDelete}',
         'visibleButtons'=>[
+            'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
             'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
         ],
         'buttons'=>[
@@ -78,10 +80,29 @@ $gridColumns = [
                     'title' => Yii::t('yii', 'Update'),
                 ]);
             },
+            'coursDateDelete' => function ($url, $model, $key) {
+                return Html::a('<span class="glyphicon glyphicon-trash"></span>', Url::to(['/cours-date/delete', 'id' => $key, 'from' => '/cours-date/liste']), [
+                    'title' => Yii::t('yii', 'Delete'),
+                    'data' => [
+                        'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                        'method' => 'post',
+                    ],
+                ]);
+            },
         ],
     ],
 ];
 ?>
+
+<?php if (!empty($alerte)) {
+    echo Alert::widget([
+        'options' => [
+            'class' => 'alert-'.$alerte['class'],
+        ],
+        'body' => $alerte['message'],
+    ]); 
+} ?>
+
 <div class="cours-date-index">
 
     <h1><?= Html::encode($this->title) ?></h1>

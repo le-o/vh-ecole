@@ -22,23 +22,38 @@ use yii\bootstrap\Alert;
 
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-3">
             <?= $form->field($model, 'fk_niveau')->dropDownList($modelParams->optsNiveau(),['prompt'=>Yii::t('app', 'Choisir un niveau')]) ?>
         </div>
-        <div class="col-sm-1">
+        <div class="col-sm-2">
             <label></label>
             <?= $form->field($model, 'is_actif')->checkbox() ?>
+        </div>
+        <div class="col-sm-2">
+            <label></label>
+            <?= $form->field($model, 'is_publie')->checkbox() ?>
+        </div>
+        <div class="col-sm-2">
+            <label></label>
+            <?= $form->field($model, 'is_materiel_compris')->checkbox() ?>
+        </div>
+        <div class="col-sm-2">
+            <label></label>
+            <?= $form->field($model, 'is_entree_compris')->checkbox() ?>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-sm-8">
+        <div class="col-sm-3">
             <?= $form->field($model, 'fk_nom')->dropDownList($modelParams->optsNomCours(),['prompt'=>Yii::t('app', 'Choisir un nom')]) ?>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-3">
+            <?= $form->field($model, 'fk_age')->dropDownList($modelParams->optsTrancheAge(),['prompt'=>Yii::t('app', 'Choisir une tranche d\'âge')]) ?>
+        </div>
+        <div class="col-sm-3">
             <?= $form->field($model, 'session')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-3">
             <?= $form->field($model, 'annee')->textInput(['type' => 'number', 'min' => 2016, 'maxlength' => true]) ?>
         </div>
     </div>
@@ -59,8 +74,11 @@ use yii\bootstrap\Alert;
     </div>
     
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-6">
             <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+        </div>
+        <div class="col-sm-6">
+            <?= $form->field($model, 'offre_speciale')->textarea(['rows' => 6]) ?>
         </div>
     </div>
 

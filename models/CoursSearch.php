@@ -71,6 +71,7 @@ class CoursSearch extends Cours
             'participant_min' => $this->participant_min,
             'participant_max' => $this->participant_max,
             'is_actif' => $this->is_actif,
+            'is_publie' => $this->is_publie,
         ])
         ->andFilterWhere(['like', 'session', $this->session]);
 

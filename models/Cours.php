@@ -11,6 +11,7 @@ use Yii;
  * @property integer $fk_niveau
  * @property integer $fk_type
  * @property integer $fk_nom
+ * @property integer $fk_age
  * @property string $description
  * @property float $duree
  * @property string $session
@@ -18,7 +19,11 @@ use Yii;
  * @property float $prix
  * @property integer $participant_min
  * @property integer $participant_max
+ * @property string $offre_speciale
+ * @property integer $is_materiel_compris
+ * @property integer $is_entree_compris
  * @property integer $is_actif
+ * @property integer $is_publie
  *
  * @property Parametres $fkNiveau
  * @property CoursDate[] $coursDates
@@ -39,10 +44,10 @@ class Cours extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_niveau', 'fk_type', 'fk_nom', 'description', 'duree', 'is_actif'], 'required'],
-            [['fk_niveau', 'fk_type', 'fk_nom', 'participant_min', 'participant_max', 'is_actif'], 'integer'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie'], 'required'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie'], 'integer'],
             [['duree', 'prix'], 'double'],
-            [['description', 'session'], 'string'],
+            [['description', 'session', 'offre_speciale'], 'string'],
             [['annee'], 'safe']
         ];
     }
@@ -57,6 +62,7 @@ class Cours extends \yii\db\ActiveRecord
             'fk_niveau' => Yii::t('app', 'Fk Niveau'),
             'fk_type' => Yii::t('app', 'Fk Type'),
             'fk_nom' => Yii::t('app', 'Fk Nom'),
+            'fk_age' => Yii::t('app', 'Fk Age'),
             'description' => Yii::t('app', 'Description'),
             'duree' => Yii::t('app', 'Durée'),
             'session' => Yii::t('app', 'Session'),
@@ -64,7 +70,11 @@ class Cours extends \yii\db\ActiveRecord
             'prix' => Yii::t('app', 'Prix'),
             'participant_min' => Yii::t('app', 'Participant Min'),
             'participant_max' => Yii::t('app', 'Participant Max'),
+            'offre_speciale' => Yii::t('app', 'Offre Spéciale'),
+            'is_materiel_compris' => Yii::t('app', 'Is Materiel Compris'),
+            'is_entree_compris' => Yii::t('app', 'Is Entree Compris'),
             'is_actif' => Yii::t('app', 'Is Actif'),
+            'is_publie' => Yii::t('app', 'Is Publié'),
         ];
     }
 
@@ -92,6 +102,22 @@ class Cours extends \yii\db\ActiveRecord
         return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_nom']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkAge()
+    {
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_nom']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFirstCoursDate()
+    {
+        return $this->hasMany(CoursDate::className(), ['fk_cours' => 'cours_id'])->one();
+    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */

@@ -149,7 +149,8 @@ class SiteController extends Controller
         if (isset($emails)) {
             $message = Yii::$app->mailer->compose()
                 ->setFrom(Yii::$app->params['adminEmail'])
-                ->setTo($emails)
+                ->setTo(Yii::$app->params['adminEmail'])
+                ->setBcc($emails)
                 ->setSubject($mail['nom'])
                 ->setHtmlBody($mail['valeur']);
 

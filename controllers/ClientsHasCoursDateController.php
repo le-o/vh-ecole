@@ -5,6 +5,9 @@ namespace app\controllers;
 use Yii;
 use app\models\ClientsHasCoursDate;
 use app\models\ClientsHasCoursDateSearch;
+use app\models\CoursDate;
+use app\models\Personnes;
+use app\models\Parametres;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -92,15 +95,25 @@ class ClientsHasCoursDateController extends Controller
      * @param integer $fk_cours_date
      * @return mixed
      */
-    public function actionUpdate($fk_personne, $fk_cours_date)
+    public function actionUpdate($fk_personne, $fk_cours)
     {
-        $model = $this->findModel($fk_personne, $fk_cours_date);
+        $unCours = CoursDate::findOne(['fk_cours' => $fk_cours]);
+        $allCoursDate = CoursDate::findAll(['fk_cours' => $fk_cours]);
+        $arrayCoursDate = [];
+        foreach ($allCoursDate as $coursDate) {
+            $arrayCoursDate[] = $coursDate->cours_date_id;
+        }
+        $model = ClientsHasCoursDate::find()->where(['fk_personne' => $fk_personne])->andWhere(['IN', 'fk_cours_date', $arrayCoursDate])->one();
+        $modelPersonne = Personnes::findOne(['personne_id' => $fk_personne]);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'fk_personne' => $model->fk_personne, 'fk_cours_date' => $model->fk_cours_date]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->save();
+            return $this->redirect(['/cours/view', 'id' => $fk_cours]);
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'modelPersonne' => $modelPersonne,
+                'modelParams' => new Parametres,
             ]);
         }
     }

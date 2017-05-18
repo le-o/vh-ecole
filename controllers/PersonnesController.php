@@ -266,43 +266,58 @@ class PersonnesController extends Controller
         
         if (!empty(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
-            $newCours = explode('|', $post['new_cours']);
-            if ($newCours[1] == Yii::$app->params['coursPlanifie']) {
-                $modelDate = CoursDate::find()
-                    ->where(['=', 'fk_cours', $newCours[0]])
-                    ->andWhere(['>=', 'date', date('Y-m-d')])
-                    ->all();
-                if (empty($modelDate)) {
-                    $alerte['class'] = 'warning';
-                    $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
-                } else {
-                    foreach ($modelDate as $date) {
-                        $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                        $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
-                        $modelClientsHasCoursDate->fk_personne = $id;
-                        $modelClientsHasCoursDate->is_present = true;
-                        $modelClientsHasCoursDate->save(false);
+            
+            if (!empty($new['new_cours'])) {
+                // soit on ajoute un cours
+                $newCours = explode('|', $post['new_cours']);
+                if ($newCours[1] == Yii::$app->params['coursPlanifie']) {
+                    $modelDate = CoursDate::find()
+                        ->where(['=', 'fk_cours', $newCours[0]])
+                        ->andWhere(['>=', 'date', date('Y-m-d')])
+                        ->all();
+                    if (empty($modelDate)) {
+                        $alerte['class'] = 'warning';
+                        $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
+                    } else {
+                        foreach ($modelDate as $date) {
+                            $modelClientsHasCoursDate = new ClientsHasCoursDate();
+                            $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
+                            $modelClientsHasCoursDate->fk_personne = $id;
+                            $modelClientsHasCoursDate->is_present = true;
+                            $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
+                            $modelClientsHasCoursDate->save(false);
+                        }
+                        $alerte['class'] = 'success';
+                        $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
                     }
-                    $alerte['class'] = 'success';
-                    $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+                } elseif ($newCours[1] == Yii::$app->params['coursPonctuel']) {
+                    $modelClientsHasCoursDate = new ClientsHasCoursDate();
+                    $modelClientsHasCoursDate->fk_personne = $id;
+                    $modelClientsHasCoursDate->fk_cours_date = $newCours[0];
+                    $modelClientsHasCoursDate->is_present = true;
+                    $modelClientsHasCoursDate->fk_statut = $model->fk_statut;
+                    if (!$modelClientsHasCoursDate->save()) {
+                        $alerte['class'] = 'danger';
+                        $alerte['message'] = Yii::t('app', 'Inscription impossible - erreur inattendue, veuillez contactez le support.');
+                    } else {
+                        $alerte['class'] = 'success';
+                        $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+                    }
                 }
-            } elseif ($newCours[1] == Yii::$app->params['coursPonctuel']) {
-                $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                $modelClientsHasCoursDate->fk_personne = $id;
-                $modelClientsHasCoursDate->fk_cours_date = $newCours[0];
-                $modelClientsHasCoursDate->is_present = true;
-                if (!$modelClientsHasCoursDate->save()) {
-                    $alerte['class'] = 'danger';
-                    $alerte['message'] = Yii::t('app', 'Inscription impossible - erreur inattendue, veuillez contactez le support.');
-                } else {
-                    $alerte['class'] = 'success';
-                    $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+                if (in_array($model->fk_statut, Yii::$app->params['groupePersStatutNonActif']) && $alerte['class'] == 'success') {
+                    $model->fk_statut = Yii::$app->params['persStatutInscrit'];
+                    $model->save();
+                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
                 }
-            }
-            if (in_array($model->fk_statut, Yii::$app->params['groupePersStatutNonActif']) && $alerte['class'] == 'success') {
-                $model->fk_statut = Yii::$app->params['persStatutInscrit'];
-                $model->save();
-                $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
+            } elseif (!empty($post['Parametres'])) {
+                // soit on envoi un email
+                SiteController::actionEmail($post['Parametres'], [$model->email => $model->email]);
+                $alerte['class'] = 'info';
+                $alerte['message'] = Yii::t('app', 'Email envoyé');
+            } else {
+                // dans ce cas on ajoute un participant sans en avoir sélectionné
+                $alerte['class'] = 'warning';
+                $alerte['message'] = Yii::t('app', 'L\'action à réaliser n\'a pas pu être définie.');
             }
         }
         
@@ -361,12 +376,17 @@ class PersonnesController extends Controller
             }
         }
         
+        $parametre = new Parametres();
+        $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
+        
         return $this->render('view', [
             'alerte' => $alerte,
             'model' => $this->findModel($id),
             'coursDateDataProvider' => $coursDateDataProvider,
             'dataCours' => $dataCours,
             'coursDataProvider' => $coursDataProvider,
+            'parametre' => $parametre,
+            'emails' => $emails,
         ]);
     }
 

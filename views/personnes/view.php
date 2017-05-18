@@ -89,7 +89,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <br /><h3><?= Yii::t('app', 'Mes cours comme participants') ?></h3>
     <?= $this->render('/cours/_inscription', [
         'dataCours' => $dataCours,
+        'personneModel' => $model,
         'coursDataProvider' => $coursDataProvider,
+        'parametre' => $parametre,
+        'emails' => $emails,
     ]) ?>
 
 </div>
