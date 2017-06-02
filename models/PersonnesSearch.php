@@ -21,7 +21,7 @@ class PersonnesSearch extends Personnes
     {
         return [
             [['personne_id', 'fk_statut', 'fk_type', 'fk_formation'], 'integer'],
-            [['noclient_cf', 'societe', 'nom', 'prenom', 'adresse1', 'adresse2', 'npa', 'localite', 'telephone', 'telephone2',
+            [['noclient_cf', 'suivi_client', 'societe', 'nom', 'prenom', 'adresse1', 'adresse2', 'npa', 'localite', 'telephone', 'telephone2',
                 'email', 'email2', 'date_naissance', 'informations', 'carteclient_cf', 'categorie3_cf', 'soldefacture_cf'], 'safe'],
         ];
     }
@@ -69,6 +69,7 @@ class PersonnesSearch extends Personnes
         ]);
 
         $query->andFilterWhere(['like', 'noclient_cf', $this->noclient_cf])
+            ->andFilterWhere(['like', 'suivi_client', $this->suivi_client])
             ->andFilterWhere(['like', 'societe', $this->societe])
             ->andFilterWhere(['like', 'nom', $this->nom])
             ->andFilterWhere(['like', 'prenom', $this->prenom])

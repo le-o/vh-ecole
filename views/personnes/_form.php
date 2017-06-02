@@ -95,8 +95,11 @@ use yii\bootstrap\Alert;
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-6">
             <?= $form->field($model, 'informations')->textarea(['rows' => 6]) ?>
+        </div>
+        <div class="col-sm-6">
+            <?= $form->field($model, 'suivi_client')->textarea(['rows' => 6]) ?>
         </div>
     </div>
     <div class="row">

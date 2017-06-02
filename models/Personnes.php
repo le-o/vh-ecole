@@ -14,6 +14,7 @@ use \DateTime;
  * @property integer $fk_formation
  * @property string $noclient_cf
  * @property string $societe
+ * @property string $suivi_client
  * @property string $nom
  * @property string $prenom
  * @property string $adresse1
@@ -62,6 +63,7 @@ class Personnes extends \yii\db\ActiveRecord
             [['informations'], 'string'],
             [['noclient_cf'], 'string', 'max' => 10],
             [['societe', 'nom', 'prenom'], 'string', 'max' => 60],
+            [['suivi_client'], 'string', 'max' => 250],
             [['adresse1', 'adresse2', 'localite', 'email', 'email2'], 'string', 'max' => 100],
             [['npa'], 'string', 'max' => 5],
             [['telephone', 'telephone2'], 'string', 'max' => 20],
@@ -81,6 +83,7 @@ class Personnes extends \yii\db\ActiveRecord
             'fk_formation' => Yii::t('app', 'Niveau formation'),
             'noclient_cf' => Yii::t('app', 'Num client CASHFLOW'),
             'societe' => Yii::t('app', 'Societe'),
+            'suivi_client' => Yii::t('app', 'Suivi client'),
             'nom' => Yii::t('app', 'Nom'),
             'prenom' => Yii::t('app', 'Prenom'),
             'adresse1' => Yii::t('app', 'Adresse 1'),

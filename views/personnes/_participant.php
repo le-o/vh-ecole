@@ -118,6 +118,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'label' => 'Statut',
                 'visible' => (!isset($model->fk_type) || (isset($model->fk_type) && $model->fk_type == Yii::$app->params['coursPlanifie'])) ? true : false,
             ],
+            'suivi_client',
             'societe',
             'nom',
             'prenom',

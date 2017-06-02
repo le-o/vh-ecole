@@ -8,7 +8,7 @@ use yii\bootstrap\Alert;
 /* @var $model app\models\Personnes */
 
 $this->title = $model->nom.' '.$model->prenom;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Personnes'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Client'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -73,6 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->getInterlocuteurs(),
             ],
             'informations:ntext',
+            'suivi_client:ntext',
             'carteclient_cf',
             'categorie3_cf',
             'soldefacture_cf'

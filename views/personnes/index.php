@@ -12,7 +12,7 @@ use yii\web\View;
 /* @var $searchModel app\models\PersonnesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Personnes');
+$this->title = Yii::t('app', 'Clients');
 $this->params['breadcrumbs'][] = $this->title;
 
 $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); });', View::POS_END);
@@ -35,7 +35,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
     <div class="row">
         <div class="col-sm-6">
-            <?= Html::a(Yii::t('app', 'Create Personnes'), ['create'], ['class' => 'btn btn-success']) ?>
+            <?= Html::a(Yii::t('app', 'Create Client'), ['create'], ['class' => 'btn btn-success']) ?>
 
             <?php $form = ActiveForm::begin(['options' => ['style' => 'display:inline;']]); ?>
             <?php Modal::begin([
@@ -95,6 +95,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'value' => 'fkType.nom',
                 'filter' => $typeFilter,
             ],
+            'suivi_client',
             'societe',
             'nom',
             'prenom',

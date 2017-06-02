@@ -599,7 +599,7 @@ class CoursDateController extends Controller
             $Event->url = Url::to(['/cours-date/view', 'id' => $time->cours_date_id]);
             
             if ($time->fkCours->fk_type == Yii::$app->params['coursPonctuel'] && $time->fkCours->fk_nom != Yii::$app->params['nomCoursDecouverte']) {
-                $Event->title = (isset($time->clientsHasCoursDate[0]) ? $time->clientsHasCoursDate[0]->fkPersonne->societe.' '.$time->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
+                $Event->title = (isset($time->clientsHasCoursDate[0]) ? $time->clientsHasCoursDate[0]->fkPersonne->suivi_client.' '.$time->clientsHasCoursDate[0]->fkPersonne->societe.' '.$time->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
             } else {
                 $Event->title = $time->fkCours->fkNom->nom.' '.$time->fkCours->session.'.'.$time->fkCours->annee;
             }
