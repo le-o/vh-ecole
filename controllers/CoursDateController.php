@@ -114,7 +114,17 @@ class CoursDateController extends Controller
                     if (!$model->save()) {
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                     }
-
+                    
+                    foreach ($model->coursHasMoniteurs as $oldMoniteur) {
+                        if (!in_array($oldMoniteur->fk_moniteur, $moniteurs)) {
+                            // moniteur supprimé - email pour annoncer
+                            $email = [$oldMoniteur->fkMoniteur->email];
+                            $contenu = ['nom' => 'Suppression cours - moniteur', 
+                                'valeur' => 'Ton inscription en tant que moniteur au cours '.$model->fkCours->fkNom->nom.' du '.date('d.m.Y', strtotime($model->date)).' '.substr($model->heure_debut, 0, 5).' a été supprimée.'
+                            ];
+                            SiteController::actionEmail($contenu, $email);
+                        }
+                    }
                     CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
                     foreach ($moniteurs as $moniteur_id) {
                         $addMoniteur = new CoursHasMoniteurs();
@@ -124,7 +134,22 @@ class CoursDateController extends Controller
                         if (!($flag = $addMoniteur->save(false))) {
                             throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                         }
+                        $emails[] = $addMoniteur->fkMoniteur->email;
+                        $nomMoniteurs[] = $addMoniteur->fkMoniteur->prenom.' '.$addMoniteur->fkMoniteur->nom;
                     }
+                    
+                    // on envoi l'email à tous les moniteurs
+                    $contenu = ['nom' => $model->fkCours->fkNom->nom.' - modifications', 
+                        'valeur' => 'Des modifications ont été apportée au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
+                            Cours : '.$model->fkCours->fkNom->nom.' <br />
+                            Session : '.$model->fkCours->session.'<br />
+                            Année : '.$model->fkCours->annee.'<br />
+                            Date : '.date('d.m.Y', strtotime($model->date)).'<br />
+                            Heure : '.substr($model->heure_debut, 0, 5).'<br />
+                            Infos : '.$model->remarque.'<br />
+                            Moniteur(s) : '.  implode(', ', $nomMoniteurs)
+                    ];
+                    SiteController::actionEmail($contenu, $emails);
                     
                     $myCours = Cours::findOne($model->fk_cours);
                     // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
@@ -279,16 +304,31 @@ class CoursDateController extends Controller
 		        if (!$model->save()) {
 			        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
 			    }
-		        
-		        foreach ($moniteurs as $moniteur_id) {
-			        $addMoniteur = new CoursHasMoniteurs();
-			        $addMoniteur->fk_cours_date = $model->cours_date_id;
-			        $addMoniteur->fk_moniteur = $moniteur_id;
-			        $addMoniteur->is_responsable = 0;
-			        if (! ($flag = $addMoniteur->save(false))) {
-				        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
+                
+                foreach ($moniteurs as $moniteur_id) {
+                    $addMoniteur = new CoursHasMoniteurs();
+                    $addMoniteur->fk_cours_date = $model->cours_date_id;
+                    $addMoniteur->fk_moniteur = $moniteur_id;
+                    $addMoniteur->is_responsable = 0;
+                    if (!($flag = $addMoniteur->save(false))) {
+                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                     }
-		        }
+                    $emails[] = $addMoniteur->fkMoniteur->email;
+                    $nomMoniteurs[] = $addMoniteur->fkMoniteur->prenom.' '.$addMoniteur->fkMoniteur->nom;
+                }
+
+                // on envoi l'email à tous les moniteurs
+                $contenu = ['nom' => $model->fkCours->fkNom->nom.' - nouveauté', 
+                    'valeur' => 'Un nouveau cours a été planifié auquel tu es prévu comme moniteur. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
+                        Cours : '.$model->fkCours->fkNom->nom.' <br />
+                        Session : '.$model->fkCours->session.'<br />
+                        Année : '.$model->fkCours->annee.'<br />
+                        Date : '.date('d.m.Y', strtotime($model->date)).'<br />
+                        Heure : '.substr($model->heure_debut, 0, 5).'<br />
+                        Infos : '.$model->remarque.'<br />
+                        Moniteur(s) : '.  implode(', ', $nomMoniteurs)
+                ];
+                SiteController::actionEmail($contenu, $emails);
                 
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
                 // seulement pour les cours planifié
@@ -438,7 +478,7 @@ class CoursDateController extends Controller
     {
         $model = $this->findModel($id);
         $alerte = [];
-
+        
         if ($post = Yii::$app->request->post()) {
             if (!empty($post['new_participant'])) {
                 $modelClientsHasCoursDate = new ClientsHasCoursDate();
@@ -457,7 +497,17 @@ class CoursDateController extends Controller
                     if (!$model->save()) {
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                     }
-
+                    
+                    foreach ($model->coursHasMoniteurs as $oldMoniteur) {
+                        if (!in_array($oldMoniteur->fk_moniteur, $moniteurs)) {
+                            // moniteur supprimé - email pour annoncer
+                            $email = [$oldMoniteur->fkMoniteur->email];
+                            $contenu = ['nom' => 'Suppression cours - moniteur', 
+                                'valeur' => 'Ton inscription en tant que moniteur au cours '.$model->fkCours->fkNom->nom.' du '.date('d.m.Y', strtotime($model->date)).' '.substr($model->heure_debut, 0, 5).' a été supprimée.'
+                            ];
+                            SiteController::actionEmail($contenu, $email);
+                        }
+                    }
                     CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
                     foreach ($moniteurs as $moniteur_id) {
                         $addMoniteur = new CoursHasMoniteurs();
@@ -467,7 +517,22 @@ class CoursDateController extends Controller
                         if (!($flag = $addMoniteur->save(false))) {
                             throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                         }
+                        $emails[] = $addMoniteur->fkMoniteur->email;
+                        $nomMoniteurs[] = $addMoniteur->fkMoniteur->prenom.' '.$addMoniteur->fkMoniteur->nom;
                     }
+                    
+                    // on envoi l'email à tous les moniteurs
+                    $contenu = ['nom' => $model->fkCours->fkNom->nom.' - modifications', 
+                        'valeur' => 'Des modifications ont été apportée au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
+                            Cours : '.$model->fkCours->fkNom->nom.' <br />
+                            Session : '.$model->fkCours->session.'<br />
+                            Année : '.$model->fkCours->annee.'<br />
+                            Date : '.date('d.m.Y', strtotime($model->date)).'<br />
+                            Heure : '.substr($model->heure_debut, 0, 5).'<br />
+                            Infos : '.$model->remarque.'<br />
+                            Moniteur(s) : '.  implode(', ', $nomMoniteurs)
+                    ];
+                    SiteController::actionEmail($contenu, $emails);
                     
                     $myCours = Cours::findOne($model->fk_cours);
                     // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur

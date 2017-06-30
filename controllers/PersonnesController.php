@@ -267,7 +267,7 @@ class PersonnesController extends Controller
         if (!empty(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
             
-            if (!empty($new['new_cours'])) {
+            if (!empty($post['new_cours'])) {
                 // soit on ajoute un cours
                 $newCours = explode('|', $post['new_cours']);
                 if ($newCours[1] == Yii::$app->params['coursPlanifie']) {
@@ -295,7 +295,7 @@ class PersonnesController extends Controller
                     $modelClientsHasCoursDate->fk_personne = $id;
                     $modelClientsHasCoursDate->fk_cours_date = $newCours[0];
                     $modelClientsHasCoursDate->is_present = true;
-                    $modelClientsHasCoursDate->fk_statut = $model->fk_statut;
+                    $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
                     if (!$modelClientsHasCoursDate->save()) {
                         $alerte['class'] = 'danger';
                         $alerte['message'] = Yii::t('app', 'Inscription impossible - erreur inattendue, veuillez contactez le support.');

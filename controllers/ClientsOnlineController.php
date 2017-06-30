@@ -135,7 +135,7 @@ class ClientsOnlineController extends Controller
                     $transaction->commit();
 
                     $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInscriptionOnline']);
-                    SiteController::actionEmail($contenu, [$model->email]);
+                    SiteController::actionEmail($contenu, [$model->email], true);
 
                     return $this->render('confirmation');
                 } catch (\Exception $e) {

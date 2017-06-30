@@ -135,7 +135,7 @@ class SiteController extends Controller
      * @param $mail
      * @param $adresses
      */
-    public static function actionEmail($mail, $adresses)
+    public static function actionEmail($mail, $adresses, $public = false)
     {
         if (YII_ENV === 'dev') {
             $emails[] = Yii::$app->params['testEmail'];
@@ -147,12 +147,20 @@ class SiteController extends Controller
         }
         
         if (isset($emails)) {
-            $message = Yii::$app->mailer->compose()
-                ->setFrom(Yii::$app->params['adminEmail'])
-                ->setTo(Yii::$app->params['adminEmail'])
-                ->setBcc($emails)
-                ->setSubject($mail['nom'])
-                ->setHtmlBody($mail['valeur']);
+            if ($public) {
+                $message = Yii::$app->mailer->compose()
+                    ->setFrom(Yii::$app->params['adminEmail'])
+                    ->setTo($emails)
+                    ->setSubject($mail['nom'])
+                    ->setHtmlBody($mail['valeur']);
+            } else {
+                $message = Yii::$app->mailer->compose()
+                    ->setFrom(Yii::$app->params['adminEmail'])
+                    ->setTo(Yii::$app->params['adminEmail'])
+                    ->setBcc($emails)
+                    ->setSubject($mail['nom'])
+                    ->setHtmlBody($mail['valeur']);
+            }
 
             //  (this creates the full MIME message required for imap_append()
             $msg = $message->toString();
