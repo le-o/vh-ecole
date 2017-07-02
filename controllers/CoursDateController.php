@@ -140,7 +140,7 @@ class CoursDateController extends Controller
                     
                     // on envoi l'email à tous les moniteurs
                     $contenu = ['nom' => $model->fkCours->fkNom->nom.' - modifications', 
-                        'valeur' => 'Des modifications ont été apportée au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
+                        'valeur' => 'Des modifications ont été apportées au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
                             Cours : '.$model->fkCours->fkNom->nom.' <br />
                             Session : '.$model->fkCours->session.'<br />
                             Année : '.$model->fkCours->annee.'<br />
@@ -523,7 +523,7 @@ class CoursDateController extends Controller
                     
                     // on envoi l'email à tous les moniteurs
                     $contenu = ['nom' => $model->fkCours->fkNom->nom.' - modifications', 
-                        'valeur' => 'Des modifications ont été apportée au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
+                        'valeur' => 'Des modifications ont été apportées au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
                             Cours : '.$model->fkCours->fkNom->nom.' <br />
                             Session : '.$model->fkCours->session.'<br />
                             Année : '.$model->fkCours->annee.'<br />
