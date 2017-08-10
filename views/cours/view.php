@@ -150,9 +150,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
         'caption' => '<div class="row"><div class="col-sm-2">'.Yii::t('app', 'Planification prévue').'</div>'.
-                        '<div class="col-sm-5">'.Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary'.$displayActions]).'
+                        '<div class="col-sm-6">'.Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary'.$displayActions]).'
                         '.Html::a(Yii::t('app', 'Create Cours Date Multiple'), ['cours-date/recursive', 'cours_id' => $model->cours_id], ['class' => 'btn btn-info'.$displayActions.$createR]).'
-                        '.Html::a(Yii::t('app', 'Gestion moniteurs'), ['cours/gestionmoniteurs', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default'.$displayActions]).'</div>',
+                        '.Html::a(Yii::t('app', 'Gestion moniteurs'), ['cours/gestionmoniteurs', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default'.$displayActions]).'
+                        '.Html::a(Yii::t('app', 'Gestion présences'), ['cours/gestionpresences', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default'.$displayActions]).'</div>',
         'summary' => '',
     ]); ?>
 

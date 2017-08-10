@@ -98,6 +98,9 @@ class CoursController extends Controller
         } elseif ($msg === 'monit') {
             $alerte['class'] = 'success';
             $alerte['message'] = Yii::t('app', 'Toutes les modifications sur les moniteurs ont été enregistrées !');
+        } elseif ($msg === 'presence') {
+            $alerte['class'] = 'success';
+            $alerte['message'] = Yii::t('app', 'Toutes les modifications sur les présences ont été enregistrées !');
         } elseif ($msg !== '') {
             $alerte['class'] = 'danger';
             $alerte['message'] = $msg;
@@ -383,8 +386,8 @@ class CoursController extends Controller
     }
     
     /**
-     * Affichage de la page de gestion globale des moniteurs.
-     * Permet la mise à jour des données des moniteurs pour un cours
+     * Affichage de la page de gestion globale des inscriptions.
+     * Permet la mise à jour des données des inscriptions pour un cours (toutes les dates)
      * @param integer $id
      * @return mixed
      */
@@ -564,6 +567,66 @@ class CoursController extends Controller
             'model' => $model,
             'dataMoniteurs' => $dataMoniteurs,
             'arrayMoniteurs' => $arrayMoniteurs,
+            'arrayData' => $arrayData,
+        ]);
+    }
+    
+    /**
+     * Affichage de la page de gestion globale des présences.
+     * Permet la mise à jour des données des présences pour un cours
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionGestionpresences($cours_id) {
+        $model = $this->findModel($cours_id);
+        $alerte = '';
+        
+        if (!empty(Yii::$app->request->post())) {
+            $post = Yii::$app->request->post();
+            
+            $transaction = \Yii::$app->db->beginTransaction();
+            try {
+                // on met toutes les présences à 0 pour les cours en question
+                foreach ($model->coursDates as $coursDate) {
+                    ClientsHasCoursDate::updateAll(['is_present' => 0], 'fk_cours_date = '.$coursDate->cours_date_id);
+                }
+
+                // on reconstruit la liste d'après la saisie
+                foreach ($post['dateparticipant'] as $parDate) {
+                    foreach ($parDate as $key => $v) {
+                        $ids = explode('|', $key);
+                        $myClientCours = ClientsHasCoursDate::find()->where('fk_personne = :personne_id AND fk_cours_date = :cours_date_id', ['personne_id' => $ids[1], 'cours_date_id' => $ids[0]])->one();
+                        $myClientCours->is_present = 1;
+                        if (!($flag = $myClientCours->save())) {
+                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la présence (IDs '.$ids[1].'|'.$ids[0].'.'));
+                        }
+                    }
+                }
+
+                $transaction->commit();
+                // on redirige vers la page du cours
+                $msg = 'presence';
+                return $this->redirect(['/cours/view', 'id' => $cours_id, 'msg' => $msg]);
+
+            } catch (Exception $e) {
+                $alerte = $e->getMessage();
+                $transaction->rollBack();
+            }
+        }
+        
+        // préparation des data
+        foreach ($model->coursDates as $coursDate) {
+            $arrayData[$coursDate->cours_date_id]['model'] = $coursDate;
+            foreach ($coursDate->clientsHasCoursDate as $participant) {
+                $arrayParticipants[$participant->fk_personne] = $participant;
+                $arrayData[$coursDate->cours_date_id]['participants'][$participant->fk_personne] = $participant;
+            }
+        }
+        
+        return $this->render('presences', [
+	        'alerte' => $alerte,
+            'model' => $model,
+            'arrayParticipants' => $arrayParticipants,
             'arrayData' => $arrayData,
         ]);
     }
