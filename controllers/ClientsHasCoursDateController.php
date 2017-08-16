@@ -103,19 +103,21 @@ class ClientsHasCoursDateController extends Controller
         foreach ($allCoursDate as $coursDate) {
             $arrayCoursDate[] = $coursDate->cours_date_id;
         }
-        $model = ClientsHasCoursDate::find()->where(['fk_personne' => $fk_personne])->andWhere(['IN', 'fk_cours_date', $arrayCoursDate])->one();
+        $models = ClientsHasCoursDate::find()->where(['fk_personne' => $fk_personne])->andWhere(['IN', 'fk_cours_date', $arrayCoursDate])->all();
         $modelPersonne = Personnes::findOne(['personne_id' => $fk_personne]);
-
-        if ($model->load(Yii::$app->request->post())) {
-            $model->save();
-            return $this->redirect(['/cours/view', 'id' => $fk_cours]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-                'modelPersonne' => $modelPersonne,
-                'modelParams' => new Parametres,
-            ]);
+        
+        foreach ($models as $model) {
+            if ($model->load(Yii::$app->request->post())) {
+                $model->save();
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                    'modelPersonne' => $modelPersonne,
+                    'modelParams' => new Parametres,
+                ]);
+            }
         }
+        return $this->redirect(['/cours/view', 'id' => $fk_cours]);
     }
 
     /**
