@@ -42,19 +42,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => ['1'=>'Oui', '0'=>'Non'],
             ],
             [
-                'attribute' => 'fkNiveau',
-                'value' => 'fkNiveau.nom',
-            ],
-            [
                 'attribute' => 'fkType',
                 'value' => 'fkType.nom',
+                'label' => Yii::t('app', 'Type'),
             ],
             [
                 'attribute' => 'fkNom',
                 'value' => 'fkNom.nom',
+                'label' => Yii::t('app', 'Nom'),
+            ],
+            [
+                'attribute' => 'fkNiveau',
+                'value' => 'fkNiveau.nom',
+                'label' => Yii::t('app', 'Niveau'),
+            ],
+            [
+                'attribute' => 'fkSemestre',
+                'value' => 'fkSemestre.nom',
+                'label' => Yii::t('app', 'Semestre'),
+            ],
+            [
+                'attribute' => 'fkSaison',
+                'value' => 'fkSaison.nom',
+                'label' => Yii::t('app', 'Saison'),
             ],
             'session',
-            'annee',
             'participant_min',
             'participant_max',
             [

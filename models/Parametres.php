@@ -130,6 +130,30 @@ class Parametres extends \yii\db\ActiveRecord
     {
         return $this->optsDropDown(10);
     }
+    
+    /**
+     * @return array options tranche âge for drop-down
+     */
+    public function optsSaison()
+    {
+        return $this->optsDropDown(11);
+    }
+    
+    /**
+     * @return array options tranche âge for drop-down
+     */
+    public function optsJourSemaine()
+    {
+        return $this->optsDropDown(12);
+    }
+    
+    /**
+     * @return array options tranche âge for drop-down
+     */
+    public function optsSemestre()
+    {
+        return $this->optsDropDown(13);
+    }
 
     /**
      * @return array options from classkey for drop-down
@@ -160,6 +184,9 @@ class Parametres extends \yii\db\ActiveRecord
             '8' => 'Niveau de formation',
             '9' => 'Statut de participation',
             '10' => 'Tranche d\'âge',
+            '11' => 'Année de cours',
+            '12' => 'Jour de la semaine',
+            '13' => 'Nom session internet',
         );
     }
 }

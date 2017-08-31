@@ -158,6 +158,8 @@ class CoursController extends Controller
             } elseif (!empty($new['Cours'])) {
                 $alerte = '';
                 if ($model->load(Yii::$app->request->post())) {
+                    // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
+                    $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
                     if (!$model->save()) {
                         $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
                     }
@@ -283,6 +285,8 @@ class CoursController extends Controller
         $model = $this->findModel($id);
 		$alerte = '';
         if ($model->load(Yii::$app->request->post())) {
+            // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
+            $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
             if (!$model->save()) {
 		        $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
 		    } else {
@@ -737,11 +741,22 @@ class CoursController extends Controller
             $data = ["Aucune donnée trouvée"];
         } else {
             foreach ($dataProvider->getModels() as $c) {
+                $jours = [];
+                foreach ($c->fkJours as $j) {
+                    $jours[] = $j->nom;
+                }
+                $dates = [];
+                foreach ($c->coursDates as $d) {
+                    $dates[] = $d->date.' '.$d->heure_debut;
+                }
                 $data[] = [
                     'id' => $c->cours_id,
                     'nom' => $c->fkNom->nom,
                     'niveau' => $c->fkNiveau->nom,
+                    'semestre' => ($c->fk_semestre != '') ? $c->fkSemestre->nom : '',
+                    'saison' => ($c->fk_saison != '') ? $c->fkSaison->nom : '',
                     'session' => $c->session,
+                    'jours_semaine' => $jours,
                     'type' => $c->fkType->nom,
                     'annee' => $c->annee,
                     'duree' => $c->duree,
@@ -753,6 +768,7 @@ class CoursController extends Controller
                     'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
                     'offre_speciale' => $c->offre_speciale,
                     'premier_jour_session' => $c->FirstCoursDate->date,
+                    'toutes_les_dates' => $dates,
                 ];
             }
         }

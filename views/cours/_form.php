@@ -59,6 +59,18 @@ use yii\bootstrap\Alert;
     </div>
 
     <div class="row">
+        <div class="col-sm-6">
+            <?= $form->field($model, 'fk_jours')->checkboxList($modelParams->optsJourSemaine()) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'fk_saison')->dropDownList($modelParams->optsSaison(),['prompt'=>Yii::t('app', 'Choisir une saison')]) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'fk_semestre')->dropDownList($modelParams->optsSemestre(),['prompt'=>Yii::t('app', 'Choisir un semestre')]) ?>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-sm-3">
             <?= $form->field($model, 'duree')->textInput(['type' => 'number', 'step' => '0.25', 'placeholder' => Yii::t('app', 'en heure')]) ?>
         </div>

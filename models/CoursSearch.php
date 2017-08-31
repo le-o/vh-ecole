@@ -15,6 +15,9 @@ class CoursSearch extends Cours
     public $fkNiveau;
     public $fkType;
     public $fkNom;
+    public $fkSaison;
+    public $fkSemestre;
+    public $fkJours;
     
     /**
      * @inheritdoc
@@ -102,10 +105,24 @@ class CoursSearch extends Cours
             $nom->where('nom.nom LIKE "%'.$this->fkNom.'%"');
         }]);
         $dataProvider->sort->attributes['fkNom'] = [
-            // The tables are the ones our relation are configured to
-            // in my case they are prefixed with "tbl_"
             'asc' => ['nom.nom' => SORT_ASC],
             'desc' => ['nom.nom' => SORT_DESC],
+        ];
+        $query->joinWith(['fkSaison' => function ($nom) {
+            $nom->alias('saison');
+//            $nom->where('saison.nom LIKE "%'.$this->fkSaison.'%"');
+        }]);
+        $dataProvider->sort->attributes['fkSaison'] = [
+            'asc' => ['saison.nom' => SORT_ASC],
+            'desc' => ['saison.nom' => SORT_DESC],
+        ];
+        $query->joinWith(['fkSemestre' => function ($nom) {
+            $nom->alias('semestre');
+//            $nom->where('semestre.nom LIKE "%'.$this->fkSemestre.'%"');
+        }]);
+        $dataProvider->sort->attributes['fkSemestre'] = [
+            'asc' => ['semestre.nom' => SORT_ASC],
+            'desc' => ['semestre.nom' => SORT_DESC],
         ];
         $dataProvider->sort->defaultOrder = ['is_actif'=>SORT_DESC, 'fkNom'=>SORT_ASC];
 
