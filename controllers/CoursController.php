@@ -769,6 +769,8 @@ class CoursController extends Controller
                     'offre_speciale' => $c->offre_speciale,
                     'premier_jour_session' => $c->FirstCoursDate->date,
                     'toutes_les_dates' => $dates,
+                    'description' => $c->description,
+                    'offre_speciale' => $c->offre_speciale,
                 ];
             }
         }

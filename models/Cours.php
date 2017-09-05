@@ -174,6 +174,19 @@ class Cours extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getFkJoursNoms()
+    {
+        $jourNom = [];
+        $jours = $this->hasMany(Parametres::className(), ['parametre_id' => 'fk_jours']);
+        foreach ($jours->all() as $j) {
+            $jourNom[] = $j->nom;
+        }
+        return implode(', ', $jourNom);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getFirstCoursDate()
     {
         return $this->hasMany(CoursDate::className(), ['fk_cours' => 'cours_id'])->one();

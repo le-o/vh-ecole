@@ -53,9 +53,6 @@ use yii\bootstrap\Alert;
         <div class="col-sm-3">
             <?= $form->field($model, 'session')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-sm-3">
-            <?= $form->field($model, 'annee')->textInput(['type' => 'number', 'min' => 2016, 'maxlength' => true]) ?>
-        </div>
     </div>
 
     <div class="row">

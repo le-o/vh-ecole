@@ -68,17 +68,6 @@ class SiteController extends Controller
         $searchModel->homepage = true;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
-        // on reprend tous les cours avec date dans le futur
-        $coursIds = [];
-        foreach($dataProvider->getModels() as $coursdate) {
-            $coursIds[$coursdate->fk_cours] = $coursdate->fk_cours;
-        }
-        // puis on inactive les cours qui n'existe pas dans la liste
-        if (!empty($coursIds)) {
-            $coursInactifs = Cours::updateAll(['is_actif' => 0], 'cours_id NOT IN ('.implode(',', $coursIds).')');
-            $coursActifs = Cours::updateAll(['is_actif' => 1], 'cours_id IN ('.implode(',', $coursIds).')');
-        }
-        
         // set la valeur de la date début du calendrier
         if (Yii::$app->session->get('home-cal-debut') === null) Yii::$app->session->set('home-cal-debut', date('Y-m-d'));
         if (Yii::$app->session->get('home-cal-view') === null) Yii::$app->session->set('home-cal-view', 'agendaWeek');
