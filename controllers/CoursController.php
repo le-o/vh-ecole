@@ -412,6 +412,10 @@ class CoursController extends Controller
                 try {
                     // on supprime toutes les inscriptions pour les cours en question
                     foreach ($model->coursDates as $coursDate) {
+                        foreach ($coursDate->clientsHasCoursDate as $participant) {
+                            $saveStatut[$participant->fk_personne]['part'] = $participant;
+//                            $saveStatut[$participant->fk_personne]['statut'] = $participant->fk_statut;
+                        }
                         ClientsHasCoursDate::deleteAll('fk_cours_date = :cours_date_id', ['cours_date_id' => $coursDate->cours_date_id]);
                     }
 
@@ -423,7 +427,7 @@ class CoursController extends Controller
                             $addParticipant->fk_personne = $ids[1];
                             $addParticipant->fk_cours_date = $ids[0];
                             $addParticipant->is_present = 1;
-                            $addParticipant->fk_statut= Yii::$app->params['partInscrit'];
+                            $addParticipant->fk_statut= (isset($saveStatut[$ids[1]])) ? $saveStatut[$ids[1]]['part']->fk_statut : Yii::$app->params['partInscrit'];
                             if (!($flag = $addParticipant->save(false))) {
                                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du participant (ID '.$ids[1].'.'));
                             }
