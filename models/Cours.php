@@ -144,7 +144,7 @@ class Cours extends \yii\db\ActiveRecord
      */
     public function getFkAge()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_nom']);
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_age']);
     }
 
     /**

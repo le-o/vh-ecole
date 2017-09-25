@@ -414,7 +414,6 @@ class CoursController extends Controller
                     foreach ($model->coursDates as $coursDate) {
                         foreach ($coursDate->clientsHasCoursDate as $participant) {
                             $saveStatut[$participant->fk_personne]['part'] = $participant;
-//                            $saveStatut[$participant->fk_personne]['statut'] = $participant->fk_statut;
                         }
                         ClientsHasCoursDate::deleteAll('fk_cours_date = :cours_date_id', ['cours_date_id' => $coursDate->cours_date_id]);
                     }
