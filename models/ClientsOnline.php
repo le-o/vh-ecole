@@ -41,7 +41,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
     {
         return [
             [['fk_parent', 'fk_cours', 'is_actif'], 'integer'],
-            [['fk_cours', 'adresse', 'npa', 'localite', 'telephone', 'email'], 'required'],
+            [['fk_cours', 'adresse', 'npa', 'localite', 'telephone', 'email', 'fk_cours'], 'required'],
             [['date_naissance', 'date_inscription'], 'safe'],
             [['informations'], 'string'],
             [['nom', 'prenom'], 'string', 'max' => 60],

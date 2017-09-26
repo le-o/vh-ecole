@@ -82,7 +82,7 @@ return [
     'Exporter tous' => 'Exporter tous',
     'Faire un choix ...' => 'Faire un choix ...',
     'Fk Age' => '@@Tranche d\'âge@@',
-    'Fk Cours' => 'Cours',
+    'Fk Cours' => 'Nom du cours',
     'Fk Cours Date' => 'Date de cours',
     'Fk Interlocuteur' => 'Interlocuteur',
     'Fk Moniteur' => 'Moniteur',

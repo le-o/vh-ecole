@@ -68,23 +68,35 @@ $this->registerJs('
             ]); ?>
         </div>
         <div class="col-sm-6">
-            <label class="control-label" for="w1"><?= Yii::t('app', 'Nom du cours'); ?></label>
-	        <?= Select2::widget([
-				'name' => 'list_cours',
-				'value' => $selectedCours, // initial value
+            <?= $form->field($model, 'fk_cours')->widget(Select2::classname(), [
+                'options'=>['placeholder' => Yii::t('app', 'Choisir un cours ...'), 
+                    'multiple' => false, 
+                    'onchange'=>"
+                        var ar = ['24', '36', '38'];
+                        if ($.inArray($(this).val(), ar) != -1) {
+                            $('#choix_enfant').show();
+                        } else {
+                            $('#choix_enfant').hide();
+                        }",
+                ],
+                'value' => $selectedCours, // initial value
 				'data' => $dataCours,
-				'options' => ['placeholder' => Yii::t('app', 'Choisir un cours ...'), 'multiple' => false],
-			    'pluginOptions' => [
-			        'allowClear' => true,
-			        'tags' => true,
-			    ],
-			]); ?>
+                'pluginOptions'=>[
+                    'initialize' => true,
+                    'allowClear' => true,
+                    'tags' => true,
+                ],
+            ]); ?>
         </div>
     </div>
     
     <div class="row">
         <div class="col-sm-12">
-            <?= yii\bootstrap\BaseHtml::checkbox('offre_annuelle', false, ['label' => Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)')]) ?>
+            <?= yii\bootstrap\BaseHtml::radioList('offre_supp', false, [
+                'cours_essai' => Yii::t('app', 'Je souhaite inscrire mon enfant pour 2 cours à l’essai (je déciderai au terme des 2 cours si j’inscris mon enfant pour un semestre ou à l’année)'),
+                'semestre' => Yii::t('app', 'Je souhaite inscrire mon enfant pour un semestre uniquement'),
+                'offre_annuelle' => Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)')
+            ], ['id' => 'choix_enfant', 'style' => 'display:none;']) ?>
             <?= yii\bootstrap\BaseHtml::checkbox('pmt_tranche', false, ['label' => Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)')]) ?>
         </div>
     </div>

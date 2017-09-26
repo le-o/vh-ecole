@@ -93,13 +93,21 @@ class ClientsOnlineController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
-            $model->fk_cours = $post['list_cours'];
             $model->is_actif = true;
             
             // gestion des options supp
-            if (isset($post['offre_annuelle']))
-                $model->informations .= '
-                    + '.Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)');
+            if (isset($post['offre_supp']) && in_array($model->fk_cours, [24, 36, 38])) {
+                if ($post['offre_supp'] == 'cours_essai') {
+                    $model->informations .= '
+                        + '.Yii::t('app', 'Je souhaite inscrire mon enfant pour 2 cours à l’essai (je déciderai au terme des 2 cours si j’inscris mon enfant pour un semestre ou à l’année)');
+                } elseif ($post['offre_supp'] == 'semestre') {
+                    $model->informations .= '
+                        + '.Yii::t('app', 'Je souhaite inscrire mon enfant pour un semestre uniquement');
+                } elseif ($post['offre_supp'] == 'offre_annuelle') {
+                    $model->informations .= '
+                        + '.Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)');
+                }
+            }
             if (isset($post['pmt_tranche']))
                 $model->informations .= '
                     + '.Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)');
