@@ -1,12 +1,22 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Alert;
+use yii\web\View;
+use kartik\file\FileInput;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Cours */
 /* @var $form yii\widgets\ActiveForm */
+
+$script = '
+    $("button.fileinput-remove-button").on("click", function() {
+            console.log("click")
+        });
+    ';
+$this->registerJs($script, View::POS_END);
 ?>
 
 <?php if ($alerte != '') {
@@ -20,7 +30,7 @@ use yii\bootstrap\Alert;
 
 <div class="cours-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
     <div class="row">
         <div class="col-sm-3">
             <?= $form->field($model, 'fk_niveau')->dropDownList($modelParams->optsNiveau(),['prompt'=>Yii::t('app', 'Choisir un niveau')]) ?>
@@ -84,10 +94,39 @@ use yii\bootstrap\Alert;
     
     <div class="row">
         <div class="col-sm-6">
-            <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+            <?= $form->field($model, 'extrait')->textarea(['rows' => 2]) ?>
         </div>
         <div class="col-sm-6">
-            <?= $form->field($model, 'offre_speciale')->textarea(['rows' => 6]) ?>
+            <?= $form->field($model, 'offre_speciale')->textarea(['rows' => 2]) ?>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12">
+            <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <?= $form->field($model, 'fk_categories')->checkboxList($modelParams->optsCategorie()) ?>
+        </div>
+        <div class="col-sm-6">
+            <?= $form->field($model, 'image')->widget(FileInput::classname(), [
+                'options' => ['accept' => 'image/*'],
+                'pluginOptions' => [
+                    'initialPreview'=>($model->image_web != '') ? ['..'.Yii::$app->params['uploadPath'] . $model->image_web] : false,
+                    'initialPreviewAsData'=>true,
+                    'showUpload' => false,
+                    'overwriteInitial'=>true
+                ],
+                'pluginEvents' => [
+                    'filecleared' => 'function() { 
+                        $("#cours-image_hidden").val("");
+                    }',
+                ]
+            ]) ?>
+            <?= $form->field($model, 'image_hidden')->hiddenInput()->label(false); ?>
         </div>
     </div>
 

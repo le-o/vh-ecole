@@ -132,7 +132,7 @@ class Parametres extends \yii\db\ActiveRecord
     }
     
     /**
-     * @return array options tranche âge for drop-down
+     * @return array options saison for drop-down
      */
     public function optsSaison()
     {
@@ -140,7 +140,7 @@ class Parametres extends \yii\db\ActiveRecord
     }
     
     /**
-     * @return array options tranche âge for drop-down
+     * @return array options jours semaine for drop-down
      */
     public function optsJourSemaine()
     {
@@ -148,11 +148,19 @@ class Parametres extends \yii\db\ActiveRecord
     }
     
     /**
-     * @return array options tranche âge for drop-down
+     * @return array options semestre for drop-down
      */
     public function optsSemestre()
     {
         return $this->optsDropDown(13);
+    }
+    
+    /**
+     * @return array options categorie for drop-down
+     */
+    public function optsCategorie()
+    {
+        return $this->optsDropDown(14);
     }
 
     /**
@@ -187,6 +195,7 @@ class Parametres extends \yii\db\ActiveRecord
             '11' => 'Année de cours',
             '12' => 'Jour de la semaine',
             '13' => 'Nom session internet',
+            '14' => 'Catégorie internet',
         );
     }
 }

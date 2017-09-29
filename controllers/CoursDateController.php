@@ -251,7 +251,7 @@ class CoursDateController extends Controller
             'dataMoniteurs' => $dataMoniteurs,
             'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : [],
 
-            'isInscriptionOk' => ($participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
+            'isInscriptionOk' => (Yii::$app->user->identity->id < 700 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
             'dataClients' => $dataClients,
             'participantDataProvider' => $participantDataProvider,
             'parametre' => $parametre,
@@ -588,7 +588,7 @@ class CoursDateController extends Controller
             'dataMoniteurs' => $dataMoniteurs,
             'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : [],
 
-            'isInscriptionOk' => ($participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
+            'isInscriptionOk' => (Yii::$app->user->identity->id < 700 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
             'dataClients' => $dataClients,
             'participantDataProvider' => $participantDataProvider,
             'parametre' => $parametre,

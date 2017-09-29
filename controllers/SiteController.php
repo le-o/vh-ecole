@@ -163,7 +163,7 @@ class SiteController extends Controller
 
                 //  After this you can call imap_append like this:
                 // connect to IMAP (port 143)
-                $stream = imap_open("{mail.infomaniak.ch:143/imap}", Yii::$app->params['adminEmail'], "Verticsa");
+                $stream = imap_open("{mail.infomaniak.ch:143/imap}", Yii::$app->params['adminEmail'], "V-HSaxon2012");
                 // Saves message to Sent folder and marks it as read
                 imap_append($stream,"{mail.infomaniak.ch:143/imap}Envoyes appli",$msg."\r\n","\\Seen");
                 // Close connection to the server when you're done

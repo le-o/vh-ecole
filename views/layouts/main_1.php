@@ -25,6 +25,9 @@ AppAsset::register($this);
             padding-top: 0;
             padding-bottom: 0;
         }
+        body {
+            background-color: transparent;
+        }
     </style>
 </head>
 <body>

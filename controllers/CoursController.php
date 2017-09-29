@@ -12,6 +12,7 @@ use app\models\Personnes;
 use app\models\Parametres;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -55,6 +56,15 @@ class CoursController extends Controller
                             return (Yii::$app->user->identity->id < 1000) ? true : false;
                         }
                     ],
+                ],
+            ],
+            [
+                'class' => 'yii\filters\PageCache',
+                'only' => ['getcoursjson'],
+                'duration' => 60,
+                'dependency' => [
+                    'class' => 'yii\caching\DbDependency',
+                    'sql' => 'SELECT * FROM cours WHERE is_actif = 1 AND is_publie = 1',
                 ],
             ],
         ];
@@ -160,6 +170,26 @@ class CoursController extends Controller
                 if ($model->load(Yii::$app->request->post())) {
                     // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
                     $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
+                    $model->fk_categories = Yii::$app->request->post()['Cours']['fk_categories'];
+                    $model->image_hidden = Yii::$app->request->post()['Cours']['image_hidden'];
+                    
+                    // on s'occupe de sauver l'image si elle existe
+                    if ($image = UploadedFile::getInstance($model, 'image')) {
+                        // store the source file extension
+                        $ext = end((explode(".", $image->name)));
+                        // generate a unique file name
+                        $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
+                        $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
+                        if (!$image->saveAs($path)) {
+                            $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
+                        }
+                    } elseif ($model->image_hidden == '') {
+                        if (is_file(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web)) {
+                            unlink(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web);
+                        }
+                        $model->image_web = null;
+                    }
+                    
                     if (!$model->save()) {
                         $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
                     }
@@ -170,6 +200,9 @@ class CoursController extends Controller
                 $alerte['message'] = Yii::t('app', 'Vous devez sélectionner un participant pour pouvoir l\'ajouter.');
             }
 	    }
+        
+        // on assigne la valeur de l'image au champ caché
+        $model->image_hidden = $model->image_web;
 
         // liste des dates de cours
         $listeCoursDate = [];
@@ -260,6 +293,21 @@ class CoursController extends Controller
 		$alerte = '';
         if ($model->load(Yii::$app->request->post())) {
             $model->fk_type = $model->fkNom->info_special;
+            // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
+            $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
+            $model->fk_categories = Yii::$app->request->post()['Cours']['fk_categories'];
+
+            // on s'occupe de sauver l'image si elle existe
+            if ($image = UploadedFile::getInstance($model, 'image')) {
+                // store the source file extension
+                $ext = end((explode(".", $image->name)));
+                // generate a unique file name
+                $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
+                $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
+                if (!$image->saveAs($path)) {
+                    $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
+                }
+            }
 	        if (!$model->save()) {
 		        $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
 		    } else {
@@ -287,6 +335,25 @@ class CoursController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
             $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
+            $model->fk_categories = Yii::$app->request->post()['Cours']['fk_categories'];
+                    
+            // on s'occupe de sauver l'image si elle existe
+            if ($image = UploadedFile::getInstance($model, 'image')) {
+                // store the source file extension
+                $ext = end((explode(".", $image->name)));
+                // generate a unique file name
+                $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
+                $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
+                if (!$image->saveAs($path)) {
+                    $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
+                }
+            } elseif ($model->image == '') {
+                if (is_file(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web)) {
+                    unlink(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web);
+                }
+                $model->image_web = null;
+            }
+            
             if (!$model->save()) {
 		        $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
 		    } else {
@@ -748,6 +815,10 @@ class CoursController extends Controller
                 foreach ($c->fkJours as $j) {
                     $jours[] = $j->nom;
                 }
+                $categories = [];
+                foreach ($c->fkCategories as $cat) {
+                    $categories[] = $cat->nom;
+                }
                 $dates = [];
                 foreach ($c->coursDates as $d) {
                     $dates[] = $d->date.' '.$d->heure_debut;
@@ -772,8 +843,11 @@ class CoursController extends Controller
                     'offre_speciale' => $c->offre_speciale,
                     'premier_jour_session' => $c->FirstCoursDate->date,
                     'toutes_les_dates' => $dates,
+                    'extrait' => $c->extrait,
                     'description' => $c->description,
                     'offre_speciale' => $c->offre_speciale,
+                    'categories' => $categories,
+                    'image_web' => ($c->image_web != '') ? '/ecole/_files/images/'.$c->image_web : '',
                 ];
             }
         }

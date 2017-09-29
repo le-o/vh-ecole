@@ -12,6 +12,7 @@ use Yii;
  * @property integer $fk_type
  * @property integer $fk_nom
  * @property integer $fk_age
+ * @property string $extrait
  * @property string $description
  * @property float $duree
  * @property string $session
@@ -27,12 +28,23 @@ use Yii;
  * @property integer $is_entree_compris
  * @property integer $is_actif
  * @property integer $is_publie
+ * @property array $fk_categories 
+ * @property string $image_web 
  *
+ * @property ClientsHasCours[] $clientsHasCours 
+ * @property Personnes[] $fkPersonnes 
  * @property Parametres $fkNiveau
+ * @property Parametres $fkType 
+ * @property Parametres $fkNom 
+ * @property Parametres $fkAge 
  * @property CoursDate[] $coursDates
  */
 class Cours extends \yii\db\ActiveRecord
 {
+    
+    public $image;
+    public $image_hidden;
+    
     /**
      * @inheritdoc
      */
@@ -47,11 +59,13 @@ class Cours extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie'], 'required'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'session', 'prix', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie'], 'required'],
             [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'fk_saison', 'fk_semestre', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie'], 'integer'],
             [['duree', 'prix'], 'double'],
-            [['description', 'session', 'offre_speciale'], 'string'],
-            [['annee'], 'safe']
+            [['extrait', 'description', 'session', 'offre_speciale'], 'string'],
+            [['annee', 'image'], 'safe'],
+            [['image_web'], 'default', 'value' => null],
+            [['image'], 'file', 'extensions' => 'png, jpg', 'skipOnEmpty' => true],
         ];
     }
 
@@ -90,6 +104,7 @@ class Cours extends \yii\db\ActiveRecord
     public function afterFind()
     {
         $this->fk_jours = explode(',', $this->fk_jours);
+        $this->fk_categories = explode(',', $this->fk_categories);
         parent::afterFind();
     }
     
@@ -100,6 +115,7 @@ class Cours extends \yii\db\ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             $this->fk_jours = (!empty($this->fk_jours)) ? implode(',', $this->fk_jours) : '';
+            $this->fk_categories = (!empty($this->fk_categories)) ? implode(',', $this->fk_categories) : '';
             return true;
         } else {
             return false;
@@ -112,6 +128,7 @@ class Cours extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         $this->fk_jours = explode(',', $this->fk_jours);
+        $this->fk_categories = explode(',', $this->fk_categories);
         parent::afterSave($insert, $changedAttributes);
     }
 
@@ -182,6 +199,14 @@ class Cours extends \yii\db\ActiveRecord
             $jourNom[] = $j->nom;
         }
         return implode(', ', $jourNom);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkCategories()
+    {
+        return $this->hasMany(Parametres::className(), ['parametre_id' => 'fk_categories']);
     }
 
     /**
