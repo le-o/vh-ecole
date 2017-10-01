@@ -65,7 +65,7 @@ class Cours extends \yii\db\ActiveRecord
             [['extrait', 'description', 'session', 'offre_speciale'], 'string'],
             [['annee', 'image'], 'safe'],
             [['image_web'], 'default', 'value' => null],
-            [['image'], 'file', 'extensions' => 'png, jpg', 'skipOnEmpty' => true],
+            [['image'], 'file', 'extensions' => 'png, jpg', 'maxSize' => 1024 * 1024 * 3, 'skipOnEmpty' => true],
         ];
     }
 

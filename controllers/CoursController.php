@@ -58,15 +58,15 @@ class CoursController extends Controller
                     ],
                 ],
             ],
-            [
-                'class' => 'yii\filters\PageCache',
-                'only' => ['getcoursjson'],
-                'duration' => 60,
-                'dependency' => [
-                    'class' => 'yii\caching\DbDependency',
-                    'sql' => 'SELECT * FROM cours WHERE is_actif = 1 AND is_publie = 1',
-                ],
-            ],
+//            [
+//                'class' => 'yii\filters\PageCache',
+//                'only' => ['getcoursjson'],
+//                'duration' => 60,
+//                'dependency' => [
+//                    'class' => 'yii\caching\DbDependency',
+//                    'sql' => 'SELECT * FROM cours WHERE is_actif = 1 AND is_publie = 1',
+//                ],
+//            ],
         ];
     }
 
@@ -821,7 +821,7 @@ class CoursController extends Controller
                 }
                 $dates = [];
                 foreach ($c->coursDates as $d) {
-                    $dates[] = $d->date.' '.$d->heure_debut;
+                    $dates[] = date('Y-m-d', strtotime($d->date)).' '.$d->heure_debut;
                 }
                 $data[] = [
                     'id' => $c->cours_id,
@@ -841,13 +841,13 @@ class CoursController extends Controller
                     'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
                     'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
                     'offre_speciale' => $c->offre_speciale,
-                    'premier_jour_session' => $c->FirstCoursDate->date,
+                    'premier_jour_session' => date('Y-m-d', strtotime($c->FirstCoursDate->date)),
                     'toutes_les_dates' => $dates,
                     'extrait' => $c->extrait,
                     'description' => $c->description,
                     'offre_speciale' => $c->offre_speciale,
                     'categories' => $categories,
-                    'image_web' => ($c->image_web != '') ? '/ecole/_files/images/'.$c->image_web : '',
+                    'image_web' => ($c->image_web != '') ? Url::home(true).'/../../_files/images/'.$c->image_web : '',
                 ];
             }
         }
