@@ -354,9 +354,10 @@ class PersonnesController extends Controller
             }
             $dataCoursDate[$cle]['fk_type'] = $clientCoursDate->fkCoursDate->fkCours->fk_type;
             $dataCoursDate[$cle]['fkType.nom'] = $clientCoursDate->fkCoursDate->fkCours->fkType->nom;
-            $dataCoursDate[$cle]['fkNom.nom'] = $clientCoursDate->fkCoursDate->fkCours->fkNom->nom;
+            $dataCoursDate[$cle]['fkNom.nom'] = $clientCoursDate->fkCoursDate->fkCours->fkNom->nom.' '.$clientCoursDate->fkCoursDate->fkCours->fkNiveau->nom;
             $dataCoursDate[$cle]['session'] = $clientCoursDate->fkCoursDate->fkCours->session;
             $dataCoursDate[$cle]['annee'] = $clientCoursDate->fkCoursDate->fkCours->annee;
+            $dataCoursDate[$cle]['fkSaison.nom'] = isset($clientCoursDate->fkCoursDate->fkCours->fkSaison) ? $clientCoursDate->fkCoursDate->fkCours->fkSaison->nom : '';
         }
         $coursDataProvider = new ArrayDataProvider([
 		    'allModels' => $dataCoursDate,
@@ -454,16 +455,6 @@ class PersonnesController extends Controller
             
             $transaction = \Yii::$app->db->beginTransaction();
             try {
-                // on traite le changement de statut pour les activités de la personne
-                $changedArray = array_diff_assoc($model->attributes, $model->oldAttributes);
-                foreach($changedArray as $key => $value){
-                    if ($key == 'fk_statut' && $value == Yii::$app->params['persStatutInscrit']) {
-                        foreach ($model->clientsHasCoursDate as $date) {
-                            $date->fk_statut = Yii::$app->params['persStatutInscrit'];
-                            $date->save();
-                        }
-                    }
-                }
                 if (!$model->save()) {
                     throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
                 }

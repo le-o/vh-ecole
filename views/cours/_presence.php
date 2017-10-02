@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model app\models\Cours */
 
-$this->title = Yii::t('app', 'Liste des présences cours').' '.$model->fkNom->nom;
+$this->title = Yii::t('app', 'Liste des présences cours').' '.$model->fkNom->nom.' '.$model->fkNiveau->nom;
 ?>
 
 <div class="cours-view">
@@ -19,7 +19,7 @@ $this->title = Yii::t('app', 'Liste des présences cours').' '.$model->fkNom->no
         <table>
             <tr class="entete">
                 <td colspan="5" class="titre">
-                    <?= $model->fkNom->nom.' Session '.$model->session.'.'.$model->annee.' / '.$model->prix.'.-' ?>
+                    <?= $model->fkSaison->nom.' '.$model->fkSemestre->nom ?>
                 </td>
                 <?php
                 foreach ($coursDate as $date) {

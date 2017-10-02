@@ -58,15 +58,15 @@ class CoursController extends Controller
                     ],
                 ],
             ],
-//            [
-//                'class' => 'yii\filters\PageCache',
-//                'only' => ['getcoursjson'],
-//                'duration' => 60,
-//                'dependency' => [
-//                    'class' => 'yii\caching\DbDependency',
-//                    'sql' => 'SELECT * FROM cours WHERE is_actif = 1 AND is_publie = 1',
-//                ],
-//            ],
+            [
+                'class' => 'yii\filters\PageCache',
+                'only' => ['getcoursjson'],
+                'duration' => 60,
+                'dependency' => [
+                    'class' => 'yii\caching\DbDependency',
+                    'sql' => 'SELECT * FROM cours WHERE is_actif = 1 AND is_publie = 1',
+                ],
+            ],
         ];
     }
 

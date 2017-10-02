@@ -95,7 +95,10 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             ],
             'duree',
             'session',
-            'annee',
+            [
+                'label' => Yii::t('app', 'Fk Saison'),
+                'attribute' => 'fkSaison.nom',
+            ],
             'date',
             
             ['class' => 'yii\grid\ActionColumn',

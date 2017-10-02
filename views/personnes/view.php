@@ -72,6 +72,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'html',
                 'value' => $model->getInterlocuteurs(),
             ],
+            [
+                'label' => Yii::t('app', 'est interlocuteur de'),
+                'format' => 'html',
+                'value' => $model->getIsInterlocuteursFrom(),
+            ],
             'informations:ntext',
             'suivi_client:ntext',
             'carteclient_cf',

@@ -231,6 +231,19 @@ class Personnes extends \yii\db\ActiveRecord
     }
     
     /**
+     * @return string
+     */
+    public function getIsInterlocuteursFrom()
+    {
+        $interlocuteurs = [];
+        $myInterlocuteurs = PersonnesHasInterlocuteurs::findAll(['fk_interlocuteur' => $this->personne_id]);
+        foreach ($myInterlocuteurs as $interlocuteur) {
+            $interlocuteurs[] = \yii\helpers\Html::a($interlocuteur->fkPersonne->NomPrenom, \yii\helpers\Url::to(['/personnes/view', 'id' => $interlocuteur->fk_personne]));
+        }
+        return implode('<br />', $interlocuteurs);
+    }
+    
+    /**
      * 
      * @param array $excludePart
      * @return array

@@ -176,11 +176,11 @@ class CoursDateController extends Controller
                 $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
             }
         }
-
+        
         foreach ($model->coursHasMoniteurs as $myMoniteur) {
             $moniteurs[] = $myMoniteur->fkMoniteur->nomPrenom;
         }
-        $listeMoniteurs = implode(', ', $moniteurs);
+        $listeMoniteurs = (isset($moniteurs)) ? implode(', ', $moniteurs) : '';
 
         // Gestion des participants
         $participants = Personnes::find()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $model->cours_date_id])->orderBy('clients_has_cours_date.fk_statut ASC');
@@ -305,6 +305,8 @@ class CoursDateController extends Controller
 			        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
 			    }
                 
+                $nomMoniteurs = [];
+                $emails = [];
                 foreach ($moniteurs as $moniteur_id) {
                     $addMoniteur = new CoursHasMoniteurs();
                     $addMoniteur->fk_cours_date = $model->cours_date_id;
@@ -328,7 +330,9 @@ class CoursDateController extends Controller
                         Infos : '.$model->remarque.'<br />
                         Moniteur(s) : '.  implode(', ', $nomMoniteurs)
                 ];
-                SiteController::actionEmail($contenu, $emails);
+                if (!empty($emails)) {
+                    SiteController::actionEmail($contenu, $emails);
+                }
                 
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
                 // seulement pour les cours planifié
