@@ -90,6 +90,7 @@ class ClientsOnlineController extends Controller
         
         $model = new ClientsOnline();
         $modelsClient = [new ClientsOnline];
+        $alert = '';
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -153,7 +154,7 @@ class ClientsOnlineController extends Controller
             }
         }
         
-        $modelCours = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('nom, tri')->all();
+        $modelCours = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('nom, tri')->where(['is_actif' => true, 'is_publie' => true])->all();
         foreach ($modelCours as $cours) {
             $dataCours[$cours->fkNiveau->nom][$cours->fkNom->parametre_id] = $cours->fkNom->nom;
         }
@@ -163,6 +164,7 @@ class ClientsOnlineController extends Controller
             'modelsClient' => $modelsClient,
             'dataCours' => $dataCours,
             'selectedCours' => [],
+            'alerte' => $alerte,
         ]);
     }
 
