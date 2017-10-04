@@ -290,7 +290,7 @@ class CoursController extends Controller
     public function actionCreate()
     {
         $model = new Cours();
-		$alerte = '';
+        $alerte = '';
         if ($model->load(Yii::$app->request->post())) {
             $model->fk_type = $model->fkNom->info_special;
             // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
@@ -308,15 +308,15 @@ class CoursController extends Controller
                     $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
                 }
             }
-	        if (!$model->save()) {
-		        $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
-		    } else {
-	            return $this->redirect(['view', 'id' => $model->cours_id]);
-	        }
+            if (!$model->save()) {
+                    $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
+                } else {
+                return $this->redirect(['view', 'id' => $model->cours_id]);
+            }
         }
         $modelParams = new Parametres;
         return $this->render('create', [
-	        'alerte' => $alerte,
+            'alerte' => $alerte,
             'model' => $model,
             'modelParams' => $modelParams,
         ]);
@@ -825,7 +825,7 @@ class CoursController extends Controller
                 }
                 $data[] = [
                     'id' => $c->cours_id,
-                    'nom' => $c->fkNom->nom,
+                    'nom' => ($c->fk_nom == 26) ? $c->fkNom->nom.' '.$c->fkNiveau->nom : $c->fkNom->nom,
                     'niveau' => $c->fkNiveau->nom,
                     'semestre' => ($c->fk_semestre != '') ? $c->fkSemestre->nom : '',
                     'saison' => ($c->fk_saison != '') ? $c->fkSaison->nom : '',
