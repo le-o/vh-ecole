@@ -1,18 +1,18 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use yii\helpers\Url;
+use kartik\grid\GridView;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Alert;
-use yii\helpers\Url;
 use yii\web\View;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\PersonnesSearch */
+/* @var $searchModel app\models\CoursDateSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Clients');
+$this->title = Yii::t('app', 'Liste clients actifs');
 $this->params['breadcrumbs'][] = $this->title;
 
 $script = "$(document).on('click', '.showModalButton', function(){
@@ -31,6 +31,39 @@ $script = "$(document).on('click', '.showModalButton', function(){
 });";
 $this->registerJs($script, View::POS_END);
 $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); });', View::POS_END);
+
+// On créé les colonnes ici, comme ca réutilisable dans l'export et la gridview
+$gridColumns = [
+    ['class' => 'kartik\grid\CheckboxColumn'],
+    ['class' => 'kartik\grid\SerialColumn'],
+    'statutPart',
+    [
+        'label' => 'Cours',
+        'value' => function($data) {
+            return $data['nomCours'].' '.$data['niveauCours'];
+        }
+    ],
+    'nom',
+    'prenom',
+    'suivi_client',
+    'age',
+
+    ['class' => 'yii\grid\ActionColumn',
+        'template'=>'{partUpdate}',
+        'buttons'=>[
+            'partUpdate' => function ($url, $data) {
+                $from['url'] = 'cours-date/actif';
+                if (isset($_GET['page'])) {
+                    $from['page'] = $_GET['page'];
+                }
+                $from = json_encode($from);
+                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours-date/update', 'fk_personne' => $data['personne_id'], 'fk_cours' => $data['cours_id'], 'from' => $from]), [
+                    'title' => Yii::t('app', 'Modifier statut'),
+                ]);
+            },
+        ],
+    ],
+];
 ?>
 
 <?php if (!empty($alerte)) {
@@ -39,19 +72,15 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             'class' => 'alert-'.$alerte['class'],
         ],
         'body' => $alerte['message'],
-    ]);
+    ]); 
 } ?>
 
-
-<div class="personnes-index">
+<div class="cours-date-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
+    
     <div class="row">
         <div class="col-sm-6">
-            <?= Html::a(Yii::t('app', 'Create Client'), ['create'], ['class' => 'btn btn-success']) ?>
-
             <?php $form = ActiveForm::begin(['options' => ['style' => 'display:inline;']]); ?>
             <?php Modal::begin([
                 'id' => 'modal',
@@ -92,40 +121,13 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             <?php ActiveForm::end(); ?>
         </div>
     </div>
-
+    <br />
     <?= GridView::widget([
         'id' => 'personnegrid',
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\CheckboxColumn'],
-            ['class' => 'yii\grid\SerialColumn'],
-            
-            [
-                'attribute' => 'fk_statut',
-                'value' => 'fkStatut.nom',
-                'filter' => $typeStatut,
-            ],
-            [
-                'attribute' => 'fk_type',
-                'value' => 'fkType.nom',
-                'filter' => $typeFilter,
-            ],
-            'suivi_client',
-            'societe',
-            'nom',
-            'prenom',
-            'localite',
-            'email:email',
-            'telephone',
-            
-            ['class' => 'yii\grid\ActionColumn',
-                'visibleButtons'=>[
-                    'update' => (Yii::$app->user->identity->id < 1000) ? true : false,
-                    'delete' => (Yii::$app->user->identity->id < 1000) ? true : false,
-                ],
-            ],
-        ],
+        'columns' => $gridColumns,
+        'summary' => '',
+        'tableOptions' => ['class' => 'cours-date-liste']
     ]); ?>
 
 </div>

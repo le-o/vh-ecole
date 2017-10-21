@@ -493,7 +493,7 @@ class CoursController extends Controller
                             $addParticipant->fk_personne = $ids[1];
                             $addParticipant->fk_cours_date = $ids[0];
                             $addParticipant->is_present = 1;
-                            $addParticipant->fk_statut= (isset($saveStatut[$ids[1]])) ? $saveStatut[$ids[1]]['part']->fk_statut : Yii::$app->params['partInscrit'];
+                            $addParticipant->fk_statut = (isset($saveStatut[$ids[1]])) ? $saveStatut[$ids[1]]['part']->fk_statut : Yii::$app->params['partInscrit'];
                             if (!($flag = $addParticipant->save(false))) {
                                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du participant (ID '.$ids[1].'.'));
                             }
@@ -531,7 +531,7 @@ class CoursController extends Controller
         if (isset($newParticipant)) $arrayParticipants[$newParticipant->fk_personne] = $newParticipant;
         
         return $this->render('inscriptions', [
-	        'alerte' => $alerte,
+            'alerte' => $alerte,
             'model' => $model,
             'dataParticipants' => $dataParticipants,
             'arrayParticipants' => $arrayParticipants,
@@ -821,11 +821,11 @@ class CoursController extends Controller
                 }
                 $dates = [];
                 foreach ($c->coursDates as $d) {
-                    $dates[] = date('Y-m-d', strtotime($d->date)).' '.$d->heure_debut;
+                    $dates[] = date('r', strtotime($d->date.' '.$d->heure_debut));
                 }
                 $data[] = [
                     'id' => $c->cours_id,
-                    'nom' => ($c->fk_nom == 26) ? $c->fkNom->nom.' '.$c->fkNiveau->nom : $c->fkNom->nom,
+                    'nom' => $c->fkNom->nom,
                     'niveau' => $c->fkNiveau->nom,
                     'semestre' => ($c->fk_semestre != '') ? $c->fkSemestre->nom : '',
                     'saison' => ($c->fk_saison != '') ? $c->fkSaison->nom : '',

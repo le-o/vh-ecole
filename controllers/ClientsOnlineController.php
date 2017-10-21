@@ -90,7 +90,7 @@ class ClientsOnlineController extends Controller
         
         $model = new ClientsOnline();
         $modelsClient = [new ClientsOnline];
-        $alert = '';
+        $alerte = '';
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();

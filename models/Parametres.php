@@ -198,4 +198,24 @@ class Parametres extends \yii\db\ActiveRecord
             '14' => 'Catégorie internet',
         );
     }
+    
+    /**
+     * Permet de foncer ou d'éclaircir une couleur hexadecimal
+     * @param string $couleur
+     * @param int $changementTon
+     * @return string
+     */
+    public static function changerTonCouleur($couleur,$changementTon){
+        $couleur=substr($couleur,1,6);
+        $cl=explode('x',wordwrap($couleur,2,'x',3));
+        $couleur='';
+        for($i=0;$i<=2;$i++){
+            $cl[$i]=hexdec($cl[$i]);
+            $cl[$i]=$cl[$i]+$changementTon;
+            if($cl[$i]<0) $cl[$i]=0;
+            if($cl[$i]>255) $cl[$i]=255;
+            $couleur.=StrToUpper(substr('0'.dechex($cl[$i]),-2));
+        }
+        return '#'.$couleur; 
+    }
 }

@@ -38,7 +38,7 @@ class PersonnesController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'view'],
+                        'actions' => ['index', 'view', 'setemail'],
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
                             return (Yii::$app->user->identity->id < 1100) ? true : false;
@@ -80,7 +80,7 @@ class PersonnesController extends Controller
 
         if (!empty(Yii::$app->request->post())) {
             $mail = Yii::$app->request->post();
-            SiteController::actionEmail($mail['Parametres'], $listeEmails);
+            SiteController::actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
 
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à toutes les personnes sélectionnées');
@@ -493,6 +493,36 @@ class PersonnesController extends Controller
             'dataInterlocuteurs' => $dataInterlocuteurs,
             'selectedInterlocuteurs' => (isset($selectedInterlocuteurs)) ? $selectedInterlocuteurs : [],
         ]);
+    }
+    
+    /**
+     * Permet de lister les emails des personnes (ajax)
+     * @return json
+     */
+    public function actionSetemail() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (isset($_POST['keylist'])) {
+            $keys = $_POST['keylist'];
+            foreach ($keys as $k) {
+                $arrKeys = explode('*', $k);
+                $ids[] = (isset($arrKeys[1])) ? $arrKeys[1] : $arrKeys[0];
+            }
+            $listeEmails = [];
+            $models = Personnes::find()->where(['IN', 'personne_id', $ids])->all();
+            foreach ($models as $myPersonne) {
+                if (strpos($myPersonne->email, '@') !== false) {
+                    $listeEmails[$myPersonne->email] = $myPersonne->email;
+                }
+
+                foreach ($myPersonne->personneHasInterlocuteurs as $pi) {
+                    $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                }
+            }
+        } else {
+            $listeEmails = explode(', ', $_POST['allEmails']);
+        }
+        
+        return ['emails' => implode(', ', $listeEmails)];
     }
 
     /**

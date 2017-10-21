@@ -260,6 +260,10 @@ class CoursDateController extends Controller
         ]);
     }
     
+    /**
+     * Lists all CoursDate models with participants.
+     * @return mixed
+     */
     public function actionListe($msg = '')
     {
         $searchModel = new CoursDateSearch();
@@ -279,6 +283,91 @@ class CoursDateController extends Controller
 	        'alerte' => $alerte,
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
+        ]);
+    }
+    
+    /**
+     * Lists all CoursDate models with participants in the futur.
+     * @return mixed
+     */
+    public function actionActif()
+    {
+        $searchModel = new CoursDateSearch();
+        $searchModel->depuis = date('d.m.Y');
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        if (!empty(Yii::$app->request->post())) {
+            $mail = Yii::$app->request->post();
+            echo "<pre>";
+            print_r($mail);
+            echo "</pre>";
+            exit;
+            SiteController::actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
+
+            $alerte['class'] = 'info';
+            $alerte['message'] = Yii::t('app', 'Email envoyé à toutes les personnes sélectionnées');
+        }
+        
+        $arrayParticipants = [];
+        $listeEmails = [];
+        foreach ($dataProvider->models as $data) {
+            foreach ($data->clientsHasCoursDate as $client) {
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['statutPart'] = $client->fkStatut->nom;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['nomCours'] = $data->fkCours->fkNom->nom;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['niveauCours'] = $data->fkCours->fkNiveau->nom;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['nom'] = $client->fkPersonne->nom;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['prenom'] = $client->fkPersonne->prenom;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['suivi_client'] = $client->fkPersonne->suivi_client;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['age'] = $client->fkPersonne->age;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['cours_id'] = $data->fk_cours;
+                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['personne_id'] = $client->fk_personne;
+                
+                if (strpos($client->fkPersonne->email, '@') !== false) {
+                    $listeEmails[$client->fkPersonne->email] = $client->fkPersonne->email;
+                }
+//                if ($client->fk_personne == 1202) {
+//                echo "<pre>";
+//                print_r($client->fkPersonne->personneHasInterlocuteurs);
+//                echo "</pre>";
+////                exit;
+//                }
+                foreach ($client->fkPersonne->personneHasInterlocuteurs as $pi) {
+//                    if ($client->fk_personne == 1202) {
+//                echo "<pre>";
+//                print_r($pi->fkInterlocuteur);
+//                echo "</pre>";
+////                exit;
+//                }
+                    $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                }
+                
+//                if ($client->fk_personne == 1202) {
+//                    echo "<pre>";
+//                    print_r($listeEmails);
+//                    echo "</pre>";
+//                    exit;
+//                }
+            }
+        }
+        // pour trier, par chance c'est dans le bon ordre :)
+        asort($arrayParticipants);
+        
+        $participantDataProvider = new ArrayDataProvider([
+            'allModels' => $arrayParticipants,
+            'pagination' => [
+                'pageSize' => 100,
+            ],
+        ]);
+        
+        $parametre = new Parametres();
+        $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
+        
+        return $this->render('actif', [
+            'dataProvider' => $participantDataProvider,
+            'searchModel' => $searchModel,
+            'parametre' => $parametre,
+            'emails' => $emails,
+            'listeEmails' => $listeEmails,
         ]);
     }
 
@@ -351,6 +440,7 @@ class CoursDateController extends Controller
                             $cc->fk_personne = $part->fk_personne;
                             $cc->fk_cours_date = $model->cours_date_id;
                             $cc->is_present = true;
+                            $cc->fk_statut = $part->fk_statut;
                             $cc->save();
                         }
                     }
@@ -362,14 +452,14 @@ class CoursDateController extends Controller
                     $myCours->save();
                 }
 		        
-		        $transaction->commit();
-		        if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
+                $transaction->commit();
+                if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
                     return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
                 } else {
                     return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
                 }
-		    } catch (Exception $e) {
-			    $alerte['class'] = 'danger';
+            } catch (Exception $e) {
+                $alerte['class'] = 'danger';
                 $alerte['message'] = $e->getMessage();
                 $transaction->rollBack();
             }
@@ -667,8 +757,9 @@ class CoursDateController extends Controller
             $Event->id = $time->cours_date_id;
             $Event->url = Url::to(['/cours-date/view', 'id' => $time->cours_date_id]);
             
-            if ($time->fkCours->fk_type == Yii::$app->params['coursPonctuel'] && $time->fkCours->fk_nom != Yii::$app->params['nomCoursDecouverte']) {
+            if ($time->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
                 $Event->title = (isset($time->clientsHasCoursDate[0]) ? $time->clientsHasCoursDate[0]->fkPersonne->suivi_client.' '.$time->clientsHasCoursDate[0]->fkPersonne->societe.' '.$time->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
+                $Event->title .= ' '.$time->fkCours->fkNom->nom.' '.$time->fkCours->session;
             } else {
                 $Event->title = $time->fkCours->fkNom->nom.' '.$time->fkCours->session.'.'.$time->fkCours->annee;
             }
@@ -681,7 +772,12 @@ class CoursDateController extends Controller
             $Event->description = implode(', ', $arrayMoniteurs);
             $Event->start = date('Y-m-d\TH:i:s\Z',strtotime($time->date.' '.$time->heure_debut));
             $Event->end = date('Y-m-d\TH:i:s\Z',strtotime($time->date.' '.$time->HeureFin));
-            $Event->color = $time->fkCours->fkNom->info_couleur;
+            
+            if ($time->fkCours->fkNom->info_couleur != '' && in_array($time->fkCours->fk_nom, Yii::$app->params['coursModificationCouleur'])) {
+                $Event->color = Parametres::changerTonCouleur($time->fkCours->fkNom->info_couleur, Yii::$app->params['nuanceSelonNiveau'][$time->fkCours->fkNiveau->tri]);
+            } else {
+                $Event->color = $time->fkCours->fkNom->info_couleur;
+            }
             $events[] = $Event;
         }
 

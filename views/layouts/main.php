@@ -54,7 +54,8 @@ AppAsset::register($this);
                 ['label' => Yii::t('app', 'Outils'),
                     'items' => [
                          ['label' => Yii::t('app', 'Inscription online'), 'url' => ['/clients-online']],
-                         Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Statistiques moniteurs'), 'url' => ['/personnes/moniteurs']] : '',
+                         ['label' => Yii::t('app', 'Statistiques moniteurs'), 'url' => ['/personnes/moniteurs']],
+                         Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Clients actifs'), 'url' => ['/cours-date/actif']] : '',
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres']] : '',
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore']] : '',
                     ],
@@ -81,7 +82,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; Vertic SA <?= date('Y') ?> - version 2.7.2</p>
+        <p class="pull-left">&copy; Vertic SA <?= date('Y') ?> - version 2.8</p>
 
         <p class="pull-right">Developpé par <a href="http://www.d-web.ch" target="_blank">d-web.ch</a></p>
     </div>
