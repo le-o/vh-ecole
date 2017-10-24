@@ -106,7 +106,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'buttons'=>[
                     'coursView' => function ($model, $key, $index) {
                         $key = explode('|', $index);
-                        if ($key[1] == Yii::$app->params['coursPlanifie']) {
+                        if (in_array($key[1], Yii::$app->params['coursPlanifieS'])) {
                             $page = '/cours/view';
                         } else {
                             $page = '/cours-date/view';

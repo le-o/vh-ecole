@@ -148,7 +148,7 @@ return [
     'Nombre participant max atteint' => 'Nombre participants max atteint',
     'Npa' => 'Npa',
     'Num client CASHFLOW' => 'Num client CASHFLOW',
-    'Offre Spéciale' => 'Offre Spéciale',
+    'Offre Spéciale' => 'Infos tarifs',
     'Outils' => 'Outils',
     'Parametre ID' => 'Paramètre ID',
     'Parametres' => 'Paramètres',

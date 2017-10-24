@@ -77,20 +77,20 @@ $this->params['breadcrumbs'][] = $this->title;
     
     <?php } ?>
 
-    <?php if ($model->fk_type == Yii::$app->params['coursPlanifie']) { ?>
-        <?= $this->render('/personnes/_participant', [
-            'alerte' => '',
-            'model' => $model,
-            'viewAndId' => ['cours', $model->cours_id],
-            'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->participant_max) ? true : false,
-            'dataClients' => $dataClients,
-            'participantDataProvider' => $participantDataProvider,
-            'parametre' => $parametre,
-            'emails' => $emails,
-            'listeEmails' => $listeEmails,
-            'forPresenceOnly' => false,
-        ]) ?>
-    <?php } ?>
+    
+    <?= $this->render('/personnes/_participant', [
+        'alerte' => '',
+        'model' => $model,
+        'viewAndId' => ['cours', $model->cours_id],
+        'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->participant_max) ? true : false,
+        'dataClients' => $dataClients,
+        'participantDataProvider' => $participantDataProvider,
+        'parametre' => $parametre,
+        'emails' => $emails,
+        'listeEmails' => $listeEmails,
+        'forPresenceOnly' => false,
+    ]) ?>
+    
     
     <?= GridView::widget([
         'dataProvider' => $coursDateProvider,

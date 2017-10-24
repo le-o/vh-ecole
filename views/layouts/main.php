@@ -82,7 +82,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; Vertic SA <?= date('Y') ?> - version 2.8</p>
+        <p class="pull-left">&copy; Vertic SA <?= date('Y') ?> - version 2.8.1</p>
 
         <p class="pull-right">Developpé par <a href="http://www.d-web.ch" target="_blank">d-web.ch</a></p>
     </div>

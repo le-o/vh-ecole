@@ -85,18 +85,16 @@ $this->params['breadcrumbs'][] = $this->title;
     
     <?php } ?>
 
-    <?php /*if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) { */ ?>
-        <?= $this->render('/personnes/_participant', [
-            'model' => $model,
-            'viewAndId' => ['cours-date', $model->cours_date_id],
-            'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
-            'dataClients' => $dataClients,
-            'participantDataProvider' => $participantDataProvider,
-            'parametre' => $parametre,
-            'emails' => $emails,
-            'listeEmails' => $listeEmails,
-            'forPresenceOnly' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? false : true,
-        ]) ?>
-    <?php /*}*/ ?>
+    <?= $this->render('/personnes/_participant', [
+        'model' => $model,
+        'viewAndId' => ['cours-date', $model->cours_date_id],
+        'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
+        'dataClients' => $dataClients,
+        'participantDataProvider' => $participantDataProvider,
+        'parametre' => $parametre,
+        'emails' => $emails,
+        'listeEmails' => $listeEmails,
+        'forPresenceOnly' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? false : true,
+    ]) ?>
 
 </div>

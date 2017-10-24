@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'rowOptions' => function($model) {
-            if ($model->fk_type == Yii::$app->params['coursPlanifie'] && $model->nombreClientsInscrits >= $model->participant_max) return ['class' => 'warning'];
+            if (in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) && $model->nombreClientsInscrits >= $model->participant_max) return ['class' => 'warning'];
             if ($model->is_actif == false) return ['class' => 'danger'];
             return [];
         },
@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => Yii::t('app', 'Nb Part'),
                 'value' => function ($model) {
-                    return ($model->fk_type == Yii::$app->params['coursPlanifie']) ? $model->nombreClientsInscrits : Yii::t('app', 'n/a');
+                    return (in_array($model->fk_type, Yii::$app->params['coursPlanifieS'])) ? $model->nombreClientsInscrits : Yii::t('app', 'n/a');
                 }
             ],
             // 'description:ntext',

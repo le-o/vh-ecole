@@ -92,7 +92,7 @@ class CoursController extends Controller
      */
     public function actionView($id, $msg = '')
     {
-	    $model = $this->findModel($id);
+        $model = $this->findModel($id);
         $alerte = [];
         $session = Yii::$app->session;
 
@@ -117,89 +117,94 @@ class CoursController extends Controller
         }
 
         $sendEmail = false;
-	    if (!empty(Yii::$app->request->post()) || $session->getFlash('newParticipant') != '') {
-            // soit on force toutes les dates, soit on prend que le futur (mode normal !)
-            if ($session->getFlash('newParticipant') != '') {
-                $modelDate = CoursDate::find()
-                    ->where(['=', 'fk_cours', $model->cours_id])
-                    ->all();
-                $new = ['new_participant' => $session->getFlash('newParticipant')];
-            } else {
-                $modelDate = CoursDate::find()
-                    ->where(['=', 'fk_cours', $model->cours_id])
-                    ->andWhere(['>=', 'date', date('Y-m-d')])
-                    ->all();
-                $new = Yii::$app->request->post();
-            }
+        if (!empty(Yii::$app->request->post()) || $session->getFlash('newParticipant') != '') {
+        // soit on force toutes les dates, soit on prend que le futur (mode normal !)
+        if ($session->getFlash('newParticipant') != '') {
+            $modelDate = CoursDate::find()
+                ->where(['=', 'fk_cours', $model->cours_id])
+                ->all();
+            $new = ['new_participant' => $session->getFlash('newParticipant')];
+        } else {
+            $modelDate = CoursDate::find()
+                ->where(['=', 'fk_cours', $model->cours_id])
+                ->andWhere(['>=', 'date', date('Y-m-d')])
+                ->all();
+            $new = Yii::$app->request->post();
+        }
             
-            if (!empty($new['new_participant'])) {
-                // soit on ajoute un participant
-                if (empty($modelDate)) {
-                    $alerte['class'] = 'warning';
-                    $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
-                    $alerte['message'] .= '<a class="btn btn-link" href="'.Url::to(['/cours/view', 'id' => $id]).'">'.Yii::t('app', 'Forcer l\'inscription à toutes les dates ?').'</a>';
-                    $session->setFlash('newParticipant', $new['new_participant']);
-                } else {
-                    $participant = Personnes::findOne(['personne_id' => $new['new_participant']]);
-                    foreach ($modelDate as $date) {
-                        $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                        $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
-                        $modelClientsHasCoursDate->fk_personne = $new['new_participant'];
-                        $modelClientsHasCoursDate->is_present = true;
-                        $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
-                        $modelClientsHasCoursDate->save(false);
-                    }
-                    $alerte['class'] = 'success';
-                    $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
-                    
-                    // on passe la personne au statut inscrit si non actif
-                    if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
-                        $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
-                        $participant->save();
-                        $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
-                    }
-                }
-            } elseif (!empty($new['Parametres'])) {
-                // soit on envoi un email !
-                // on le fait après avoir cherché la liste des participants
-                $sendEmail = true;
-                $alerte['class'] = 'info';
-                $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
-            } elseif (!empty($new['Cours'])) {
-                $alerte = '';
-                if ($model->load(Yii::$app->request->post())) {
-                    // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
-                    $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
-                    $model->fk_categories = Yii::$app->request->post()['Cours']['fk_categories'];
-                    $model->image_hidden = Yii::$app->request->post()['Cours']['image_hidden'];
-                    
-                    // on s'occupe de sauver l'image si elle existe
-                    if ($image = UploadedFile::getInstance($model, 'image')) {
-                        // store the source file extension
-                        $ext = end((explode(".", $image->name)));
-                        // generate a unique file name
-                        $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
-                        $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
-                        if (!$image->saveAs($path)) {
-                            $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
-                        }
-                    } elseif ($model->image_hidden == '') {
-                        if (is_file(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web)) {
-                            unlink(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web);
-                        }
-                        $model->image_web = null;
-                    }
-                    
-                    if (!$model->save()) {
-                        $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
-                    }
-                }
-            } else {
-                // dans ce cas on ajoute un participant sans en avoir sélectionné
+        if (!empty($new['new_participant'])) {
+            // soit on ajoute un participant
+            if (empty($modelDate)) {
                 $alerte['class'] = 'warning';
-                $alerte['message'] = Yii::t('app', 'Vous devez sélectionner un participant pour pouvoir l\'ajouter.');
+                $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
+                $alerte['message'] .= '<a class="btn btn-link" href="'.Url::to(['/cours/view', 'id' => $id]).'">'.Yii::t('app', 'Forcer l\'inscription à toutes les dates ?').'</a>';
+                $session->setFlash('newParticipant', $new['new_participant']);
+            } else {
+                $participant = Personnes::findOne(['personne_id' => $new['new_participant']]);
+                foreach ($modelDate as $date) {
+                    $modelClientsHasCoursDate = new ClientsHasCoursDate();
+                    $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
+                    $modelClientsHasCoursDate->fk_personne = $new['new_participant'];
+                    $modelClientsHasCoursDate->is_present = true;
+                    $modelClientsHasCoursDate->fk_statut = ($model->fk_type == Yii::$app->params['coursPonctuel']) ? Yii::$app->params['partNonInscrit'] : Yii::$app->params['partInscrit'];
+                    $modelClientsHasCoursDate->save(false);
+
+                    // si cours ponctuel, on n'inscrit à une seul date
+                    if ($model->fk_type == Yii::$app->params['coursPonctuel']) {
+                        break;
+                    }
+                }
+                $alerte['class'] = 'success';
+                $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+
+                // on passe la personne au statut inscrit si non actif
+                if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
+                    $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
+                    $participant->save();
+                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
+                }
             }
-	    }
+        } elseif (!empty($new['Parametres'])) {
+            // soit on envoi un email !
+            // on le fait après avoir cherché la liste des participants
+            $sendEmail = true;
+            $alerte['class'] = 'info';
+            $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
+        } elseif (!empty($new['Cours'])) {
+            $alerte = '';
+            if ($model->load(Yii::$app->request->post())) {
+                // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
+                $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
+                $model->fk_categories = Yii::$app->request->post()['Cours']['fk_categories'];
+                $model->image_hidden = Yii::$app->request->post()['Cours']['image_hidden'];
+
+                // on s'occupe de sauver l'image si elle existe
+                if ($image = UploadedFile::getInstance($model, 'image')) {
+                    // store the source file extension
+                    $ext = end((explode(".", $image->name)));
+                    // generate a unique file name
+                    $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
+                    $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
+                    if (!$image->saveAs($path)) {
+                        $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
+                    }
+                } elseif ($model->image_hidden == '') {
+                    if (is_file(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web)) {
+                        unlink(Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web);
+                    }
+                    $model->image_web = null;
+                }
+
+                if (!$model->save()) {
+                    $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
+                }
+            }
+        } else {
+            // dans ce cas on ajoute un participant sans en avoir sélectionné
+            $alerte['class'] = 'warning';
+            $alerte['message'] = Yii::t('app', 'Vous devez sélectionner un participant pour pouvoir l\'ajouter.');
+        }
+        }
         
         // on assigne la valeur de l'image au champ caché
         $model->image_hidden = $model->image_web;
@@ -232,20 +237,20 @@ class CoursController extends Controller
 	    
         $dataClients = Personnes::getClientsNotInCours($excludePart);
 
-		$coursDateProvider = new ActiveDataProvider([
-		    'query' => $coursDate,
-		    'pagination' => [
-		        'pageSize' => 20,
-		    ],
-		    'sort' =>false
-		]);
+        $coursDateProvider = new ActiveDataProvider([
+            'query' => $coursDate,
+            'pagination' => [
+                'pageSize' => 20,
+            ],
+            'sort' =>false
+        ]);
 
-		$participantDataProvider = new ActiveDataProvider([
-		    'query' => $participants,
-		    'pagination' => [
-		        'pageSize' => 20,
-		    ],
-		]);
+        $participantDataProvider = new ActiveDataProvider([
+            'query' => $participants,
+            'pagination' => [
+                'pageSize' => 20,
+            ],
+        ]);
         foreach($participantDataProvider->models as $part) {
             foreach ($coursDate->all() as $date) {
                 $pres = $date->getForPresence($part->personne_id);
@@ -801,6 +806,11 @@ class CoursController extends Controller
         }
     }
     
+    /**
+     * Fonction API qui permet de retrouver la liste des cours à publier sur le
+     * site internet
+     * @return json La liste des cours
+     */
     public function actionGetcoursjson() {
         $searchModel = new CoursSearch();
         $searchModel->is_actif = 1;
@@ -840,7 +850,7 @@ class CoursController extends Controller
                     'tranche_age' => $c->fkAge->nom,
                     'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
                     'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
-                    'offre_speciale' => $c->offre_speciale,
+                    'infos_tarifs' => $c->offre_speciale,
                     'premier_jour_session' => date('Y-m-d', strtotime($c->FirstCoursDate->date)),
                     'toutes_les_dates' => $dates,
                     'extrait' => $c->extrait,

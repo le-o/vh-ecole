@@ -86,13 +86,11 @@ use yii\bootstrap\Alert;
         </div>
     </div>
     
-    <?php if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) { ?>
     <div class="row">
         <div class="col-sm-3">
             <?= $form->field($model, 'nb_client_non_inscrit')->textInput(['type' => 'number', 'step' => '1']) ?>
         </div>
     </div>
-    <?php } ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

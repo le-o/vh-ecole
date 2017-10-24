@@ -65,7 +65,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
             <?php $form = ActiveForm::begin(); ?>
             <div class="col-sm-5">
-                <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => 'btn btn-default']) ?>
+                <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->NombreClientsInscrits == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
                 <?php Modal::begin([
                     'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
                     'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],
@@ -117,7 +117,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             [
                 'attribute' => 'statutPart',
                 'label' => 'Statut',
-                'visible' => (!isset($model->fk_type) || (isset($model->fk_type) && $model->fk_type == Yii::$app->params['coursPlanifie'])) ? true : false,
+                'visible' => (!isset($model->fk_type) || (isset($model->fk_type) && in_array($model->fk_type, Yii::$app->params['coursPlanifieS']))) ? true : true,
             ],
             'suivi_client',
             'societe',
@@ -146,7 +146,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'checkboxOptions' => function ($data, $key, $index, $column) use ($model, $forPresenceOnly) {
                     if ($forPresenceOnly) {
                         $bool = $data->getClientsHasOneCoursDate($model->cours_date_id);
-                        return ['value' => $key, 'checked' => $bool->is_present];
+                        return ['value' => $key, 'checked' => (isset($bool->is_present)) ? $bool->is_present : false];
                     }
                     return '';
                 }
@@ -157,7 +157,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'visibleButtons'=>[
                     'partView' => (Yii::$app->user->identity->id < 1100) ? true : false,
                     'partUpdate' => (Yii::$app->user->identity->id < 1100 && $viewAndId[0] != 'cours-date') ? true : false,
-                    'partDeleteFutur' => (Yii::$app->user->identity->id < 1000) ? (isset($model->fk_type) ? $model->fk_type == Yii::$app->params['coursPlanifie'] : $model->fkCours->fk_type  == Yii::$app->params['coursPlanifie']) : false,
+                    'partDeleteFutur' => (Yii::$app->user->identity->id < 1000) ? (isset($model->fk_type) ? in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) : in_array($model->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) : false,
                     'partDelete' => (Yii::$app->user->identity->id < 1000) ? true : false,
                 ],
                 'buttons'=>[

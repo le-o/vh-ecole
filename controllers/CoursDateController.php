@@ -424,8 +424,8 @@ class CoursDateController extends Controller
                 }
                 
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
-                // seulement pour les cours planifié
-                if ($myCours->fk_type == Yii::$app->params['coursPlanifie']) {
+                // seulement pour les cours planifiés (planifié et régulié)
+                if (in_array($myCours->fk_type, Yii::$app->params['coursPlanifieS'])) {
                     $coursDate = CoursDate::find()
                         ->where(['=', 'fk_cours', $model->fk_cours])
                         ->andWhere(['!=', 'cours_date_id', $model->cours_date_id])

@@ -270,7 +270,7 @@ class PersonnesController extends Controller
             if (!empty($post['new_cours'])) {
                 // soit on ajoute un cours
                 $newCours = explode('|', $post['new_cours']);
-                if ($newCours[1] == Yii::$app->params['coursPlanifie']) {
+                if (in_array($newCours[1], Yii::$app->params['coursPlanifieS'])) {
                     $modelDate = CoursDate::find()
                         ->where(['=', 'fk_cours', $newCours[0]])
                         ->andWhere(['>=', 'date', date('Y-m-d')])
@@ -341,7 +341,7 @@ class PersonnesController extends Controller
         foreach ($model->clientsHasCoursDate as $clientCoursDate) {
             $listeCours[] = $clientCoursDate->fkCoursDate->fk_cours;
             
-            if ($clientCoursDate->fkCoursDate->fkCours->fk_type == Yii::$app->params['coursPlanifie']) {
+            if (in_array($clientCoursDate->fkCoursDate->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) {
                 $cle = $clientCoursDate->fkCoursDate->fk_cours.'|'.$clientCoursDate->fkCoursDate->fkCours->fk_type;
                 $dataCoursDate[$cle]['duree'] = $clientCoursDate->fkCoursDate->fkCours->duree;
                 $dataCoursDate[$cle]['linkid'] = $clientCoursDate->fkCoursDate->fk_cours;
@@ -368,7 +368,7 @@ class PersonnesController extends Controller
         
         $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['is_actif' => [1]])->all();
         foreach ($coursNot as $c) {
-            if ($c->fk_type == Yii::$app->params['coursPlanifie']) {
+            if (in_array($c->fk_type, Yii::$app->params['coursPlanifieS'])) {
                 $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->fkSaison->nom.' '.$c->session;
             } else {
                 foreach ($c->coursDates as $coursDate) {

@@ -69,11 +69,11 @@ $gridColumns = [
                 ]);
             },
             'coursDateView' => function ($url, $model, $key) {
-                if ($model->fkCours->fk_type == Yii::$app->params['coursPlanifie']) {
+//                if ($model->fkCours->fk_type == Yii::$app->params['coursPlanifie']) {
                     return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
                         'title' => Yii::t('yii', 'View'),
                     ]);
-                }
+//                }
             },
             'coursDateUpdate' => function ($url, $model, $key) {
                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours-date/update', 'id' => $key]), [
