@@ -236,6 +236,6 @@ class Cours extends \yii\db\ActiveRecord
         foreach ($coursDate->all() as $date) {
             $listeCoursDate[] = $date->cours_date_id;
         }
-	    return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->count();
+        return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['partInscrit']])->count();
     }
 }

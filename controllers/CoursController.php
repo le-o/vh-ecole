@@ -851,13 +851,14 @@ class CoursController extends Controller
                     'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
                     'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
                     'infos_tarifs' => $c->offre_speciale,
-                    'premier_jour_session' => date('Y-m-d', strtotime($c->FirstCoursDate->date)),
+                    'premier_jour_session' => (!empty($c->FirstCoursDate)) ? date('Y-m-d', strtotime($c->FirstCoursDate->date)) : '',
                     'toutes_les_dates' => $dates,
                     'extrait' => $c->extrait,
                     'description' => $c->description,
                     'offre_speciale' => $c->offre_speciale,
                     'categories' => $categories,
                     'image_web' => ($c->image_web != '') ? Url::home(true).'/../../_files/images/'.$c->image_web : '',
+                    'tri' => $c->fkNom->tri,
                 ];
             }
         }
