@@ -110,6 +110,7 @@ $this->registerJs($script, View::POS_END);
     <div class="row">
         <div class="col-sm-6">
             <?= $form->field($model, 'fk_categories')->checkboxList($modelParams->optsCategorie()) ?>
+            <?= $form->field($model, 'fk_langue')->dropDownList($modelParams->optsLangue()) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'image')->widget(FileInput::classname(), [

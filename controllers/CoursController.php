@@ -858,6 +858,7 @@ class CoursController extends Controller
                     'offre_speciale' => $c->offre_speciale,
                     'categories' => $categories,
                     'image_web' => ($c->image_web != '') ? Url::home(true).'/../../_files/images/'.$c->image_web : '',
+                    'langue' => $c->fkLangue->nom,
                     'tri' => $c->fkNom->tri,
                 ];
             }

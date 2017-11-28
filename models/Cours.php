@@ -30,6 +30,7 @@ use Yii;
  * @property integer $is_publie
  * @property array $fk_categories 
  * @property string $image_web 
+ * @property integer $fk_langue
  *
  * @property ClientsHasCours[] $clientsHasCours 
  * @property Personnes[] $fkPersonnes 
@@ -38,6 +39,7 @@ use Yii;
  * @property Parametres $fkNom 
  * @property Parametres $fkAge 
  * @property CoursDate[] $coursDates
+ * @property Parametres $fkLangue
  */
 class Cours extends \yii\db\ActiveRecord
 {
@@ -59,8 +61,8 @@ class Cours extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'session', 'prix', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie'], 'required'],
-            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'fk_saison', 'fk_semestre', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie'], 'integer'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'session', 'prix', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie', 'fk_langue'], 'required'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'fk_saison', 'fk_semestre', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie', 'fk_langue'], 'integer'],
             [['duree', 'prix'], 'double'],
             [['extrait', 'description', 'session', 'offre_speciale'], 'string'],
             [['annee', 'image'], 'safe'],
@@ -95,6 +97,7 @@ class Cours extends \yii\db\ActiveRecord
             'is_entree_compris' => Yii::t('app', 'Is Entree Compris'),
             'is_actif' => Yii::t('app', 'Is Actif'),
             'is_publie' => Yii::t('app', 'Is Publié'),
+            'fk_langue' => Yii::t('app', 'Langue'),
         ];
     }
     
@@ -178,6 +181,14 @@ class Cours extends \yii\db\ActiveRecord
     public function getFkSemestre()
     {
         return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_semestre']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkLangue()
+    {
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_langue']);
     }
 
     /**

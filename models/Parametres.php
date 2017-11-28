@@ -162,6 +162,14 @@ class Parametres extends \yii\db\ActiveRecord
     {
         return $this->optsDropDown(14);
     }
+    
+    /**
+     * @return array options langue for drop-down
+     */
+    public function optsLangue()
+    {
+        return $this->optsDropDown(15);
+    }
 
     /**
      * @return array options from classkey for drop-down
@@ -196,6 +204,7 @@ class Parametres extends \yii\db\ActiveRecord
             '12' => 'Jour de la semaine',
             '13' => 'Nom session internet',
             '14' => 'Catégorie internet',
+            '15' => 'Langue',
         );
     }
     
