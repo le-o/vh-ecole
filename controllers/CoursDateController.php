@@ -108,16 +108,6 @@ class CoursDateController extends Controller
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                     }
                     
-//                    foreach ($model->coursHasMoniteurs as $oldMoniteur) {
-//                        if (!in_array($oldMoniteur->fk_moniteur, $moniteurs)) {
-//                            // moniteur supprimé - email pour annoncer
-//                            $email = [$oldMoniteur->fkMoniteur->email];
-//                            $contenu = ['nom' => 'Suppression cours - moniteur', 
-//                                'valeur' => 'Ton inscription en tant que moniteur au cours '.$model->fkCours->fkNom->nom.' du '.date('d.m.Y', strtotime($model->date)).' '.substr($model->heure_debut, 0, 5).' a été supprimée.'
-//                            ];
-//                            SiteController::actionEmail($contenu, $email);
-//                        }
-//                    }
                     CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
                     foreach ($moniteurs as $moniteur_id) {
                         $addMoniteur = new CoursHasMoniteurs();
@@ -127,22 +117,7 @@ class CoursDateController extends Controller
                         if (!($flag = $addMoniteur->save(false))) {
                             throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                         }
-//                        $emails[] = $addMoniteur->fkMoniteur->email;
-//                        $nomMoniteurs[] = $addMoniteur->fkMoniteur->prenom.' '.$addMoniteur->fkMoniteur->nom;
                     }
-                    
-                    // on envoi l'email à tous les moniteurs
-//                    $contenu = ['nom' => $model->fkCours->fkNom->nom.' - modifications', 
-//                        'valeur' => 'Des modifications ont été apportées au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
-//                            Cours : '.$model->fkCours->fkNom->nom.' <br />
-//                            Session : '.$model->fkCours->session.'<br />
-//                            Année : '.$model->fkCours->annee.'<br />
-//                            Date : '.date('d.m.Y', strtotime($model->date)).'<br />
-//                            Heure : '.substr($model->heure_debut, 0, 5).'<br />
-//                            Infos : '.$model->remarque.'<br />
-//                            Moniteur(s) : '.  implode(', ', $nomMoniteurs)
-//                    ];
-//                    SiteController::actionEmail($contenu, $emails);
                     
                     $myCours = Cours::findOne($model->fk_cours);
                     // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
@@ -318,28 +293,9 @@ class CoursDateController extends Controller
                 if (strpos($client->fkPersonne->email, '@') !== false) {
                     $listeEmails[$client->fkPersonne->email] = $client->fkPersonne->email;
                 }
-//                if ($client->fk_personne == 1202) {
-//                echo "<pre>";
-//                print_r($client->fkPersonne->personneHasInterlocuteurs);
-//                echo "</pre>";
-////                exit;
-//                }
                 foreach ($client->fkPersonne->personneHasInterlocuteurs as $pi) {
-//                    if ($client->fk_personne == 1202) {
-//                echo "<pre>";
-//                print_r($pi->fkInterlocuteur);
-//                echo "</pre>";
-////                exit;
-//                }
                     $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
                 }
-                
-//                if ($client->fk_personne == 1202) {
-//                    echo "<pre>";
-//                    print_r($listeEmails);
-//                    echo "</pre>";
-//                    exit;
-//                }
             }
         }
         // pour trier, par chance c'est dans le bon ordre :)
@@ -585,16 +541,6 @@ class CoursDateController extends Controller
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                     }
                     
-//                    foreach ($model->coursHasMoniteurs as $oldMoniteur) {
-//                        if (!in_array($oldMoniteur->fk_moniteur, $moniteurs)) {
-//                            // moniteur supprimé - email pour annoncer
-//                            $email = [$oldMoniteur->fkMoniteur->email];
-//                            $contenu = ['nom' => 'Suppression cours - moniteur', 
-//                                'valeur' => 'Ton inscription en tant que moniteur au cours '.$model->fkCours->fkNom->nom.' du '.date('d.m.Y', strtotime($model->date)).' '.substr($model->heure_debut, 0, 5).' a été supprimée.'
-//                            ];
-//                            SiteController::actionEmail($contenu, $email);
-//                        }
-//                    }
                     CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
                     foreach ($moniteurs as $moniteur_id) {
                         $addMoniteur = new CoursHasMoniteurs();
@@ -604,22 +550,7 @@ class CoursDateController extends Controller
                         if (!($flag = $addMoniteur->save(false))) {
                             throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                         }
-//                        $emails[] = $addMoniteur->fkMoniteur->email;
-//                        $nomMoniteurs[] = $addMoniteur->fkMoniteur->prenom.' '.$addMoniteur->fkMoniteur->nom;
                     }
-                    
-                    // on envoi l'email à tous les moniteurs
-//                    $contenu = ['nom' => $model->fkCours->fkNom->nom.' - modifications', 
-//                        'valeur' => 'Des modifications ont été apportées au cours suivant. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
-//                            Cours : '.$model->fkCours->fkNom->nom.' <br />
-//                            Session : '.$model->fkCours->session.'<br />
-//                            Année : '.$model->fkCours->annee.'<br />
-//                            Date : '.date('d.m.Y', strtotime($model->date)).'<br />
-//                            Heure : '.substr($model->heure_debut, 0, 5).'<br />
-//                            Infos : '.$model->remarque.'<br />
-//                            Moniteur(s) : '.  implode(', ', $nomMoniteurs)
-//                    ];
-//                    SiteController::actionEmail($contenu, $emails);
                     
                     $myCours = Cours::findOne($model->fk_cours);
                     // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
