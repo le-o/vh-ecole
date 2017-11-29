@@ -156,13 +156,6 @@ class CoursController extends Controller
                 }
                 $alerte['class'] = 'success';
                 $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
-
-                // on passe la personne au statut inscrit si non actif
-                if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
-                    $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
-                    $participant->save();
-                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
-                }
             }
         } elseif (!empty($new['Parametres'])) {
             // soit on envoi un email !

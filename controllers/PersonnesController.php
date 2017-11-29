@@ -304,11 +304,6 @@ class PersonnesController extends Controller
                         $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
                     }
                 }
-                if (in_array($model->fk_statut, Yii::$app->params['groupePersStatutNonActif']) && $alerte['class'] == 'success') {
-                    $model->fk_statut = Yii::$app->params['persStatutInscrit'];
-                    $model->save();
-                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
-                }
             } elseif (!empty($post['Parametres'])) {
                 // soit on envoi un email
                 SiteController::actionEmail($post['Parametres'], [$model->email => $model->email]);

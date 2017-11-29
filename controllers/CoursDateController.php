@@ -98,13 +98,6 @@ class CoursDateController extends Controller
                 $modelClientsHasCoursDate->save(false);
                 $alerte['class'] = 'success';
                 $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
-                
-                // on passe la personne au statut inscrit
-                if (in_array($participant->fk_statut, Yii::$app->params['groupePersStatutNonActif'])) {
-                    $participant->fk_statut = Yii::$app->params['persStatutInscrit'];
-                    $participant->save();
-                    $alerte['message'] .= '<br />'.Yii::t('app', 'Son statut a été modifié en inscrit.');
-                }
             } elseif (!empty($post['CoursDate'])) {
                 $model->load(Yii::$app->request->post());
                 $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
