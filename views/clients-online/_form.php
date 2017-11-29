@@ -78,9 +78,10 @@ $this->registerJs('
                         } else {
                             $('#choix_enfant').hide();
                         }",
+                    'disabled' => (count($dataCours) == 1) ? true : false,
                 ],
                 'value' => $selectedCours, // initial value
-				'data' => $dataCours,
+                'data' => $dataCours,
                 'pluginOptions'=>[
                     'initialize' => true,
                     'allowClear' => true,

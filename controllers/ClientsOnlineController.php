@@ -84,12 +84,15 @@ class ClientsOnlineController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($cours_id = null)
     {
         $this->layout = "main_1";
         
         $model = new ClientsOnline();
         $modelsClient = [new ClientsOnline];
+        if ($cours_id !== null && $cours_id !== '') {
+            $modelCours = Cours::findOne($cours_id);
+        }
         $alerte = '';
 
         if ($model->load(Yii::$app->request->post())) {
@@ -109,9 +112,18 @@ class ClientsOnlineController extends Controller
                         + '.Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)');
                 }
             }
-            if (isset($post['pmt_tranche']))
+            if (isset($post['pmt_tranche'])) {
                 $model->informations .= '
                     + '.Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)');
+            }
+            
+            if (isset($modelCours)) {
+                $model->informations .= '
+                        INFO: '.Yii::t('app', 'Le client souhaite être inscrit au cours suivant').': '.
+                        $modelCours->cours_id.'-'.$modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom.' - '.
+                            $modelCours->fkSemestre->nom.' '.$modelCours->fkSaison->nom.' '.$modelCours->session;
+                $model->fk_cours = $modelCours->fk_nom;
+            }
 
             $modelsClient = Model::createMultiple(ClientsOnline::classname(), [], 'client_online_id');
             Model::loadMultiple($modelsClient, $post);
@@ -154,9 +166,14 @@ class ClientsOnlineController extends Controller
             }
         }
         
-        $modelCours = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('nom, tri')->where(['is_actif' => true, 'is_publie' => true])->all();
-        foreach ($modelCours as $cours) {
-            $dataCours[$cours->fkNiveau->nom][$cours->fkNom->parametre_id] = $cours->fkNom->nom;
+        if (isset($modelCours)) {
+            $dataCours[$modelCours->cours_id] = $modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom.' - '.$modelCours->fkSemestre->nom;
+            $model->fk_cours = $cours_id;
+        } else {
+            $modelCours = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('nom, tri')->where(['is_actif' => true, 'is_publie' => true])->all();
+            foreach ($modelCours as $cours) {
+                $dataCours[$cours->fkNiveau->nom][$cours->fkNom->parametre_id] = $cours->fkNom->nom;
+            }
         }
         
         return $this->render('create', [
