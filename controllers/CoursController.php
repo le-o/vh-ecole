@@ -520,7 +520,7 @@ class CoursController extends Controller
             }
         }
         
-        $modelParticipants = Personnes::find()->where(['<>', 'fk_type', Yii::$app->params['typeEncadrant']])->andWhere(['not in', 'personne_id', $dejaParticipants])->orderBy('nom, prenom')->all();
+        $modelParticipants = Personnes::find()->where(['<>', 'fk_type', Yii::$app->params['typeEncadrantActif']])->andWhere(['not in', 'personne_id', $dejaParticipants])->orderBy('nom, prenom')->all();
         foreach ($modelParticipants as $participant) {
             $dataParticipants[$participant->fkStatut->nom][$participant->personne_id] = $participant->NomPrenom;
         }
@@ -626,7 +626,7 @@ class CoursController extends Controller
             }
         }
         
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrant']])->andWhere(['not in', 'personne_id', $dejaMoniteurs])->orderBy('nom, prenom')->all();
+        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->andWhere(['not in', 'personne_id', $dejaMoniteurs])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
             $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
         }

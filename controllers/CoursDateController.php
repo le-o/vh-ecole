@@ -188,7 +188,7 @@ class CoursDateController extends Controller
         foreach ($myMoniteurs as $moniteur) {
 	        $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
         }
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrant']])->orderBy('nom, prenom')->all();
+        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
             $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
         }
@@ -577,7 +577,7 @@ class CoursDateController extends Controller
         foreach ($myMoniteurs as $moniteur) {
 	        $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
         }
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrant']])->orderBy('nom, prenom')->all();
+        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
             $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
         }
