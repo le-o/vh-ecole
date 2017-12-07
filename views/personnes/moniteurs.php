@@ -42,7 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'nom',
             'prenom',
             'localite',
-            'fk_langues',
+            [
+                'attribute' => 'fk_langues',
+                'label' => Yii::t('app', 'Langues parlées'),
+            ],
             'email:email',
             'telephone',
             [
