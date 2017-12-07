@@ -110,7 +110,6 @@ class PersonnesController extends Controller
     public function actionMoniteurs()
     {
         $searchModel = new PersonnesSearch();
-        $searchModel->fk_type = Yii::$app->params['typeEncadrant'];
         $dataProvider = $searchModel->searchMoniteurs(Yii::$app->request->queryParams, false);
         
         $searchParams = Yii::$app->request->queryParams;
@@ -136,10 +135,12 @@ class PersonnesController extends Controller
             }
             if (!$searchParCours || ($searchParCours && $heures !== 0)) {
                 $dataMoniteurs[$moniteur->personne_id]['statut'] = $moniteur->fkStatut->nom;
+                $dataMoniteurs[$moniteur->personne_id]['type'] = $moniteur->fkType->nom;
                 $dataMoniteurs[$moniteur->personne_id]['societe'] = $moniteur->societe;
                 $dataMoniteurs[$moniteur->personne_id]['nom'] = $moniteur->nom;
                 $dataMoniteurs[$moniteur->personne_id]['prenom'] = $moniteur->prenom;
                 $dataMoniteurs[$moniteur->personne_id]['localite'] = $moniteur->localite;
+                $dataMoniteurs[$moniteur->personne_id]['fk_langues'] = $moniteur->fkLanguesNoms;
                 $dataMoniteurs[$moniteur->personne_id]['email'] = $moniteur->email;
                 $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;
                 $dataMoniteurs[$moniteur->personne_id]['heures'] = number_format($heures, 2, '.', '\'');
@@ -157,6 +158,9 @@ class PersonnesController extends Controller
         $dataCours = $modelParams->optsNomCours();
         $selectedCours = (isset($searchParams['list_cours'])) ? $searchParams['list_cours'] : '';
         
+        $dataLangues = $modelParams->optsLangue();
+        $selectedLangue = (isset($searchParams['fk_langues'])) ? $searchParams['fk_langues'] : '';
+        
         $fromData = serialize(['selectedCours' => $selectedCours, 'searchFrom' => $searchFrom, 'searchTo' => $searchTo]);
 
         return $this->render('moniteurs', [
@@ -165,6 +169,8 @@ class PersonnesController extends Controller
             'searchTo' => ($searchTo == '9999-12-31') ? '' : date('d.m.Y', strtotime($searchTo)),
             'selectedCours' => $selectedCours,
             'dataCours' => $dataCours,
+            'selectedLangue' => $selectedLangue,
+            'dataLangues' => $dataLangues,
             'moniteursProvider' => $moniteursProvider,
             'heuresTotal' => number_format($heuresTotal, 2, '.', '\''),
             'fromData' => $fromData,
@@ -317,7 +323,7 @@ class PersonnesController extends Controller
         }
         
         $coursDateDataProvider = [];
-        if ($model->fk_type == Yii::$app->params['typeEncadrant']) {
+        if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
             $listeCoursDate = [];
             foreach ($model->moniteurHasCoursDate as $mcd) {
                 $listeCoursDate[] = $mcd->fk_cours_date;
@@ -397,6 +403,9 @@ class PersonnesController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
+            if (isset(Yii::$app->request->post()['Personnes']['fk_langues'])) {
+                $model->fk_langues = Yii::$app->request->post()['Personnes']['fk_langues'];
+            }
             
             $transaction = \Yii::$app->db->beginTransaction();
             try {
@@ -447,11 +456,14 @@ class PersonnesController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
+            if (isset(Yii::$app->request->post()['Personnes']['fk_langues'])) {
+                $model->fk_langues = Yii::$app->request->post()['Personnes']['fk_langues'];
+            }
             
             $transaction = \Yii::$app->db->beginTransaction();
             try {
                 if (!$model->save()) {
-                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
+                    throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
                 }
                 
                 $interlocuteurs = (isset($post['list_interlocuteurs'])) ? $post['list_interlocuteurs'] : [];
@@ -461,7 +473,7 @@ class PersonnesController extends Controller
                     $addInterlocuteur->fk_personne = $model->personne_id;
                     $addInterlocuteur->fk_interlocuteur = $interlocuteur_id;
                     if (!($flag = $addInterlocuteur->save(false))) {
-                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des interlocuteur(s).'));
+                        throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des interlocuteur(s).'));
                     }
                 }
 

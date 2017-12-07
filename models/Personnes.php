@@ -12,6 +12,7 @@ use \DateTime;
  * @property integer $fk_statut
  * @property integer $fk_type
  * @property integer $fk_formation
+ * @property integer $fk_langues
  * @property string $noclient_cf
  * @property string $societe
  * @property string $suivi_client
@@ -30,6 +31,7 @@ use \DateTime;
  * @property string $carteclient_cf
  * @property string $categorie3_cf
  * @property string $soldefacture_cf
+ * @property string $complement_langue
  *
  * @property Parametres $fkStatut
  * @property Parametres $fkType
@@ -63,7 +65,7 @@ class Personnes extends \yii\db\ActiveRecord
             [['informations'], 'string'],
             [['noclient_cf'], 'string', 'max' => 10],
             [['societe', 'nom', 'prenom'], 'string', 'max' => 60],
-            [['suivi_client'], 'string', 'max' => 250],
+            [['suivi_client', 'complement_langue'], 'string', 'max' => 250],
             [['adresse1', 'adresse2', 'localite', 'email', 'email2'], 'string', 'max' => 100],
             [['npa'], 'string', 'max' => 5],
             [['telephone', 'telephone2'], 'string', 'max' => 20],
@@ -81,6 +83,7 @@ class Personnes extends \yii\db\ActiveRecord
             'fk_statut' => Yii::t('app', 'Statut'),
             'fk_type' => Yii::t('app', 'Type'),
             'fk_formation' => Yii::t('app', 'Niveau formation'),
+            'fk_langues' => Yii::t('app', 'Langues parlées'),
             'noclient_cf' => Yii::t('app', 'Num client CASHFLOW'),
             'societe' => Yii::t('app', 'Societe'),
             'suivi_client' => Yii::t('app', 'Suivi client'),
@@ -108,6 +111,7 @@ class Personnes extends \yii\db\ActiveRecord
     public function afterFind()
     {
         $this->date_naissance = ($this->date_naissance == '0000-00-00') ? '' : date('d.m.Y', strtotime($this->date_naissance));
+        $this->fk_langues = json_decode($this->fk_langues);
         $this->oldAttributes = $this->attributes;
         parent::afterFind();
     }
@@ -118,6 +122,7 @@ class Personnes extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
+            $this->fk_langues = json_encode($this->fk_langues);
             $this->date_naissance = ($this->date_naissance == '') ? 'null' : date('Y-m-d', strtotime($this->date_naissance));
             return true;
         } else {
@@ -126,9 +131,18 @@ class Personnes extends \yii\db\ActiveRecord
     }
     
     /**
-	 * @return Personne nom prénom
-	 */
-	public function getNomPrenom()
+     * @inheritdoc
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        $this->fk_langues = json_decode($this->fk_langues);
+        parent::afterSave($insert, $changedAttributes);
+    }
+    
+    /**
+     * @return Personne nom prénom
+     */
+    public function getNomPrenom()
     {
         return $this->nom.' '.$this->prenom;
     }
@@ -175,6 +189,27 @@ class Personnes extends \yii\db\ActiveRecord
     public function getFkFormation()
     {
         return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_formation']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkLangues()
+    {
+        return $this->hasMany(Parametres::className(), ['parametre_id' => 'fk_langues']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkLanguesNoms()
+    {
+        $langueNom = [];
+        $langues = $this->hasMany(Parametres::className(), ['parametre_id' => 'fk_langues']);
+        foreach ($langues->all() as $l) {
+            $langueNom[] = $l->nom;
+        }
+        return implode(', ', $langueNom);
     }
     
     /**

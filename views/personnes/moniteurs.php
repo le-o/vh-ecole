@@ -24,6 +24,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $searchModel,
         'selectedCours' => $selectedCours,
         'dataCours' => $dataCours,
+        'selectedLangue' => $selectedLangue,
+        'dataLangues' => $dataLangues,
         'searchFrom' => $searchFrom,
         'searchTo' => $searchTo,
     ]); ?>
@@ -35,10 +37,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'statut',
+            'type',
             'societe',
             'nom',
             'prenom',
             'localite',
+            'fk_langues',
             'email:email',
             'telephone',
             [
@@ -48,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{listeHeures}',
+                'template'=>'{view} {update} {listeHeures}',
                 'buttons'=>[
                     'listeHeures' => function ($url, $model, $key) use ($fromData) {
                         return Html::a('<span class="glyphicon glyphicon-calendar"></span>', Url::to(['viewmoniteur', 'id' => $key, 'fromData' => $fromData]), [

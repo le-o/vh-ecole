@@ -113,6 +113,17 @@ use yii\bootstrap\Alert;
             <?= $form->field($model, 'soldefacture_cf')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
+    
+    <?php if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) { ?>
+    <div class="row">
+        <div class="col-sm-4">
+            <?= $form->field($model, 'fk_langues')->checkboxList($modelParams->optsLangue()) ?>
+        </div>
+        <div class="col-sm-8">
+            <?= $form->field($model, 'complement_langue')->textarea(['rows' => 6]) ?>
+        </div>
+    </div>
+    <?php } ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

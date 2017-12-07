@@ -39,9 +39,11 @@ AppAsset::register($this);
         'items' => [
             ['label' => 'Accueil', 'url' => ['/site/index']],
             !Yii::$app->user->isGuest && Yii::$app->user->identity->id < 1100 ?
-                [
-                    'label' => 'Les clients',
-                    'url' => ['/personnes'],
+                ['label' => Yii::t('app', 'Les personnes'),
+                    'items' => [
+                        ['label' => Yii::t('app', 'Les clients'), 'url' => ['/personnes']],
+                        ['label' => Yii::t('app', 'Les moniteurs'), 'url' => ['/personnes/moniteurs']],
+                    ]
                 ] : '',
             !Yii::$app->user->isGuest ? 
                 ['label' => Yii::t('app', 'Les cours'),
@@ -82,7 +84,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; Vertic SA <?= date('Y') ?> - version 2.8.3</p>
+        <p class="pull-left">&copy; Vertic SA <?= date('Y') ?> - version 3.0</p>
 
         <p class="pull-right">Developpé par <a href="http://www.d-web.ch" target="_blank">d-web.ch</a></p>
     </div>
