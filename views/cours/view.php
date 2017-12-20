@@ -64,10 +64,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => Yii::t('app', 'Fk Saison'),
                 'attribute' => 'fkSaison.nom',
             ],
-            [
-                'label' => Yii::t('app', 'Fk Semestre'),
-                'attribute' => 'fkSemestre.nom',
-            ],
 //            'prix',
             'participant_min',
             'participant_max',

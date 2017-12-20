@@ -72,9 +72,6 @@ $this->registerJs($script, View::POS_END);
         <div class="col-sm-3">
             <?= $form->field($model, 'fk_saison')->dropDownList($modelParams->optsSaison(),['prompt'=>Yii::t('app', 'Choisir une saison')]) ?>
         </div>
-        <div class="col-sm-3">
-            <?= $form->field($model, 'fk_semestre')->dropDownList($modelParams->optsSemestre(),['prompt'=>Yii::t('app', 'Choisir un semestre')]) ?>
-        </div>
     </div>
 
     <div class="row">

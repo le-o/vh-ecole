@@ -370,10 +370,10 @@ class PersonnesController extends Controller
         $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['is_actif' => [1]])->all();
         foreach ($coursNot as $c) {
             if (in_array($c->fk_type, Yii::$app->params['coursPlanifieS'])) {
-                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->fkSaison->nom.' '.$c->session;
+                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->session.' '.$c->fkSaison->nom;
             } else {
                 foreach ($c->coursDates as $coursDate) {
-                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->fkSaison->nom.' '.$c->session.'-'.$coursDate->date;
+                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->session.' '.$c->fkSaison->nom.'-'.$coursDate->date;
                 }
             }
         }
