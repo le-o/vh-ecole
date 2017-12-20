@@ -25,6 +25,8 @@ use yii\bootstrap\Alert;
         'modelsClient' => $modelsClient,
         'dataCours' => $dataCours,
         'selectedCours' => $selectedCours,
+        'params' => $params,
+        'typeCours' => $typeCours,
     ]) ?>
 
 </div>

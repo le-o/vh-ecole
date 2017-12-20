@@ -11,6 +11,29 @@ use wbraganca\dynamicform\DynamicFormWidget;
 /* @var $form yii\widgets\ActiveForm */
 
 $this->registerJs('
+    jQuery(document).ready(function() {
+        displayMessage(jQuery("#choix_cours"), '.$typeCours.');
+    });
+    function displayMessage(that, type) {
+        var arEnfant = [24, 36, 38];
+        var arDemande = ['.$params->optsNomCoursByType(Yii::$app->params['coursPonctuel']).'];
+        if (typeof type != \'undefined\') testType = parseInt(type);
+        else testType = parseInt(that.val());
+        console.log(testType);
+
+        if ($.inArray(testType, arEnfant) != -1) {
+            $("#choix_enfant").show();
+        } else {
+            $("#choix_enfant").hide();
+        }
+        if ($.inArray(testType, arDemande) != -1) {
+            $("#sur_demande_info").show();
+        } else {
+            $("#sur_demande_info").hide();
+        }
+    }'
+    , \yii\web\View::POS_END);
+$this->registerJs('
     $(".dynamicform_wrapper").on("beforeDelete", function(e, item) {
         if (! confirm("'.Yii::t('app', 'Etes-vous sur de vouloir supprimer cet élément?').'")) {
             return false;
@@ -70,14 +93,9 @@ $this->registerJs('
         <div class="col-sm-6">
             <?= $form->field($model, 'fk_cours')->widget(Select2::classname(), [
                 'options'=>['placeholder' => Yii::t('app', 'Choisir un cours ...'), 
+                    'id' => 'choix_cours',
                     'multiple' => false, 
-                    'onchange'=>"
-                        var ar = ['24', '36', '38'];
-                        if ($.inArray($(this).val(), ar) != -1) {
-                            $('#choix_enfant').show();
-                        } else {
-                            $('#choix_enfant').hide();
-                        }",
+                    'onchange'=>"displayMessage($(this))",
                     'disabled' => (count($dataCours) == 1) ? true : false,
                 ],
                 'value' => $selectedCours, // initial value
@@ -104,6 +122,7 @@ $this->registerJs('
     
     <div class="row">
         <div class="col-sm-12"><br />
+            <div id="sur_demande_info" style="display:none;"><span style="color:red; font-weight:bold;"><?= Yii::t('app', 'Vous avez choisi un cours sur demande, veuillez indiquer le(s) horaire(s) souhaité(s) date et heure') ?></span></div>
             <?= $form->field($model, 'informations')->textarea(['rows' => 6])->label(Yii::t('app', 'Infos, détails et besoins particuliers (date et horaire, nom de la session, offres, 2 cours à l\'essai, etc.)')) ?>
         </div>
     </div>
