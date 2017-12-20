@@ -13,6 +13,7 @@ use app\models\Personnes;
 class PersonnesSearch extends Personnes
 {
     public $fkStatut;
+    public $list_langues;
     
     /**
      * @inheritdoc
@@ -22,7 +23,7 @@ class PersonnesSearch extends Personnes
         return [
             [['personne_id', 'fk_statut', 'fk_type', 'fk_formation'], 'integer'],
             [['noclient_cf', 'suivi_client', 'societe', 'nom', 'prenom', 'adresse1', 'adresse2', 'npa', 'localite', 'telephone', 'telephone2',
-                'email', 'email2', 'date_naissance', 'informations', 'carteclient_cf', 'categorie3_cf', 'soldefacture_cf'], 'safe'],
+                'email', 'email2', 'date_naissance', 'informations', 'carteclient_cf', 'categorie3_cf', 'soldefacture_cf', 'list_langues'], 'safe'],
         ];
     }
 
@@ -110,6 +111,12 @@ class PersonnesSearch extends Personnes
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+        
+        $query->where(['IN', 'fk_type', Yii::$app->params['typeEncadrant']]);
+        if (isset($params['fk_langues']) && $params['fk_langues'] != '') {
+            $this->fk_langues = $params['fk_langues'];
+            $query->andWhere(['LIKE', 'fk_langues', $this->fk_langues]);
         }
 
         $query->andFilterWhere([

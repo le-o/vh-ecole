@@ -81,11 +81,20 @@ $this->params['breadcrumbs'][] = $this->title;
             'suivi_client:ntext',
             'carteclient_cf',
             'categorie3_cf',
-            'soldefacture_cf'
+            'soldefacture_cf',
+            [
+                'attribute' => 'fkLanguesNoms',
+                'label' => Yii::t('app', 'Langues parlées'),
+                'visible' => in_array($model->fk_type, Yii::$app->params['typeEncadrant']),
+            ],
+            [
+                'attribute' => 'complement_langue',
+                'visible' => in_array($model->fk_type, Yii::$app->params['typeEncadrant']),
+            ],
         ],
     ]) ?>
     
-    <?php if ($model->fk_type == Yii::$app->params['typeEncadrant']) {
+    <?php if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
         echo '<br /><h3>'.Yii::t('app', 'Mes cours comme moniteurs').'</h3>';
         echo $this->render('/cours-date/_moniteur', [
             'coursDateDataProvider' => $coursDateDataProvider,

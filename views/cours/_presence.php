@@ -19,7 +19,7 @@ $this->title = Yii::t('app', 'Liste des présences cours').' '.$model->fkNom->no
         <table>
             <tr class="entete">
                 <td colspan="5" class="titre">
-                    <?= $model->fkSaison->nom.' '.$model->fkSemestre->nom ?>
+                    <?= $model->fkSaison->nom ?>
                 </td>
                 <?php
                 foreach ($coursDate as $date) {

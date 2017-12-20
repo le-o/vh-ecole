@@ -24,16 +24,14 @@ use kartik\select2\Select2;
         <div class="col-sm-2">
             <label class="control-label"><?= Yii::t('app', 'Nom du cours') ?></label>
             <?= Select2::widget([
-				'name' => 'list_cours',
-				'value' => $selectedCours, // initial value
-				'data' => $dataCours,
-				'options' => ['placeholder' => Yii::t('app', 'Choisir un cours ...')],
-			    'pluginOptions' => [
-			        'allowClear' => true,
-			    ],
-			]); ?>
+                'name' => 'list_cours',
+                'value' => $selectedCours, // initial value
+                'data' => $dataCours,
+                'options' => ['placeholder' => Yii::t('app', 'Choisir un cours ...')],
+                'pluginOptions' => ['allowClear' => true],
+            ]); ?>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <label class="control-label"><?= Yii::t('app', 'Date du cours') ?></label>
             <?= DatePicker::widget([
                 'name' => 'from_date',
@@ -47,8 +45,17 @@ use kartik\select2\Select2;
                     'format' => 'dd.mm.yyyy'
                 ]
             ]); ?>
+        </div><div class="col-sm-2">
+            <label class="control-label"><?= Yii::t('app', 'Langue parlée') ?></label>
+            <?= Select2::widget([
+                'name' => 'fk_langues',
+                'value' => $selectedLangue, // initial value
+                'data' => $dataLangues,
+                'options' => ['placeholder' => Yii::t('app', 'Choisir une langue ...')],
+                'pluginOptions' => ['allowClear' => true],
+            ]); ?>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <div class="form-group">
                 <br />
                 <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
