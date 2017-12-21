@@ -40,8 +40,9 @@ $gridColumns = [
     [
         'label' => 'Cours',
         'value' => function($data) {
-            return $data['nomCours'].' '.$data['niveauCours'];
-        }
+            return '<a href="'. Url::to(['/cours/view', 'id' => $data['cours_id']]).'">'.$data['nomCours'].' '.$data['niveauCours'].'</a>';
+        },
+        'format' => 'html',
     ],
     'nom',
     'prenom',
@@ -49,8 +50,13 @@ $gridColumns = [
     'age',
 
     ['class' => 'yii\grid\ActionColumn',
-        'template'=>'{partUpdate}',
+        'template'=>'{partView} {partUpdate}',
         'buttons'=>[
+            'partView' => function ($url, $data) {
+                return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/personnes/view', 'id' => $data['personne_id']]), [
+                        'title' => Yii::t('app', 'Voir la personne'),
+                    ]);
+            },
             'partUpdate' => function ($url, $data) {
                 $from['url'] = 'cours-date/actif';
                 if (isset($_GET['page'])) {
