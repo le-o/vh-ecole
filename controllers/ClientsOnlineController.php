@@ -169,6 +169,7 @@ class ClientsOnlineController extends Controller
         if (isset($modelCours)) {
             $dataCours[$modelCours->cours_id] = $modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom.' - '.$modelCours->fkSemestre->nom;
             $model->fk_cours = $cours_id;
+            $typeCours = $modelCours->fk_nom;
         } else {
             $modelCours = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('nom, tri')->where(['is_actif' => true, 'is_publie' => true])->all();
             foreach ($modelCours as $cours) {
@@ -181,6 +182,8 @@ class ClientsOnlineController extends Controller
             'modelsClient' => $modelsClient,
             'dataCours' => $dataCours,
             'selectedCours' => [],
+            'params' => new Parametres,
+            'typeCours' => (isset($typeCours)) ? $typeCours : '',
             'alerte' => $alerte,
         ]);
     }

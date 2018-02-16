@@ -108,6 +108,21 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
+     * !! Only for javascript !!
+     * @param int $type parametres_id from info_special
+     * @return string options id separate by ,
+     */
+    public function optsNomCoursByType($type)
+    {
+        $codes = self::find()->where(['class_key' => 7, 'info_special' => $type])->orderBy('tri')->all();
+        $temp = array();
+        foreach($codes as $code) {
+            $temp[]= $code['parametre_id'];
+        }
+        return implode(', ', $temp);
+    }
+
+    /**
      * @return array options niveau formation for drop-down
      */
     public function optsNiveauFormation()
