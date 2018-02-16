@@ -12,9 +12,9 @@ use app\models\CoursDate;
  */
 class CoursDateSearch extends CoursDate
 {
-	public $fkCours;
-	public $participantMin;
-	public $participantMax;
+    public $fkCours;
+    public $participantMin;
+    public $participantMax;
     public $session;
     public $depuis;
     public $dateA;
@@ -105,6 +105,11 @@ class CoursDateSearch extends CoursDate
         }
         if ($this->dateA != '') {
             $query->andWhere("date <= '".date('Y-m-d', strtotime($this->dateA))."'");
+            if ($this->homepage == true) {
+                $query->andWhere("cours.is_publie = 1 AND cours.is_actif = 1");
+                $query->distinct = true;
+                $query->select = ['fk_cours'];
+            }
         }
 
         return $dataProvider;

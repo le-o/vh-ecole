@@ -1,6 +1,8 @@
 <?php
 
+use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 
@@ -8,6 +10,43 @@ $this->title = 'VH Gestion des cours';
   
 ?>
 <div class="site-index">
+    
+    <h2>Cours sans date dans le futur</h2>
+    
+    <?= GridView::widget([
+        'dataProvider' => $dataProviderNF,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+	    
+            [
+                'attribute' => 'fkCours',
+                'value' => 'fkCours.fkNom.nom',
+            ],
+            [
+                'label' => 'Niveau',
+                'value' => 'fkCours.fkNiveau.nom',
+            ],
+            'fkCours.session',
+            [
+                'label' => 'Saison',
+                'value' => 'fkCours.fkSaison.nom',
+            ],
+
+            ['class' => 'yii\grid\ActionColumn',
+                'template'=>'{coursUpdate}',
+                'visibleButtons'=>[
+                    'coursUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
+                ],
+                'buttons'=>[
+                    'coursUpdate' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours/view', 'id' => $model->fk_cours]), [
+                            'title' => Yii::t('yii', 'Update'),
+                        ]);
+                    },
+                ],
+            ],
+        ],
+    ]); ?>
     
     <h2>VH Calendrier des cours</h2>
     
