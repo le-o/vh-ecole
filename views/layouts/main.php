@@ -56,7 +56,6 @@ AppAsset::register($this);
                 ['label' => Yii::t('app', 'Outils'),
                     'items' => [
                          ['label' => Yii::t('app', 'Inscription online'), 'url' => ['/clients-online']],
-                         ['label' => Yii::t('app', 'Statistiques moniteurs'), 'url' => ['/personnes/moniteurs']],
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Clients actifs'), 'url' => ['/cours-date/actif']] : '',
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres']] : '',
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore']] : '',
