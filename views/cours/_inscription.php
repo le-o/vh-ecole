@@ -13,7 +13,16 @@ use yii\bootstrap\Modal;
 /* @var $model app\models\CoursDate */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); });', View::POS_END);
+$modalJs = "
+    $('#toggleEmail').click(function() {
+        $( '#item' ).toggle();
+    });
+        
+    $('.modal-email-link').click(function() {
+        $('#parametres-keyformail').val($(this).closest('tr').data('key'));
+    });
+";
+$this->registerJs($modalJs, View::POS_END);
 ?>
 
 <div class="cours-participant-form">
@@ -42,6 +51,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
         <?php $form = ActiveForm::begin(); ?>
             <div class="col-sm-4">
                 <?php Modal::begin([
+                    'id' => 'modal-email',
                     'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
                     'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],
                 ]);
@@ -50,6 +60,9 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 echo '<div id="item" style="display:none;">';
                 echo $personneModel->email;
                 echo '</div>';
+                
+                echo $form->field($parametre, 'keyForMail')->hiddenInput()->label(false);
+                echo $form->field($personneModel, 'personne_id')->hiddenInput()->label(false);
 
                 echo $form->field($parametre, 'parametre_id')->dropDownList(
                     $emails,
@@ -102,7 +115,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             'date',
             
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{coursView}',
+                'template'=>'{coursView} {coursEmail}',
                 'buttons'=>[
                     'coursView' => function ($model, $key, $index) {
                         $key = explode('|', $index);
@@ -114,6 +127,14 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                     	return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to([$page, 'id' => $key[0]]), [
 							'title' => Yii::t('app', 'Voir'),
 						]);
+                    },       
+                    'coursEmail' => function ($model, $key, $index) {
+                        return Html::a('<span class="glyphicon glyphicon-envelope"></span> ', '#', [
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modal-email',
+                            'data-key' => $index,
+                            'class' => 'modal-email-link',
+                        ]);
                     }
                 ],
             ],

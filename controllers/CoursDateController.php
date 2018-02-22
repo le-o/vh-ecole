@@ -84,8 +84,7 @@ class CoursDateController extends Controller
             $alerte['class'] = 'success';
             $alerte['message'] = Yii::t('app', 'La personne a bien été supprimée du cours !');
         }
-
-        $sendEmail = false;
+        
         if ($post = Yii::$app->request->post()) {
             if (!empty($post['new_participant'])) {
                 // soit on ajoute un participant
@@ -138,8 +137,7 @@ class CoursDateController extends Controller
                 }
             } else {
                 // soit on envoi un email !
-                // on le fait après avoir cherché la liste des participants
-                $sendEmail = true;
+                SiteController::actionEmail($post['Parametres'], explode(', ', $post['Parametres']['listeEmails']));
                 $alerte['class'] = 'info';
                 $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
             }
@@ -159,16 +157,12 @@ class CoursDateController extends Controller
             $excludePart[] = $participant->personne_id;
             
             if (strpos($participant->email, '@') !== false) {
-                $listeEmails[$participant->email] = $participant->email;
+                $listeEmails[$participant->email] = trim($participant->email);
             }
             
             foreach ($participant->personneHasInterlocuteurs as $pi) {
-                $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
             }
-        }
-
-        if ($sendEmail == true) {
-            SiteController::actionEmail($post['Parametres'], $listeEmails);
         }
         
         $dataClients = Personnes::getClientsNotInCours($excludePart);
@@ -208,6 +202,7 @@ class CoursDateController extends Controller
         }
         
         $parametre = new Parametres();
+        $parametre->listeEmails = implode(', ', $listeEmails);
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
 
         return $this->render('view', [
@@ -224,7 +219,6 @@ class CoursDateController extends Controller
             'participantDataProvider' => $participantDataProvider,
             'parametre' => $parametre,
             'emails' => $emails,
-            'listeEmails' => $listeEmails,
         ]);
     }
     
@@ -266,10 +260,6 @@ class CoursDateController extends Controller
         
         if (!empty(Yii::$app->request->post())) {
             $mail = Yii::$app->request->post();
-            echo "<pre>";
-            print_r($mail);
-            echo "</pre>";
-            exit;
             SiteController::actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
 
             $alerte['class'] = 'info';
@@ -291,10 +281,10 @@ class CoursDateController extends Controller
                 $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['personne_id'] = $client->fk_personne;
                 
                 if (strpos($client->fkPersonne->email, '@') !== false) {
-                    $listeEmails[$client->fkPersonne->email] = $client->fkPersonne->email;
+                    $listeEmails[$client->fkPersonne->email] = trim($client->fkPersonne->email);
                 }
                 foreach ($client->fkPersonne->personneHasInterlocuteurs as $pi) {
-                    $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                    $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
                 }
             }
         }

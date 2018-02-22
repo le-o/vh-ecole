@@ -70,11 +70,11 @@ class PersonnesController extends Controller
         $listeEmails = [];
         foreach ($dataProviderAll->models as $myPersonne) {
             if (strpos($myPersonne->email, '@') !== false) {
-                $listeEmails[$myPersonne->email] = $myPersonne->email;
+                $listeEmails[$myPersonne->email] = trim($myPersonne->email);
             }
             
             foreach ($myPersonne->personneHasInterlocuteurs as $pi) {
-                $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
             }
         }
 
@@ -311,6 +311,7 @@ class PersonnesController extends Controller
                     }
                 }
             } elseif (!empty($post['Parametres'])) {
+                $post['Parametres']['personne_id'] = $id;
                 // soit on envoi un email
                 SiteController::actionEmail($post['Parametres'], [$model->email => $model->email]);
                 $alerte['class'] = 'info';

@@ -86,7 +86,7 @@ class CoursDate extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return Personne nom prénom
+     * @return Date Heure de fin
      */
     public function getHeureFin()
     {
