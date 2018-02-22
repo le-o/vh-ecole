@@ -68,12 +68,19 @@ class SiteController extends Controller
         $searchModel->homepage = true;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
+        // liste de tous les cours sans date dans le futur
+        $searchNoFutur = new CoursDateSearch();
+        $searchNoFutur->dateA = date('d.m.Y');
+        $searchNoFutur->homepage = true;
+        $dataProviderNF = $searchNoFutur->search([]);
+        
         // set la valeur de la date début du calendrier
         if (Yii::$app->session->get('home-cal-debut') === null) Yii::$app->session->set('home-cal-debut', date('Y-m-d'));
         if (Yii::$app->session->get('home-cal-view') === null) Yii::$app->session->set('home-cal-view', 'agendaWeek');
         
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'dataProviderNF' => $dataProviderNF,
         ]);
     }
 
