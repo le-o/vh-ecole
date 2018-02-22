@@ -20,6 +20,10 @@ use Yii;
  */
 class Parametres extends \yii\db\ActiveRecord
 {
+    
+    public $keyForMail;
+    public $listeEmails;
+    
     /**
      * @inheritdoc
      */

@@ -93,7 +93,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'participantDataProvider' => $participantDataProvider,
         'parametre' => $parametre,
         'emails' => $emails,
-        'listeEmails' => $listeEmails,
         'forPresenceOnly' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? false : true,
     ]) ?>
 

@@ -83,7 +83,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'participantDataProvider' => $participantDataProvider,
         'parametre' => $parametre,
         'emails' => $emails,
-        'listeEmails' => $listeEmails,
         'forPresenceOnly' => false,
     ]) ?>
     

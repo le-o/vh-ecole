@@ -6,6 +6,7 @@ use Yii;
 use app\models\CoursDate;
 use app\models\CoursDateSearch;
 use app\models\Cours;
+use app\models\Personnes;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -135,20 +136,43 @@ class SiteController extends Controller
             }
         }
         
+        $content = $mail['valeur'];
+        
+        if (isset($mail['personne_id']) && !empty($mail['personne_id'])) {
+            $myPersonne = Personnes::findOne($mail['personne_id']);
+            $content = str_replace(['#prenom#', '#nom#'], [$myPersonne->prenom, $myPersonne->nom], $content);
+        }
+        
+        if (isset($mail['keyForMail']) && !empty($mail['keyForMail'])) {
+            $indexs = explode('|', $mail['keyForMail']);
+            $myCours = Cours::findOne($indexs[0]);
+            $dateCours = $myCours->nextCoursDate;
+            $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : '<b>heure début</b>';
+            $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : '<b>heure fin</b>';
+            $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
+            $content = str_replace(
+                ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', 
+                    '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#'], 
+                [$myCours->fkNom->nom, $myCours->FkJoursNoms, $heure_debut, $heure_fin, 
+                    $myCours->session, $myCours->fkSaison->nom, $myCours->prix, $date], 
+                $content
+            );
+        }
+        
         if (isset($emails)) {
             if ($public) {
                 $message = Yii::$app->mailer->compose()
                     ->setFrom(Yii::$app->params['adminEmail'])
                     ->setTo($emails)
                     ->setSubject($mail['nom'])
-                    ->setHtmlBody($mail['valeur']);
+                    ->setHtmlBody($content);
             } else {
                 $message = Yii::$app->mailer->compose()
                     ->setFrom(Yii::$app->params['adminEmail'])
                     ->setTo(Yii::$app->params['adminEmail'])
                     ->setBcc($emails)
                     ->setSubject($mail['nom'])
-                    ->setHtmlBody($mail['valeur']);
+                    ->setHtmlBody($content);
             }
 
             //  (this creates the full MIME message required for imap_append()

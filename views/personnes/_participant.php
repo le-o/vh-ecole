@@ -73,7 +73,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
                 echo '<a id="toggleEmail" href="#">'.Yii::t('app', 'Voir email(s)').'</a>';
                 echo '<div id="item" style="display:none;">';
-                echo implode(', ', $listeEmails);
+                echo $form->field($parametre, 'listeEmails')->textarea()->label(false);
                 echo '</div>';
 
                 echo $form->field($parametre, 'parametre_id')->dropDownList(

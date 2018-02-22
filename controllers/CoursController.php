@@ -115,8 +115,7 @@ class CoursController extends Controller
             $alerte['class'] = 'danger';
             $alerte['message'] = $msg;
         }
-
-        $sendEmail = false;
+        
         if (!empty(Yii::$app->request->post()) || $session->getFlash('newParticipant') != '') {
         // soit on force toutes les dates, soit on prend que le futur (mode normal !)
         if ($session->getFlash('newParticipant') != '') {
@@ -159,8 +158,7 @@ class CoursController extends Controller
             }
         } elseif (!empty($new['Parametres'])) {
             // soit on envoi un email !
-            // on le fait après avoir cherché la liste des participants
-            $sendEmail = true;
+            SiteController::actionEmail($new['Parametres'], explode(', ', $post['Parametres']['listeEmails']));
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
         } elseif (!empty($new['Cours'])) {
@@ -208,24 +206,20 @@ class CoursController extends Controller
         foreach ($coursDate->all() as $date) {
             $listeCoursDate[] = $date->cours_date_id;
         }
-	    $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->orderBy('clients_has_cours_date.fk_statut ASC');
-	    $listParticipants = $participants->all();
-	    $excludePart = [];
+        $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->orderBy('clients_has_cours_date.fk_statut ASC');
+        $listParticipants = $participants->all();
+        $excludePart = [];
         $listeEmails = [];
-	    foreach ($listParticipants as $participant) {
-	        $excludePart[] = $participant->personne_id;
+        foreach ($listParticipants as $participant) {
+            $excludePart[] = $participant->personne_id;
             
             if (strpos($participant->email, '@') !== false) {
-                $listeEmails[$participant->email] = $participant->email;
+                $listeEmails[$participant->email] = trim($participant->email);
             }
             
             foreach ($participant->personneHasInterlocuteurs as $pi) {
-                $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
             }
-	    }
-
-        if ($sendEmail == true) {
-            SiteController::actionEmail($new['Parametres'], $listeEmails);
         }
 	    
         $dataClients = Personnes::getClientsNotInCours($excludePart);
@@ -255,6 +249,7 @@ class CoursController extends Controller
         }
 
         $parametre = new Parametres();
+        $parametre->listeEmails = implode(', ', $listeEmails);
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
         
         // gestion affichage bouton
@@ -276,7 +271,6 @@ class CoursController extends Controller
             'emails' => $emails,
             'displayActions' => $displayActions,
             'createR' => $createR,
-            'listeEmails' => $listeEmails,
         ]);
     }
 
