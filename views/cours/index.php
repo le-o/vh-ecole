@@ -71,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => Yii::t('app', 'Nb Part'),
                 'value' => function ($model) {
-                    return (in_array($model->fk_type, Yii::$app->params['coursPlanifieS'])) ? $model->nombreClientsInscrits : Yii::t('app', 'n/a');
+                    return (in_array($model->fk_type, Yii::$app->params['coursPlanifieS'])) ? $model->nombreClientsInscritsForDataGrid : Yii::t('app', 'n/a');
                 }
             ],
             // 'description:ntext',

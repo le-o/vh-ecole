@@ -247,7 +247,22 @@ class Cours extends \yii\db\ActiveRecord
     /**
      * @return int Number of clients
      */
-    public function getNombreClientsInscrits()
+    public function getNombreClientsInscrits($listeCoursDate = [])
+    {
+        // liste des dates de cours
+        if (!empty($listeCoursDate)) {
+            $coursDate = CoursDate::find()->where(['fk_cours' => $this->cours_id])->orderBy('date');
+            foreach ($coursDate->all() as $date) {
+                $listeCoursDate[] = $date->cours_date_id;
+            }
+        }
+        return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['partInscrit']])->count();
+    }
+    
+    /**
+     * @return string Nombre clients inscrits (Nombre clients 2 cours à l'essai)
+     */
+    public function getNombreClientsInscritsForDataGrid()
     {
         // liste des dates de cours
         $listeCoursDate = [];
@@ -255,6 +270,9 @@ class Cours extends \yii\db\ActiveRecord
         foreach ($coursDate->all() as $date) {
             $listeCoursDate[] = $date->cours_date_id;
         }
-        return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['partInscrit']])->count();
+        
+        $partEssai = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['part2Essai']])->count();
+        
+        return ($partEssai != 0) ? $this->getNombreClientsInscrits($listeCoursDate).' ('.$partEssai.')' : $this->getNombreClientsInscrits($listeCoursDate);
     }
 }
