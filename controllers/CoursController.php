@@ -241,7 +241,7 @@ class CoursController extends Controller
         foreach($participantDataProvider->models as $part) {
             foreach ($coursDate->all() as $date) {
                 $pres = $date->getForPresence($part->personne_id);
-                if (isset($pres->fk_statut)) {
+                if (!empty($pres->fk_statut)) {
                     $part->statutPart = $pres->fkStatut->nom;
                     break;
                 }
