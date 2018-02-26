@@ -143,6 +143,16 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getNombreClientsInscrits()
     {
-	    return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $this->cours_date_id])->count();
+        return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $this->cours_date_id])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['partInscrit']])->count();
+    }
+    
+    /**
+     * @return string Nombre clients inscrits (Nombre clients 2 cours à l'essai)
+     */
+    public function getNombreClientsInscritsForDataGrid()
+    {
+        $partEssai = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $this->cours_date_id])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['part2Essai']])->count();
+        
+        return ($partEssai != 0) ? $this->getNombreClientsInscrits().' ('.$partEssai.')' : $this->getNombreClientsInscrits();
     }
 }

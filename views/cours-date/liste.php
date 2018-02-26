@@ -51,7 +51,7 @@ $gridColumns = [
     [
         'label' => Yii::t('app', 'Nb Part'),
         'value' => function($data) {
-            return $data->nombreClientsInscrits;
+            return $data->nombreClientsInscritsForDataGrid;
         },
     ],
     'remarque',
