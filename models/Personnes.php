@@ -236,22 +236,6 @@ class Personnes extends \yii\db\ActiveRecord
         
         $query = $this->getClientsHasCoursDate();
         return $query->all();
-//        echo "<pre>";
-//        print_r($query);
-//        echo "</pre>";
-//        exit;
-
-//    $query
-//            ->andWhere(['client_has_cours_date.date' => '2017-10-12']);
-        $query->joinWith('fkCoursDate', false)
-            ->andWhere(['cours_date.date' => '2017-10-12']);
-//    echo "<pre>";
-//    print_r($query->all());
-//    echo "</pre>";
-//    exit;
-
-    return $query;
-        return $this->hasMany(ClientsHasCoursDate::className(), ['fk_personne' => 'personne_id', 'date' => '2017-10-12']);
     }
     
     /**

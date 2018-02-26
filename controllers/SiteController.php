@@ -147,21 +147,35 @@ class SiteController extends Controller
         
         if (isset($mail['personne_id']) && !empty($mail['personne_id'])) {
             $myPersonne = Personnes::findOne($mail['personne_id']);
-            $content = str_replace(['#prenom#', '#nom#'], [$myPersonne->prenom, $myPersonne->nom], $content);
+            $inscriptions = $myPersonne->clientsHasCoursDate;
+            $statut_inscription = isset($inscriptions[0]) ? $inscriptions[0]->fkStatut->nom : 'n/a';
+            
+            $content = str_replace(
+                ['#prenom#', '#nom#', '#statut-inscription#'], 
+                [$myPersonne->prenom, $myPersonne->nom, $statut_inscription], 
+                $content);
         }
         
         if (isset($mail['keyForMail']) && !empty($mail['keyForMail'])) {
             $indexs = explode('|', $mail['keyForMail']);
             $myCours = Cours::findOne($indexs[0]);
             $dateCours = $myCours->nextCoursDate;
+            $allDatesCours = $myCours->coursDates;
+            $datesCours = [];
+            foreach ($allDatesCours as $date) {
+                $datesCours[] = $date->date;
+            }
             $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : '<b>heure début</b>';
             $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : '<b>heure fin</b>';
             $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
+            
             $content = str_replace(
                 ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', 
-                    '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#'], 
+                    '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
+                    '#toutes-les-dates#'], 
                 [$myCours->fkNom->nom, $myCours->FkJoursNoms, $heure_debut, $heure_fin, 
-                    $myCours->session, $myCours->fkSaison->nom, $myCours->prix, $date], 
+                    $myCours->session, $myCours->fkSaison->nom, $myCours->prix, $date,
+                    implode(', ', $datesCours)], 
                 $content
             );
         }
