@@ -8,8 +8,8 @@
 namespace yii\filters;
 
 use Yii;
-use yii\base\ActionFilter;
 use yii\base\Action;
+use yii\base\ActionFilter;
 
 /**
  * HttpCache implements client-side caching by utilizing the `Last-Modified` and `ETag` HTTP headers.
@@ -102,7 +102,7 @@ class HttpCache extends ActionFilter
      */
     public $sessionCacheLimiter = '';
     /**
-     * @var boolean a value indicating whether this filter should be enabled.
+     * @var bool a value indicating whether this filter should be enabled.
      */
     public $enabled = true;
 
@@ -111,7 +111,7 @@ class HttpCache extends ActionFilter
      * This method is invoked right before an action is to be executed (after all possible filters.)
      * You may override this method to do last-minute preparation for the action.
      * @param Action $action the action to be executed.
-     * @return boolean whether the action should continue to be executed.
+     * @return bool whether the action should continue to be executed.
      */
     public function beforeAction($action)
     {
@@ -130,7 +130,9 @@ class HttpCache extends ActionFilter
         }
         if ($this->etagSeed !== null) {
             $seed = call_user_func($this->etagSeed, $action, $this->params);
-            $etag = $this->generateEtag($seed);
+            if ($seed !== null) {
+                $etag = $this->generateEtag($seed);
+            }
         }
 
         $this->sendCacheControlHeader();
@@ -140,13 +142,14 @@ class HttpCache extends ActionFilter
             $response->getHeaders()->set('Etag', $etag);
         }
 
-        if ($this->validateCache($lastModified, $etag)) {
+        $cacheValid = $this->validateCache($lastModified, $etag);
+        // https://tools.ietf.org/html/rfc7232#section-4.1
+        if ($lastModified !== null && (!$cacheValid || ($cacheValid && $etag === null))) {
+            $response->getHeaders()->set('Last-Modified', gmdate('D, d M Y H:i:s', $lastModified) . ' GMT');
+        }
+        if ($cacheValid) {
             $response->setStatusCode(304);
             return false;
-        }
-
-        if ($lastModified !== null) {
-            $response->getHeaders()->set('Last-Modified', gmdate('D, d M Y H:i:s', $lastModified) . ' GMT');
         }
 
         return true;
@@ -154,26 +157,27 @@ class HttpCache extends ActionFilter
 
     /**
      * Validates if the HTTP cache contains valid content.
-     * @param integer $lastModified the calculated Last-Modified value in terms of a UNIX timestamp.
+     * If both Last-Modified and ETag are null, returns false.
+     * @param int $lastModified the calculated Last-Modified value in terms of a UNIX timestamp.
      * If null, the Last-Modified header will not be validated.
      * @param string $etag the calculated ETag value. If null, the ETag header will not be validated.
-     * @return boolean whether the HTTP cache is still valid.
+     * @return bool whether the HTTP cache is still valid.
      */
     protected function validateCache($lastModified, $etag)
     {
-        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+        if (Yii::$app->request->headers->has('If-None-Match')) {
             // HTTP_IF_NONE_MATCH takes precedence over HTTP_IF_MODIFIED_SINCE
             // http://tools.ietf.org/html/rfc7232#section-3.3
             return $etag !== null && in_array($etag, Yii::$app->request->getETags(), true);
-        } elseif (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-            return $lastModified !== null && @strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified;
-        } else {
-            return $etag === null && $lastModified === null;
+        } elseif (Yii::$app->request->headers->has('If-Modified-Since')) {
+            return $lastModified !== null && @strtotime(Yii::$app->request->headers->get('If-Modified-Since')) >= $lastModified;
         }
+
+        return false;
     }
 
     /**
-     * Sends the cache control header to the client
+     * Sends the cache control header to the client.
      * @see cacheControlHeader
      */
     protected function sendCacheControlHeader()
@@ -185,11 +189,11 @@ class HttpCache extends ActionFilter
                 header_remove('Last-Modified');
                 header_remove('Pragma');
             }
-            session_cache_limiter($this->sessionCacheLimiter);
+
+            Yii::$app->getSession()->setCacheLimiter($this->sessionCacheLimiter);
         }
 
         $headers = Yii::$app->getResponse()->getHeaders();
-        $headers->set('Pragma');
 
         if ($this->cacheControlHeader !== null) {
             $headers->set('Cache-Control', $this->cacheControlHeader);
@@ -203,7 +207,7 @@ class HttpCache extends ActionFilter
      */
     protected function generateEtag($seed)
     {
-        $etag =  '"' . rtrim(base64_encode(sha1($seed, true)), '=') . '"';
+        $etag = '"' . rtrim(base64_encode(sha1($seed, true)), '=') . '"';
         return $this->weakEtag ? 'W/' . $etag : $etag;
     }
 }
