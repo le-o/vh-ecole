@@ -13,6 +13,7 @@ use yii\web\View;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Clients');
+$this->params['breadcrumbs'][] = Yii::t('app', 'Personnes');
 $this->params['breadcrumbs'][] = $this->title;
 
 $script = "$(document).on('click', '.showModalButton', function(){
