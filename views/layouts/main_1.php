@@ -35,7 +35,7 @@ AppAsset::register($this);
 
 <div class="wrap">
 
-    <div class="container">
+    <div class="no-container">
         <?= $content ?>
     </div>
 </div>
