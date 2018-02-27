@@ -18,7 +18,7 @@ use yii\db\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildUnsignedString()
     {
@@ -26,7 +26,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildAfterString()
     {
@@ -36,7 +36,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildFirstString()
     {
@@ -44,28 +44,29 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildCommentString()
     {
-        return $this->comment !== null ? " COMMENT " . $this->db->quoteValue($this->comment) : '';
+        return $this->comment !== null ? ' COMMENT ' . $this->db->quoteValue($this->comment) : '';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __toString()
     {
         switch ($this->getTypeCategory()) {
             case self::CATEGORY_PK:
-                $format = '{type}{check}{pos}{comment}{append}';
+                $format = '{type}{check}{comment}{append}{pos}';
                 break;
             case self::CATEGORY_NUMERIC:
-                $format = '{type}{length}{unsigned}{notnull}{unique}{default}{check}{comment}{pos}{append}';
+                $format = '{type}{length}{unsigned}{notnull}{unique}{default}{check}{comment}{append}{pos}';
                 break;
             default:
-                $format = '{type}{length}{notnull}{unique}{default}{check}{comment}{pos}{append}';
+                $format = '{type}{length}{notnull}{unique}{default}{check}{comment}{append}{pos}';
         }
+
         return $this->buildCompleteString($format);
     }
 }
