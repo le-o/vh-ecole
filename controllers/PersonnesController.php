@@ -154,6 +154,39 @@ class PersonnesController extends Controller
             ],
         ]);
         
+        // gestion du tri ici, car on a reconstruit le dataprovider manuellement
+        $moniteursProvider->setSort([
+            'attributes' => [
+                'statut' => [
+                    'asc' => ['statut' => SORT_ASC],
+                    'desc' => ['statut' => SORT_DESC],
+                ],
+                'type' => [
+                    'asc' => ['type' => SORT_ASC],
+                    'desc' => ['type' => SORT_DESC],
+                ],
+                'societe' => [
+                    'asc' => ['societe' => SORT_ASC],
+                    'desc' => ['societe' => SORT_DESC],
+                ],
+                'nom' => [
+                    'asc' => ['nom' => SORT_ASC],
+                    'desc' => ['nom' => SORT_DESC],
+                ],
+                'prenom' => [
+                    'asc' => ['prenom' => SORT_ASC],
+                    'desc' => ['prenom' => SORT_DESC],
+                ],
+                'localite' => [
+                    'asc' => ['localite' => SORT_ASC],
+                    'desc' => ['localite' => SORT_DESC],
+                ],
+            ],
+            'defaultOrder' => [
+                'nom' => SORT_ASC
+            ]
+        ]);
+        
         $modelParams = new Parametres();
         $dataCours = $modelParams->optsNomCours();
         $selectedCours = (isset($searchParams['list_cours'])) ? $searchParams['list_cours'] : '';
