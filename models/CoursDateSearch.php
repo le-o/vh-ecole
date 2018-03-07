@@ -107,6 +107,7 @@ class CoursDateSearch extends CoursDate
             $query->andWhere("date <= '".date('Y-m-d', strtotime($this->dateA))."'");
             if ($this->homepage == true) {
                 $query->andWhere("cours.is_publie = 1 AND cours.is_actif = 1");
+                $query->andWhere("fk_cours NOT IN (SELECT DISTINCT(d2.fk_cours) FROM cours_date d2 WHERE d2.date > '".date('Y-m-d', strtotime($this->dateA))."')");
                 $query->distinct = true;
                 $query->select = ['fk_cours'];
             }
