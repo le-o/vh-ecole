@@ -152,6 +152,11 @@ class SiteController extends Controller
         if (isset($mail['keyForMail']) && !empty($mail['keyForMail'])) {
             $indexs = explode('|', $mail['keyForMail']);
             $myCours = Cours::findOne($indexs[0]);
+            // on a un cours vide, on va essayer de le trouver via les dates
+            if (empty($myCours)) {
+                $myCoursDate = CoursDate::findOne($indexs[0]);
+                $myCours = Cours::findOne($myCoursDate->fk_cours);
+            }
             $dateCours = $myCours->nextCoursDate;
             $allDatesCours = $myCours->coursDates;
             $datesCours = [];
@@ -189,15 +194,11 @@ class SiteController extends Controller
                     ->setHtmlBody($content);
             }
 
-            //  (this creates the full MIME message required for imap_append()
-            $msg = $message->toString();
-            if (YII_ENV === 'dev') {
-                echo "<pre>";
-                print_r($msg);
-                echo "</pre>";
-            } else {
-                // we send the message !
-                $message->send();
+            // we send the message !
+            $message->send();
+            if (YII_ENV != 'dev') {
+                //  (this creates the full MIME message required for imap_append()
+                $msg = $message->toString();
 
                 //  After this you can call imap_append like this:
                 // connect to IMAP (port 143)
