@@ -120,7 +120,7 @@ class ParametresController extends Controller
         $data = Yii::$app->request->post();
         $myEmail = Parametres::findOne($data['id']);
         $test[] = ['sujet' => $myEmail->nom, 'contenu' => $myEmail->valeur];
-        echo json_encode($test);
+        return json_encode($test);
     }
 
     /**
