@@ -23,7 +23,10 @@ $gridColumns = [
     
     'statut',
     'type',
-    'societe',
+    [
+        'attribute' => 'societe',
+        'format' => 'html',
+    ],
     'nom',
     'prenom',
     'localite',
