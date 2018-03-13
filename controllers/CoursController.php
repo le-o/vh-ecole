@@ -229,7 +229,6 @@ class CoursController extends Controller
             'pagination' => [
                 'pageSize' => 20,
             ],
-            'sort' =>false
         ]);
 
         $participantDataProvider = new ActiveDataProvider([
