@@ -11,7 +11,7 @@ $this->title = 'VH Gestion des cours';
 ?>
 <div class="site-index">
     
-    <h2><?= Yii::t('app', 'Cours actifs sans date futur') ?></h2>
+    <h2><?= Yii::t('app', 'Cours actifs sans date future') ?></h2>
     
     <?= GridView::widget([
         'dataProvider' => $dataProviderNF,
