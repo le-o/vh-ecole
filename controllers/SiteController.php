@@ -164,23 +164,28 @@ class SiteController extends Controller
                 $myCoursDate = CoursDate::findOne($indexs[0]);
                 $myCours = Cours::findOne($myCoursDate->fk_cours);
             }
+            $saison = (isset($myCours->fkSaison)) ? $myCours->fkSaison->nom : '';
             $dateCours = $myCours->nextCoursDate;
             $allDatesCours = $myCours->coursDates;
             $datesCours = [];
+            $datesCoursInscrit = [];
             foreach ($allDatesCours as $date) {
+                if ($date->getForPresence($mail['personne_id'])) {
+                    $datesCoursInscrit[] = $date->date;
+                }
                 $datesCours[] = $date->date;
             }
-            $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : '<b>heure début</b>';
-            $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : '<b>heure fin</b>';
+            $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : '<b>heure non définie</b>';
+            $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : '<b>heure non définie</b>';
             $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
             
             $content = str_replace(
                 ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', 
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
-                    '#toutes-les-dates#'], 
+                    '#toutes-les-dates#', '#dates-inscrit#'], 
                 [$myCours->fkNom->nom, $myCours->FkJoursNoms, $heure_debut, $heure_fin, 
-                    $myCours->session, $myCours->fkSaison->nom, $myCours->prix, $date,
-                    implode(', ', $datesCours)], 
+                    $myCours->session, $saison, $myCours->prix, $date,
+                    implode(', ', $datesCours), implode(', ', $datesCoursInscrit)], 
                 $content
             );
         }
