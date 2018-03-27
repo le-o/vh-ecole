@@ -147,12 +147,10 @@ class SiteController extends Controller
         
         if (isset($mail['personne_id']) && !empty($mail['personne_id'])) {
             $myPersonne = Personnes::findOne($mail['personne_id']);
-            $inscriptions = $myPersonne->clientsHasCoursDate;
-            $statut_inscription = isset($inscriptions[0]) ? $inscriptions[0]->fkStatut->nom : 'n/a';
             
             $content = str_replace(
-                ['#prenom#', '#nom#', '#statut-inscription#'], 
-                [$myPersonne->prenom, $myPersonne->nom, $statut_inscription], 
+                ['#prenom#', '#nom#'], 
+                [$myPersonne->prenom, $myPersonne->nom], 
                 $content);
         }
         
@@ -169,11 +167,21 @@ class SiteController extends Controller
             $allDatesCours = $myCours->coursDates;
             $datesCours = [];
             $datesCoursInscrit = [];
+            $statutTraite = false;
+            $statutInscription = 'n/a';
             foreach ($allDatesCours as $date) {
                 if ($date->getForPresence($mail['personne_id'])) {
                     $datesCoursInscrit[] = $date->date;
                 }
                 $datesCours[] = $date->date;
+                // on traite le statut du participant
+                if ($statutTraite == false && isset($myPersonne)) {
+                    $inscriptions = $myPersonne->getClientsHasOneCoursDate($date->cours_date_id);
+                    if (!empty($inscriptions)) {
+                        $statutInscription = $inscriptions->fkStatut->nom;
+                    }
+                    $statutTraite = true;
+                }
             }
             $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : '<b>heure non définie</b>';
             $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : '<b>heure non définie</b>';
@@ -182,10 +190,10 @@ class SiteController extends Controller
             $content = str_replace(
                 ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', 
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
-                    '#toutes-les-dates#', '#dates-inscrit#'], 
+                    '#toutes-les-dates#', '#dates-inscrit#', '#statut-inscription#'], 
                 [$myCours->fkNom->nom, $myCours->FkJoursNoms, $heure_debut, $heure_fin, 
                     $myCours->session, $saison, $myCours->prix, $date,
-                    implode(', ', $datesCours), implode(', ', $datesCoursInscrit)], 
+                    implode(', ', $datesCours), implode(', ', $datesCoursInscrit), $statutInscription], 
                 $content
             );
         }
