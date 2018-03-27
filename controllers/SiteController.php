@@ -176,8 +176,8 @@ class SiteController extends Controller
                     $statutTraite = true;
                 }
             }
-            $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : '<b>heure non définie</b>';
-            $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : '<b>heure non définie</b>';
+            $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : $allDatesCours[0]->heure_debut;
+            $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : $allDatesCours[0]->heureFin;
             $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
             
             $content = str_replace(
