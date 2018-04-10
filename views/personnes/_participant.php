@@ -65,7 +65,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
             <?php $form = ActiveForm::begin(); ?>
             <div class="col-sm-5">
-                <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->nombreClientsInscrits == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
+                <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->getNombreClientsInscrits() == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
                 <?php Modal::begin([
                     'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
                     'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],

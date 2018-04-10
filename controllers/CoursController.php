@@ -832,7 +832,7 @@ class CoursController extends Controller
                     'duree' => $c->duree,
                     'prix' => $c->prix,
                     'participant_max' => $c->participant_max,
-                    'nombre_inscrit' => $c->NombreClientsInscrits,
+                    'nombre_inscrit' => $c->getNombreClientsInscrits(),
                     'tranche_age' => $c->fkAge->nom,
                     'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
                     'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',

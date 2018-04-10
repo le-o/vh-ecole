@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'rowOptions' => function($model) {
-            if (in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) && $model->nombreClientsInscrits >= $model->participant_max) return ['class' => 'warning'];
+            if (in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) && $model->getNombreClientsInscrits() >= $model->participant_max) return ['class' => 'warning'];
             if ($model->is_actif == false) return ['class' => 'danger'];
             return [];
         },
