@@ -346,9 +346,17 @@ class PersonnesController extends Controller
                     }
                 }
             } elseif (!empty($post['Parametres'])) {
-                $post['Parametres']['personne_id'] = $id;
                 // soit on envoi un email
-                SiteController::actionEmail($post['Parametres'], [$model->email => $model->email]);
+                $post['Parametres']['personne_id'] = $id;
+                
+                // email interloc. = pas d'envoi sinon message d'erreur :(, donc on cherche les emails des interlocuteurs
+                if (strpos($model->email, '@') !== false) {
+                    $listeEmails[$model->email] = trim($model->email);
+                }
+                foreach ($model->personneHasInterlocuteurs as $pi) {
+                    $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
+                }
+                SiteController::actionEmail($post['Parametres'], $listeEmails);
                 $alerte['class'] = 'info';
                 $alerte['message'] = Yii::t('app', 'Email envoyé');
             } else {

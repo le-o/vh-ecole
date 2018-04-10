@@ -138,11 +138,12 @@ class SiteController extends Controller
             $emails[] = Yii::$app->params['testEmail'];
         } else {
             foreach ($adresses as $a) {
-            	if ($a !== 'none' && $a !== 'interloc.')
-	                $emails[] = $a;
+            	if ($a !== 'none' && $a !== 'interloc.') {
+                    $emails[] = $a;
+                }
             }
         }
-        
+            
         $content = $mail['valeur'];
         
         if (isset($mail['personne_id']) && !empty($mail['personne_id'])) {
