@@ -250,7 +250,7 @@ class Cours extends \yii\db\ActiveRecord
     public function getNombreClientsInscrits($listeCoursDate = [])
     {
         // liste des dates de cours
-        if (!empty($listeCoursDate)) {
+        if (empty($listeCoursDate)) {
             $coursDate = CoursDate::find()->where(['fk_cours' => $this->cours_id])->orderBy('date');
             foreach ($coursDate->all() as $date) {
                 $listeCoursDate[] = $date->cours_date_id;

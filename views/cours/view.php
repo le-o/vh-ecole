@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $coursDateProvider,
         'rowOptions' => function($model) {
-            if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel'] && $model->nombreClientsInscrits >= $model->fkCours->participant_max) return ['class' => 'warning'];
+            if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel'] && $model->getNombreClientsInscrits() >= $model->fkCours->participant_max) return ['class' => 'warning'];
             return [];
         },
         'columns' => [
