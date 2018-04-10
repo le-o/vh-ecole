@@ -179,8 +179,8 @@ class SiteController extends Controller
                     $inscriptions = $myPersonne->getClientsHasOneCoursDate($date->cours_date_id);
                     if (!empty($inscriptions)) {
                         $statutInscription = $inscriptions->fkStatut->nom;
+                        $statutTraite = true;
                     }
-                    $statutTraite = true;
                 }
             }
             $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : $allDatesCours[0]->heure_debut;
