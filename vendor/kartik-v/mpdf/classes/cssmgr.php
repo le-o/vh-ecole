@@ -10,7 +10,7 @@ var $CSS;
 var $tbCSSlvl;
 
 
-function cssmgr(&$mpdf) {
+function __construct(&$mpdf) {
 	$this->mpdf = $mpdf;
 	$this->tablecascadeCSS = array();
 	$this->CSS=array();
@@ -1128,21 +1128,25 @@ function _mergeBorders(&$b, &$a) {	// Merges $a['BORDER-TOP-STYLE'] to $b['BORDE
 function MergeCSS($inherit,$tag,$attr) {
 	$p = array();
 	$zp = array(); 
+        
+        if (!is_array($attr) && $attr == '') {
+            $attr = [];
+        }
 
 	$classes = array();
 	if (isset($attr['CLASS'])) {
 		$classes = preg_split('/\s+/',$attr['CLASS']);
 	}
 	if (!isset($attr['ID'])) { $attr['ID']=''; }
-	// mPDF 6
+    	// mPDF 6
 	$shortlang = '';
 	if (!isset($attr['LANG'])) { $attr['LANG']=''; }
 	else { 
-		$attr['LANG'] = strtolower($attr['LANG']); 
-		if (strlen($attr['LANG']) == 5) {
-			$shortlang = substr($attr['LANG'],0,2);
-		}
-	}
+            $attr['LANG'] = strtolower($attr['LANG']); 
+            if (strlen($attr['LANG']) == 5) {
+                    $shortlang = substr($attr['LANG'],0,2);
+            }
+        }
 	//===============================================
 /*-- TABLES --*/
 	// Set Inherited properties
