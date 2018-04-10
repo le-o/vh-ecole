@@ -134,6 +134,7 @@ class PersonnesController extends Controller
                 }
             }
             if (!$searchParCours || ($searchParCours && $heures !== 0)) {
+                $dataMoniteurs[$moniteur->personne_id]['personne_id'] = $moniteur->personne_id;
                 $dataMoniteurs[$moniteur->personne_id]['statut'] = $moniteur->fkStatut->nom;
                 $dataMoniteurs[$moniteur->personne_id]['type'] = $moniteur->fkType->nom;
                 $dataMoniteurs[$moniteur->personne_id]['societe'] = $moniteur->societe;
@@ -148,6 +149,7 @@ class PersonnesController extends Controller
             }
         }
         $moniteursProvider = new ArrayDataProvider([
+            'key' => 'personne_id',
             'allModels' => $dataMoniteurs,
             'pagination' => [
                 'pageSize' => 100,
