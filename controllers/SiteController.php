@@ -184,15 +184,23 @@ class SiteController extends Controller
                     }
                 }
             }
-            $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : $allDatesCours[0]->heure_debut;
-            $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : $allDatesCours[0]->heureFin;
-            $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
+            if (isset($myCoursDate)) {
+                $heure_debut = $myCoursDate->heure_debut;
+                $heure_fin = $myCoursDate->heureFin;
+                $date = $myCoursDate->date;
+                $jour_cours = Yii::$app->params['joursSemaine'][date('w', strtotime($date))];
+            } else {
+                $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : $allDatesCours[0]->heure_debut;
+                $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : $allDatesCours[0]->heureFin;
+                $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
+                $jour_cours = $myCours->FkJoursNoms;
+            }
             
             $content = str_replace(
                 ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', 
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
                     '#toutes-les-dates#', '#dates-inscrit#', '#statut-inscription#'], 
-                [$myCours->fkNom->nom, $myCours->FkJoursNoms, $heure_debut, $heure_fin, 
+                [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, 
                     $myCours->session, $saison, $myCours->prix, $date,
                     implode(', ', $datesCours), implode(', ', $datesCoursInscrit), $statutInscription], 
                 $content
