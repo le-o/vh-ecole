@@ -158,7 +158,7 @@ class CoursController extends Controller
             }
         } elseif (!empty($new['Parametres'])) {
             // soit on envoi un email !
-            SiteController::actionEmail($new['Parametres'], explode(', ', $post['Parametres']['listeEmails']));
+            SiteController::actionEmail($new['Parametres'], explode(', ', $new['Parametres']['listeEmails']));
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
         } elseif (!empty($new['Cours'])) {
