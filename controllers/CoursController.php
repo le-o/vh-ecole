@@ -266,6 +266,7 @@ class CoursController extends Controller
             'coursDateProvider' => $coursDateProvider,
             'dataClients' => $dataClients,
             'participantDataProvider' => $participantDataProvider,
+            'participantIDs' => $excludePart,
             'parametre' => $parametre,
             'emails' => $emails,
             'displayActions' => $displayActions,

@@ -23,6 +23,7 @@ class Parametres extends \yii\db\ActiveRecord
     
     public $keyForMail;
     public $listeEmails;
+    public $listePersonneId;
     
     /**
      * @inheritdoc

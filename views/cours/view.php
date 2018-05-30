@@ -81,6 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->participant_max) ? true : false,
         'dataClients' => $dataClients,
         'participantDataProvider' => $participantDataProvider,
+        'participantIDs' => $participantIDs,
         'parametre' => $parametre,
         'emails' => $emails,
         'forPresenceOnly' => false,

@@ -150,8 +150,22 @@ class SiteController extends Controller
             $myPersonne = Personnes::findOne($mail['personne_id']);
             
             $content = str_replace(
-                ['#prenom#', '#nom#'], 
-                [$myPersonne->prenom, $myPersonne->nom], 
+                ['#prenom#', '#nom#', ' #tous-les-participants#'], 
+                [$myPersonne->prenom, $myPersonne->nom, ''], 
+                $content);
+        }
+        
+        if (isset($mail['listePersonneId']) && !empty($mail['listePersonneId'])) {
+            $ids = explode('|', $mail['listePersonneId']);
+            $participants = Personnes::find()->where(['IN', 'personne_id', $ids])->all();
+            
+            foreach ($participants as $p) {
+                $noms[] = $p->prenom.' '.$p->nom;
+            }
+            
+            $content = str_replace(
+                ['#tous-les-participants#', ' #prenom#', ' #nom#'],
+                [implode(', ', $noms), '', ''],
                 $content);
         }
         
@@ -171,7 +185,7 @@ class SiteController extends Controller
             $statutTraite = false;
             $statutInscription = 'n/a';
             foreach ($allDatesCours as $date) {
-                if ($date->getForPresence($mail['personne_id'])) {
+                if (isset($mail['personne_id']) && $date->getForPresence($mail['personne_id'])) {
                     $datesCoursInscrit[] = $date->date;
                 }
                 $datesCours[] = $date->date;
