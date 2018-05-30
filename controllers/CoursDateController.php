@@ -217,6 +217,7 @@ class CoursDateController extends Controller
             'isInscriptionOk' => (Yii::$app->user->identity->id < 700 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
             'dataClients' => $dataClients,
             'participantDataProvider' => $participantDataProvider,
+            'participantIDs' => $excludePart,
             'parametre' => $parametre,
             'emails' => $emails,
         ]);

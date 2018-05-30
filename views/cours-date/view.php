@@ -91,6 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
         'dataClients' => $dataClients,
         'participantDataProvider' => $participantDataProvider,
+        'participantIDs' => $participantIDs,
         'parametre' => $parametre,
         'emails' => $emails,
         'forPresenceOnly' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? false : true,

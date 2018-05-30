@@ -75,6 +75,11 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 echo '<div id="item" style="display:none;">';
                 echo $form->field($parametre, 'listeEmails')->textarea()->label(false);
                 echo '</div>';
+                
+                $parametre->keyForMail = $viewAndId[1];
+                $parametre->listePersonneId = implode('|', $participantIDs);
+                echo $form->field($parametre, 'keyForMail')->hiddenInput()->label(false);
+                echo $form->field($parametre, 'listePersonneId')->hiddenInput()->label(false);
 
                 echo $form->field($parametre, 'parametre_id')->dropDownList(
                     $emails,
