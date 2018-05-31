@@ -15,16 +15,17 @@ $this->registerJs('
         displayMessage(jQuery("#choix_cours"), '.$typeCours.');
     });
     function displayMessage(that, type) {
-        var arEnfant = [24, 36, 38];
+        var arEnfant = [24, 36, 38, 188, 189, 190, 191];
         var arDemande = ['.$params->optsNomCoursByType(Yii::$app->params['coursPonctuel']).'];
         if (typeof type != \'undefined\') testType = parseInt(type);
         else testType = parseInt(that.val());
-        console.log(testType);
 
         if ($.inArray(testType, arEnfant) != -1) {
             $("#choix_enfant").show();
+            $("#pmt_tranche").show();
         } else {
             $("#choix_enfant").hide();
+            $("#pmt_tranche").hide();
         }
         if ($.inArray(testType, arDemande) != -1) {
             $("#sur_demande_info").show();
@@ -116,7 +117,9 @@ $this->registerJs('
                 'semestre' => Yii::t('app', 'Je souhaite inscrire mon enfant pour un semestre uniquement'),
                 'offre_annuelle' => Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)')
             ], ['id' => 'choix_enfant', 'style' => 'display:none;']) ?>
-            <?= yii\bootstrap\BaseHtml::checkbox('pmt_tranche', false, ['label' => Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)')]) ?>
+            <div id="pmt_tranche" style="display:none;">
+                <?= yii\bootstrap\BaseHtml::checkbox('pmt_tranche', false, ['label' => Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (Frais administratifs: CHF 10 inscription pour un semestre, CHF 25 inscription pour la saison complète)')]) ?>
+            </div>
         </div>
     </div>
     
