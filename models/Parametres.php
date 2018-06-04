@@ -14,6 +14,7 @@ use Yii;
  * @property string $info_special
  * @property string $info_couleur
  * @property integer $tri
+ * @property string $date_fin_validite
  *
  * @property Personnes[] $personnes
  * @property Personnes[] $personnes0
@@ -42,9 +43,12 @@ class Parametres extends \yii\db\ActiveRecord
             [['class_key', 'nom'], 'required'],
             [['class_key', 'tri'], 'integer'],
             [['valeur'], 'string'],
+            [['date_fin_validite'], 'safe'],
             [['nom'], 'string', 'max' => 50],
             [['info_special'], 'string', 'max' => 150],
-            [['info_couleur'], 'string', 'max' => 7]
+            [['info_couleur'], 'string', 'max' => 7],
+            
+            [['date_fin_validite'], 'default', 'value' => NULL],
         ];
     }
 
@@ -61,55 +65,78 @@ class Parametres extends \yii\db\ActiveRecord
             'info_special' => Yii::t('app', 'Info Special'),
             'info_couleur' => Yii::t('app', 'Info Couleur'),
             'tri' => Yii::t('app', 'Tri'),
+            'date_fin_validite' => Yii::t('app', 'Invalide depuis le'),
         ];
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function afterFind()
+    {
+        $this->date_fin_validite = $this->date_fin_validite != '' && $this->date_fin_validite != '0000-00-00' ? date('d.m.Y', strtotime($this->date_fin_validite)) : '';
+        parent::afterFind();
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            $this->date_fin_validite = $this->date_fin_validite != '' && $this->date_fin_validite != '0000-00-00' ? date('Y-m-d', strtotime($this->date_fin_validite)) : null;
+            return true;
+        } else {
+            return false;
+        }
     }
     
     /**
      * @return array options email for drop-down
      */
-    public function optsEmail()
+    public function optsEmail($selectedParam = null)
     {   
-        return $this->optsDropDown(1);
+        return $this->optsDropDown(1, $selectedParam);
     }
 
     /**
      * @return array options personne statut for drop-down
      */
-    public function optsStatut()
+    public function optsStatut($selectedParam = null)
     {
-        return $this->optsDropDown(3);
+        return $this->optsDropDown(3, $selectedParam);
     }
 
     /**
      * @return array options personne type for drop-down
      */
-    public function optsType()
+    public function optsType($selectedParam = null)
     {   
-        return $this->optsDropDown(2);
+        return $this->optsDropDown(2, $selectedParam);
     }
     
     /**
      * @return array options personne type for drop-down
      */
-    public function optsNiveau()
+    public function optsNiveau($selectedParam = null)
     {   
-        return $this->optsDropDown(4);
+        return $this->optsDropDown(4, $selectedParam);
     }
 
     /**
      * @return array options cours type for drop-down
      */
-    public function optsTypeCours()
+    public function optsTypeCours($selectedParam = null)
     {
-        return $this->optsDropDown(6);
+        return $this->optsDropDown(6, $selectedParam);
     }
 
     /**
      * @return array options nom cours for drop-down
      */
-    public function optsNomCours()
+    public function optsNomCours($selectedParam = null)
     {
-        return $this->optsDropDown(7);
+        return $this->optsDropDown(7, $selectedParam);
     }
 
     /**
@@ -119,7 +146,9 @@ class Parametres extends \yii\db\ActiveRecord
      */
     public function optsNomCoursByType($type)
     {
-        $codes = self::find()->where(['class_key' => 7, 'info_special' => $type])->orderBy('tri')->all();
+        $query = self::find()->where(['class_key' => 7, 'info_special' => $type])->orderBy('tri');
+        $query->andWhere(['OR', 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
+        $codes = $query->all();
         $temp = array();
         foreach($codes as $code) {
             $temp[]= $code['parametre_id'];
@@ -130,73 +159,77 @@ class Parametres extends \yii\db\ActiveRecord
     /**
      * @return array options niveau formation for drop-down
      */
-    public function optsNiveauFormation()
+    public function optsNiveauFormation($selectedParam = null)
     {
-        return $this->optsDropDown(8);
+        return $this->optsDropDown(8, $selectedParam);
     }
 
     /**
      * @return array options statut participant for drop-down
      */
-    public function optsStatutPart()
+    public function optsStatutPart($selectedParam = null)
     {
-        return $this->optsDropDown(9);
+        return $this->optsDropDown(9, $selectedParam);
     }
     
     /**
      * @return array options tranche âge for drop-down
      */
-    public function optsTrancheAge()
+    public function optsTrancheAge($selectedParam = null)
     {
-        return $this->optsDropDown(10);
+        return $this->optsDropDown(10, $selectedParam);
     }
     
     /**
      * @return array options saison for drop-down
      */
-    public function optsSaison()
+    public function optsSaison($selectedParam = null)
     {
-        return $this->optsDropDown(11);
+        return $this->optsDropDown(11, $selectedParam);
     }
     
     /**
      * @return array options jours semaine for drop-down
      */
-    public function optsJourSemaine()
+    public function optsJourSemaine($selectedParam = null)
     {
-        return $this->optsDropDown(12);
+        return $this->optsDropDown(12, $selectedParam);
     }
     
     /**
      * @return array options semestre for drop-down
      */
-    public function optsSemestre()
+    public function optsSemestre($selectedParam = null)
     {
-        return $this->optsDropDown(13);
+        return $this->optsDropDown(13, $selectedParam);
     }
     
     /**
      * @return array options categorie for drop-down
      */
-    public function optsCategorie()
+    public function optsCategorie($selectedParam = null)
     {
-        return $this->optsDropDown(14);
+        return $this->optsDropDown(14, $selectedParam);
     }
     
     /**
      * @return array options langue for drop-down
      */
-    public function optsLangue()
+    public function optsLangue($selectedParam = null)
     {
-        return $this->optsDropDown(15);
+        return $this->optsDropDown(15, $selectedParam);
     }
 
     /**
      * @return array options from classkey for drop-down
      */
-    public function optsDropDown($classKey)
+    public function optsDropDown($classKey, $selectedParam)
     {   
-        $codes = self::find()->where(['class_key' => $classKey])->orderBy('tri')->all();
+        $query = self::find()->where(['class_key' => $classKey])->orderBy('tri');
+        
+        $withId = ($selectedParam !== null) ? 'parametre_id = '.$selectedParam : '';
+        $query->andWhere(['OR', $withId, 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
+        $codes = $query->all();
         $temp = array();
         foreach($codes as $code) {
             $temp[$code['parametre_id']]= $code->nom;

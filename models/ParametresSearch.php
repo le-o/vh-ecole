@@ -19,7 +19,7 @@ class ParametresSearch extends Parametres
     {
         return [
             [['parametre_id', 'class_key', 'tri'], 'integer'],
-            [['nom', 'valeur', 'info_special'], 'safe'],
+            [['nom', 'valeur', 'info_special', 'date_fin_validite'], 'safe'],
         ];
     }
 
@@ -59,6 +59,7 @@ class ParametresSearch extends Parametres
             'parametre_id' => $this->parametre_id,
             'class_key' => $this->class_key,
             'tri' => $this->tri,
+            'date_fin_validite' => $this->date_fin_validite,
         ]);
 
         $query->andFilterWhere(['like', 'nom', $this->nom])
