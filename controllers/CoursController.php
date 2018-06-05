@@ -78,10 +78,14 @@ class CoursController extends Controller
     {
         $searchModel = new CoursSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        $parametre = new Parametres();
+        $saisonFilter = $parametre->optsSaison();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'saisonFilter' => $saisonFilter,
         ]);
     }
 

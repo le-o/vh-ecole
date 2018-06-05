@@ -27,7 +27,7 @@ class CoursSearch extends Cours
         return [
             [['cours_id', 'participant_min', 'participant_max', 'is_actif'], 'integer'],
             [['duree', 'prix'], 'double'],
-            [['description', 'annee', 'session', 'fkNiveau', 'fkType', 'fkNom'], 'safe'],
+            [['description', 'annee', 'session', 'fkNiveau', 'fkType', 'fkNom', 'fkSaison'], 'safe'],
         ];
     }
 
@@ -75,6 +75,7 @@ class CoursSearch extends Cours
             'participant_max' => $this->participant_max,
             'is_actif' => $this->is_actif,
             'is_publie' => $this->is_publie,
+            'fk_saison' => $this->fkSaison,
         ])
         ->andFilterWhere(['like', 'session', $this->session]);
 
