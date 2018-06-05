@@ -22,15 +22,17 @@ $this->registerJs('
 
         if ($.inArray(testType, arEnfant) != -1) {
             $("#choix_enfant").show();
-            $("#pmt_tranche").show();
         } else {
             $("#choix_enfant").hide();
-            $("#pmt_tranche").hide();
         }
         if ($.inArray(testType, arDemande) != -1) {
             $("#sur_demande_info").show();
+            $("#pmt_tranche").hide();
         } else {
             $("#sur_demande_info").hide();
+            if (!isNaN(testType)) {
+                $("#pmt_tranche").show();
+            }
         }
     }'
     , \yii\web\View::POS_END);
