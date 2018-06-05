@@ -30,9 +30,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php if (Yii::$app->user->identity->id < 1000) { ?>
     
      <?= $this->render('_form', [
-	    'alerte' => '',
-        'model' => $model,
-        'modelParams' => $modelParams,
+            'alerte' => '',
+            'model' => $model,
+            'modelParams' => $modelParams,
     ]) ?>
     
     <?php } else { ?>

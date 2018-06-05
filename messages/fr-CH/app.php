@@ -117,7 +117,7 @@ return [
     'Is Materiel Compris' => 'Matériel compris',
     'Is Publié' => 'Publié sur le site internet',
     'Is Responsable' => 'Est responsable',
-    'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)' => 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert UNIQUEMENT pour les cours mini-ouistiti, maxi-ouistiti et jeunes)',
+    'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)' => 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert - uniquement pour les cours réguliers)',
     'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)' => 'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)',
     'Jour semaine' => 'Jour de la semaine',
     'Jours de la semaine' => 'Jours de la semaine',

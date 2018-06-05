@@ -22,15 +22,17 @@ $this->registerJs('
 
         if ($.inArray(testType, arEnfant) != -1) {
             $("#choix_enfant").show();
-            $("#pmt_tranche").show();
         } else {
             $("#choix_enfant").hide();
-            $("#pmt_tranche").hide();
         }
         if ($.inArray(testType, arDemande) != -1) {
             $("#sur_demande_info").show();
+            $("#pmt_tranche").hide();
         } else {
             $("#sur_demande_info").hide();
+            if (!isNaN(testType)) {
+                $("#pmt_tranche").show();
+            }
         }
     }'
     , \yii\web\View::POS_END);
@@ -126,7 +128,7 @@ $this->registerJs('
     <div class="row">
         <div class="col-sm-12"><br />
             <div id="sur_demande_info" style="display:none;"><span style="color:red; font-weight:bold;"><?= Yii::t('app', 'Vous avez choisi un cours sur demande, veuillez indiquer le(s) horaire(s) souhaité(s) date et heure') ?></span></div>
-            <?= $form->field($model, 'informations')->textarea(['rows' => 6])->label(Yii::t('app', 'Infos, détails et besoins particuliers (date et horaire, nom de la session, offres, 2 cours à l\'essai, etc.)')) ?>
+            <?= $form->field($model, 'informations')->textarea(['rows' => 6])->label(Yii::t('app', 'Infos, détails et besoins particuliers')) ?>
         </div>
     </div>
     

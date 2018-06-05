@@ -171,9 +171,11 @@ class ClientsOnlineController extends Controller
             $model->fk_cours = $cours_id;
             $typeCours = $modelCours->fk_nom;
         } else {
-            $modelCours = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('nom, tri')->where(['is_actif' => true, 'is_publie' => true])->all();
+            $query = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('parametres.tri')->where(['is_actif' => true, 'is_publie' => true]);
+            $query->andWhere(['OR', 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
+            $modelCours = $query->all();
             foreach ($modelCours as $cours) {
-                $dataCours[$cours->fkNiveau->nom][$cours->fkNom->parametre_id] = $cours->fkNom->nom;
+                $dataCours[$cours->fkNom->parametre_id] = $cours->fkNom->nom;
             }
         }
         

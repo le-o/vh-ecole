@@ -52,10 +52,10 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'is_entree_compris')->checkbox() ?>
         </div>
     </div>
-
+    
     <div class="row">
         <div class="col-sm-3">
-            <?= $form->field($model, 'fk_nom')->dropDownList($modelParams->optsNomCours(),['prompt'=>Yii::t('app', 'Choisir un nom')]) ?>
+            <?= $form->field($model, 'fk_nom')->dropDownList($modelParams->optsNomCours($model->fk_nom),['prompt'=>Yii::t('app', 'Choisir un nom')]) ?>
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'fk_age')->dropDownList($modelParams->optsTrancheAge(),['prompt'=>Yii::t('app', 'Choisir une tranche d\'âge')]) ?>
