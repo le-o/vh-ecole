@@ -29,11 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-//            [
-//                'attribute' => 'cours_id',
-//                'contentOptions'=>['style'=>'width:80px;']
-//            ],
+            
             [
                 'attribute' => 'is_actif',
                 'value' => function ($data) {
@@ -42,30 +38,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => ['1'=>'Oui', '0'=>'Non'],
             ],
             [
-                'attribute' => 'fkType',
-                'value' => 'fkType.nom',
-                'label' => Yii::t('app', 'Type'),
-            ],
-            [
                 'attribute' => 'fkNom',
                 'value' => 'fkNom.nom',
                 'label' => Yii::t('app', 'Nom'),
             ],
-            [
-                'attribute' => 'fkNiveau',
-                'value' => 'fkNiveau.nom',
-                'label' => Yii::t('app', 'Niveau'),
-            ],
-            [
-                'attribute' => 'fkJoursNoms',
-                'label' => Yii::t('app', 'Jours'),
-            ],
+            'session',
             [
                 'attribute' => 'fkSaison',
                 'value' => 'fkSaison.nom',
                 'label' => Yii::t('app', 'Saison'),
+                'filter' => $saisonFilter,
+                'headerOptions' => ['style' => 'width:95px;'],
             ],
-            'session',
             'participant_min',
             'participant_max',
             [
@@ -74,7 +58,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     return (in_array($model->fk_type, Yii::$app->params['coursPlanifieS'])) ? $model->nombreClientsInscritsForDataGrid : Yii::t('app', 'n/a');
                 }
             ],
-            // 'description:ntext',
+            [
+                'attribute' => 'fkType',
+                'value' => 'fkType.nom',
+                'label' => Yii::t('app', 'Type'),
+            ],
+            [
+                'attribute' => 'fkJoursNoms',
+                'label' => Yii::t('app', 'Jours'),
+            ],
 
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>'{view} {delete}',
