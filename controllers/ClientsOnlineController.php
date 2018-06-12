@@ -74,8 +74,15 @@ class ClientsOnlineController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        if ($model->is_actif) {
+            $doublons = \app\models\Personnes::find()
+                    ->where(['nom' => $model->nom, 'prenom' => $model->prenom])->all();
+        }
+        
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'doublon' => isset($doublons[0]) ? $doublons[0] : null,
         ]);
     }
 
@@ -214,6 +221,8 @@ class ClientsOnlineController extends Controller
                 'modelsClient' => $modelsClient,
                 'dataCours' => $dataCours,
                 'selectedCours' => [$model->fk_cours],
+                'params' => new Parametres,
+                'typeCours' => (isset($typeCours)) ? $typeCours : '',
             ]);
         }
     }
@@ -294,6 +303,71 @@ class ClientsOnlineController extends Controller
         } catch (Exception $e) {
             $transaction->rollBack();
             exit('error');
+        }
+    }
+    
+    public function actionFusionclient($idClientOnline, $idPersonne) {
+        $clientOnline = $this->findModel($idClientOnline);
+        $personne = \app\models\Personnes::findOne($idPersonne);
+        
+        $personne->fk_statut = Yii::$app->params['persStatutStandby'];
+        $personne->adresse1 = $clientOnline->adresse;
+        $personne->npa = $clientOnline->npa;
+        $personne->localite = $clientOnline->localite;
+        $personne->telephone = $clientOnline->telephone;
+        $personne->email = $clientOnline->email;
+        $personne->date_naissance = $clientOnline->date_naissance;
+        $personne->informations .= "\r\n".Yii::t('app', 'Intéressé par le cours').' '.$clientOnline->fkParametre->nom;
+        $personne->informations .= "\r\n".Yii::t('app', 'Date d\'inscription').': '.$clientOnline->date_inscription;
+        if ($clientOnline->informations != '') $personne->informations .= "\r\n\r\n".$clientOnline->informations;
+        
+        $clientsLies = ClientsOnline::findAll(['fk_parent' => $clientOnline->client_online_id]);
+        
+        $transaction = \Yii::$app->db->beginTransaction();
+        try {
+            if ($personne->save()) {
+                $clientsExistes = \app\models\PersonnesHasInterlocuteurs::findAll(['fk_interlocuteur' => $personne->personne_id]);
+                foreach ($clientsExistes as $existe) {
+                    $enfants[$existe->fkPersonne->nom.$existe->fkPersonne->prenom.$existe->fkPersonne->date_naissance] = ['nom' => $existe->fkPersonne->nom, 'prenom' => $existe->fkPersonne->prenom, 'date_naissance' => $existe->fkPersonne->date_naissance];
+                }
+                
+                foreach ($clientsLies as $client) {
+                    $key = $client->nom.$client->prenom.$client->date_naissance;
+                    if (!array_key_exists($key, $enfants)) {
+                        $c = new \app\models\Personnes;
+                        $c->fk_statut = Yii::$app->params['persStatutStandby'];
+                        $c->fk_type = Yii::$app->params['typeADefinir'];
+                        $c->nom = $client->nom;
+                        $c->prenom = $client->prenom;
+                        $c->adresse1 = $client->adresse;
+                        $c->npa = $client->npa;
+                        $c->localite = $client->localite;
+                        $c->telephone = $client->telephone;
+                        $c->email = $client->email;
+                        $c->date_naissance = $client->date_naissance;
+                        $c->informations = $p->informations;
+                        $c->save();
+
+                        $i = new \app\models\PersonnesHasInterlocuteurs;
+                        $i->fk_personne = $c->personne_id;
+                        $i->fk_interlocuteur = $personne->personne_id;
+                        $i->save();
+                    }
+                    
+                    $client->is_actif = false;
+                    $client->save(false);
+                }
+                $clientOnline->is_actif = false;
+                $clientOnline->save(false);
+
+                $transaction->commit();
+                return $this->redirect(['index']);
+            } else {
+                throw new \Exception(Yii::t('app', 'Problème lors de la transformation de la personne.'));
+            }
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            exit('error lors de la fusion des personnes :(');
         }
     }
 
