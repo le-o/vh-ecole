@@ -21,6 +21,8 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
         'modelsClient' => $modelsClient,
         'dataCours' => $dataCours,
         'selectedCours' => $selectedCours,
+        'params' => $params,
+        'typeCours' => $typeCours,
     ]) ?>
 
 </div>
