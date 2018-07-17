@@ -37,6 +37,10 @@ $gridColumns = [
     'email:email',
     'telephone',
     [
+        'attribute' => 'fk_formation',
+        'label' => Yii::t('app', 'Formation'),
+    ],
+    [
         'attribute' => 'heures',
         'footer' => '<div style="text-align:right; font-weight:bold;">'.$heuresTotal.'</div>',
         'contentOptions' => ['style' => 'text-align:right;']
@@ -81,7 +85,7 @@ $gridColumns = [
                 'columnBatchToggleSettings' => [
                     'label' => Yii::t('app', 'Tous/aucun'),
                 ],
-                'noExportColumns' => [10],
+                'noExportColumns' => [12],
                 'dropdownOptions' => [
                     'class' => 'btn btn-default',
                     'label' => Yii::t('app', 'Exporter tous'),

@@ -144,6 +144,7 @@ class PersonnesController extends Controller
                 $dataMoniteurs[$moniteur->personne_id]['fk_langues'] = $moniteur->fkLanguesNoms;
                 $dataMoniteurs[$moniteur->personne_id]['email'] = $moniteur->email;
                 $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;
+                $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = ($moniteur->fk_formation == 0 || is_null($moniteur->fk_formation) || !isset($moniteur->fkFormation)) ? '' : $moniteur->fkFormation->nom;
                 $dataMoniteurs[$moniteur->personne_id]['heures'] = number_format($heures, 2, '.', '\'');
                 $heuresTotal += $heures;
             }
