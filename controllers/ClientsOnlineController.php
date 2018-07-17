@@ -327,6 +327,7 @@ class ClientsOnlineController extends Controller
         try {
             if ($personne->save()) {
                 $clientsExistes = \app\models\PersonnesHasInterlocuteurs::findAll(['fk_interlocuteur' => $personne->personne_id]);
+                $enfants = [];
                 foreach ($clientsExistes as $existe) {
                     $enfants[$existe->fkPersonne->nom.$existe->fkPersonne->prenom.$existe->fkPersonne->date_naissance] = ['nom' => $existe->fkPersonne->nom, 'prenom' => $existe->fkPersonne->prenom, 'date_naissance' => $existe->fkPersonne->date_naissance];
                 }
