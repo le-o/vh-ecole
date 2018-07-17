@@ -47,14 +47,14 @@ class CoursSearch extends Cours
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $pageSize = 60)
     {
         $query = Cours::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pagesize' => 80,
+                'pagesize' => $pageSize,
             ],
         ]);
 
