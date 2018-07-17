@@ -806,7 +806,7 @@ class CoursController extends Controller
         $searchModel = new CoursSearch();
         $searchModel->is_actif = 1;
         $searchModel->is_publie = 1;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, 0);
         
         if ($dataProvider->count == 0) {
             $data = ["Aucune donnée trouvée"];
