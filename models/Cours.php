@@ -275,4 +275,21 @@ class Cours extends \yii\db\ActiveRecord
         
         return ($partEssai != 0) ? $this->getNombreClientsInscrits($listeCoursDate).' ('.$partEssai.')' : $this->getNombreClientsInscrits($listeCoursDate);
     }
+    
+    /**
+     * @return string Nombre clients inscrits + Nombre clients 2 cours à l'essai
+     */
+    public function getNombreClientsInscritsForExport()
+    {
+        // liste des dates de cours
+        $listeCoursDate = [];
+        $coursDate = CoursDate::find()->where(['fk_cours' => $this->cours_id])->orderBy('date');
+        foreach ($coursDate->all() as $date) {
+            $listeCoursDate[] = $date->cours_date_id;
+        }
+        
+        $partEssai = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['part2Essai']])->count();
+        
+        return $this->getNombreClientsInscrits($listeCoursDate) + $partEssai;
+    }
 }
