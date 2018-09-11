@@ -19,6 +19,7 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <?php $this->registerJsFile('../web/js/iframeResizer.contentWindow.min.js'); ?>
     <?php $this->head() ?>
     <style type="text/css">
         .wrap > .container {
@@ -30,10 +31,10 @@ AppAsset::register($this);
         }
     </style>
 </head>
-<body>
+<body class="body-no-height">
 <?php $this->beginBody() ?>
 
-<div class="wrap">
+<div class="wrap-no-height">
 
     <div class="no-container">
         <?= $content ?>
