@@ -256,7 +256,7 @@ class Cours extends \yii\db\ActiveRecord
                 $listeCoursDate[] = $date->cours_date_id;
             }
         }
-        return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['partInscrit']])->count();
+        return ClientsHasCoursDate::find()->select('fk_personne')->distinct()->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['partInscrit']])->count();
     }
     
     /**
@@ -288,8 +288,8 @@ class Cours extends \yii\db\ActiveRecord
             $listeCoursDate[] = $date->cours_date_id;
         }
         
-        $partEssai = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['part2Essai']])->count();
-        
+        $partEssai = ClientsHasCoursDate::find()->select('fk_personne')->distinct()->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['part2Essai']])->count();
+
         return $this->getNombreClientsInscrits($listeCoursDate) + $partEssai;
     }
 }

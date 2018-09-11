@@ -821,7 +821,11 @@ class CoursController extends Controller
                     $categories[] = $cat->nom;
                 }
                 $dates = [];
+                $premierJourSession = '';
                 foreach ($c->coursDates as $d) {
+                    if (empty($premierJourSession)) {
+                        $premierJourSession = date('Y-m-d', strtotime($d->date));
+                    }
                     $dates[] = date('r', strtotime($d->date.' '.$d->heure_debut));
                 }
                 $data[] = [
@@ -842,7 +846,7 @@ class CoursController extends Controller
                     'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
                     'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
                     'infos_tarifs' => $c->offre_speciale,
-                    'premier_jour_session' => (!empty($c->FirstCoursDate)) ? date('Y-m-d', strtotime($c->FirstCoursDate->date)) : '',
+                    'premier_jour_session' => $premierJourSession,
                     'toutes_les_dates' => $dates,
                     'extrait' => $c->extrait,
                     'description' => $c->description,

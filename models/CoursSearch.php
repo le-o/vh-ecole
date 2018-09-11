@@ -78,6 +78,13 @@ class CoursSearch extends Cours
             'fk_saison' => $this->fkSaison,
         ])
         ->andFilterWhere(['like', 'session', $this->session]);
+        
+        $query->joinWith(['fkLangue' => function($langue) {
+            $langue->alias('langue');
+        }]);
+        $query->joinWith(['fkAge' => function($age) {
+            $age->alias('age');
+        }]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);
         
