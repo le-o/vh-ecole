@@ -15,7 +15,7 @@ $this->registerJs('
         displayMessage(jQuery("#choix_cours"), '.$typeCours.');
     });
     function displayMessage(that, type) {
-        var arEnfant = [24, 36, 38, 188, 189, 190, 191];
+        var arEnfant = ['.implode(',', Yii::$app->params['nomsCoursEnfant']).'];
         var arDemande = ['.$params->optsNomCoursByType(Yii::$app->params['coursPonctuel']).'];
         if (typeof type != \'undefined\') testType = parseInt(type);
         else testType = parseInt(that.val());

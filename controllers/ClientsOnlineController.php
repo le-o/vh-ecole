@@ -107,7 +107,7 @@ class ClientsOnlineController extends Controller
             $model->is_actif = true;
             
             // gestion des options supp
-            if (isset($post['offre_supp']) && in_array($model->fk_cours, [24, 36, 38])) {
+            if (isset($post['offre_supp']) && in_array($model->fk_cours, Yii::$app->params['nomsCoursEnfant'])) {
                 if ($post['offre_supp'] == 'cours_essai') {
                     $model->informations .= '
                         + '.Yii::t('app', 'Je souhaite inscrire mon enfant pour 2 cours à l’essai (je déciderai au terme des 2 cours si j’inscris mon enfant pour un semestre ou à l’année)');
