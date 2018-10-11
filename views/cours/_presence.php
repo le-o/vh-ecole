@@ -8,18 +8,22 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model app\models\Cours */
 
-$this->title = Yii::t('app', 'Liste des présences cours').' '.$model->fkNom->nom.' '.$model->fkNiveau->nom;
+$this->title = Yii::t('app', 'Cours').' '.$model->fkNom->nom.' '.$model->fkNiveau->nom.' - '.
+        $model->fkJoursNoms.' '.$model->firstCoursDate->heure_debut.' '.$model->fkSaison->nom;
+
 ?>
 
 <div class="cours-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <?php foreach ($decoupage as $coursDate) { ?>
         <table>
             <tr class="entete">
-                <td colspan="5" class="titre">
-                    <?= $model->fkSaison->nom ?>
+                <td colspan="5" style="text-align: left;">
+                    <span style="font-weight: normal;">
+                        <?= (isset($model->nextCoursDate)) ? $model->nextCoursDate->getCoursHasMoniteursListe($model->nextCoursDate->coursHasMoniteurs, '<br />') : '' ?>
+                    </span>
                 </td>
                 <?php
                 foreach ($coursDate as $date) {

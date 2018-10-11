@@ -105,6 +105,9 @@ class ClientsOnlineController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
             $model->is_actif = true;
+            if (isset($modelCours)) {
+                $model->fk_cours = $modelCours->fk_nom;
+            }
             
             // gestion des options supp
             if (isset($post['offre_supp']) && in_array($model->fk_cours, Yii::$app->params['nomsCoursEnfant'])) {
@@ -129,7 +132,6 @@ class ClientsOnlineController extends Controller
                         INFO: '.Yii::t('app', 'Le client souhaite être inscrit au cours suivant').': '.
                         $modelCours->cours_id.'-'.$modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom.' - '.
                             $modelCours->fkSemestre->nom.' '.$modelCours->fkSaison->nom.' '.$modelCours->session;
-                $model->fk_cours = $modelCours->fk_nom;
             }
 
             $modelsClient = Model::createMultiple(ClientsOnline::classname(), [], 'client_online_id');

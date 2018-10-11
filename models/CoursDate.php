@@ -128,14 +128,16 @@ class CoursDate extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCoursHasMoniteursListe()
+    public function getCoursHasMoniteursListe($arrayMoniteurs = [], $sep = ', ')
     {
-        $moniteurs = $this->getCoursHasMoniteurs();
+        $moniteurs = (!empty($arrayMoniteurs)) ? $arrayMoniteurs : $this->getCoursHasMoniteurs();
         $arrayMoniteurs = [];
         foreach ($moniteurs as $m) {
-            $arrayMoniteurs[] = $m->fkMoniteur->nomPrenom;
+            if (isset($m->fk_moniteur)) {
+                $arrayMoniteurs[] = $m->fkMoniteur->nomPrenom;
+            }
         }
-        return implode(', ', $arrayMoniteurs);
+        return implode($sep, $arrayMoniteurs);
     }
     
     /**
