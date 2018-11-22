@@ -15,6 +15,9 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use yii\data\SqlDataProvider;
 
+use Spatie\CalendarLinks\Link;
+use DateTime;
+
 class SiteController extends Controller
 {
     public function behaviors()
@@ -122,6 +125,28 @@ class SiteController extends Controller
 
     public function actionAbout()
     {
+
+        $from = DateTime::createFromFormat('Y-m-d H:i', '2018-11-01 09:00');
+        $to = DateTime::createFromFormat('Y-m-d H:i', '2018-11-01 18:00');
+
+        $link = Link::create('Test dans le mail', $from, $to)
+            ->description('Cours Koala')
+            ->address('Vertic-halle Saxon');
+
+        // Generate a link to create an event on Google calendar
+        $calLink = '<br /><a href="'.$link->google().'" target="_blank"><img src="'.\yii\helpers\Url::base(true).'/images/cal-bw-01.png" style="width:20px;" /> Ajouter au calendrier google</a>'
+                . '<br /><a href="'.$link->ics().'" target="_blank"><img src="'.\yii\helpers\Url::base(true).'/images/cal-bw-01.png" style="width:20px;" /> Ajouter un événement iCal/Outlook</a>';
+        
+        $message = Yii::$app->mailer->compose()
+                    ->setFrom(Yii::$app->params['adminEmail'])
+                    ->setTo(array('leo.decaillet@d-web.ch'))
+                    ->setSubject('Hello')
+                    ->setHtmlBody("<p>ici mon texte de test</p>".$calLink);
+
+    $response = $message->send();
+
+        
+        
         return $this->render('about');
     }
     

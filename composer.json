@@ -33,7 +33,8 @@
         "yiidoc/yii2-redactor": "*",
         "open-ecommerce/yii2-backuprestore": "dev-master",
         "philippfrenzel/yii2fullcalendar":"*",
-        "wbraganca/yii2-dynamicform": "dev-master"
+        "wbraganca/yii2-dynamicform": "dev-master",
+        "spatie/calendar-links": "^1.1"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

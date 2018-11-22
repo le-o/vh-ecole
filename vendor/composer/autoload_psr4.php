@@ -35,5 +35,6 @@ return array(
     'kartik\\color\\' => array($vendorDir . '/kartik-v/yii2-widget-colorinput'),
     'kartik\\base\\' => array($vendorDir . '/kartik-v/yii2-krajee-base'),
     'cebe\\markdown\\' => array($vendorDir . '/cebe/markdown'),
+    'Spatie\\CalendarLinks\\' => array($vendorDir . '/spatie/calendar-links/src'),
     'Faker\\' => array($vendorDir . '/fzaninotto/faker/src/Faker'),
 );

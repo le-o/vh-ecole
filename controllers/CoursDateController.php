@@ -23,7 +23,7 @@ use yii\data\ArrayDataProvider;
 /**
  * CoursDateController implements the CRUD actions for CoursDate model.
  */
-class CoursDateController extends Controller
+class CoursDateController extends CommonController
 {
     public function behaviors()
     {
@@ -98,8 +98,24 @@ class CoursDateController extends Controller
                 $alerte['class'] = 'success';
                 $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
             } elseif (!empty($post['CoursDate'])) {
+                $clone = clone($model);
                 $model->load(Yii::$app->request->post());
                 $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
+                
+                foreach ($clone->coursHasMoniteurs as $myMoniteur) {
+                    $moniteursOld[] = $myMoniteur->fk_moniteur;
+                }
+                
+                $mailToMoniteurs = false;
+                if (array_diff($moniteursOld, $moniteurs)) {
+                    $mailToMoniteurs = true;
+                }
+                if (!$mailToMoniteurs && $model->date !== $clone->date) {
+                    $mailToMoniteurs = true;
+                }
+                if (!$mailToMoniteurs && ($model->heure_debut != $clone->heure_debut || $model->duree != $clone->duree)) {
+                    $mailToMoniteurs = true;
+                }
 
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
@@ -107,14 +123,12 @@ class CoursDateController extends Controller
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                     }
                     
-                    CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
-                    foreach ($moniteurs as $moniteur_id) {
-                        $addMoniteur = new CoursHasMoniteurs();
-                        $addMoniteur->fk_cours_date = $model->cours_date_id;
-                        $addMoniteur->fk_moniteur = $moniteur_id;
-                        $addMoniteur->is_responsable = 0;
-                        if (!($flag = $addMoniteur->save(false))) {
-                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
+                    if ($mailToMoniteurs == true) {
+                        $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs, true);
+                        // on envoi l'email à tous les moniteurs
+                        if (!empty($infosEmail['emails'])) {
+                            $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'update');
+                            SiteController::actionEmail($contenu, $infosEmail['emails']);
                         }
                     }
                     
@@ -325,42 +339,20 @@ class CoursDateController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
 	        
-	        $post = Yii::$app->request->post();
-	        $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
-	        
-	        $transaction = \Yii::$app->db->beginTransaction();
-	        try {
-		        if (!$model->save()) {
-			        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
-			    }
-                
-                $nomMoniteurs = [];
-                $emails = [];
-                foreach ($moniteurs as $moniteur_id) {
-                    $addMoniteur = new CoursHasMoniteurs();
-                    $addMoniteur->fk_cours_date = $model->cours_date_id;
-                    $addMoniteur->fk_moniteur = $moniteur_id;
-                    $addMoniteur->is_responsable = 0;
-                    if (!($flag = $addMoniteur->save(false))) {
-                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
-                    }
-                    $emails[] = $addMoniteur->fkMoniteur->email;
-                    $nomMoniteurs[] = $addMoniteur->fkMoniteur->prenom.' '.$addMoniteur->fkMoniteur->nom;
-                }
+            $post = Yii::$app->request->post();
+            $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
 
+            $transaction = \Yii::$app->db->beginTransaction();
+            try {
+                if (!$model->save()) {
+                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
+                }
+                
+                $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs);
                 // on envoi l'email à tous les moniteurs
-                $contenu = ['nom' => $model->fkCours->fkNom->nom.' - nouveauté', 
-                    'valeur' => 'Un nouveau cours a été planifié auquel tu es prévu comme moniteur. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
-                        Cours : '.$model->fkCours->fkNom->nom.' <br />
-                        Session : '.$model->fkCours->session.'<br />
-                        Année : '.$model->fkCours->annee.'<br />
-                        Date : '.date('d.m.Y', strtotime($model->date)).'<br />
-                        Heure : '.substr($model->heure_debut, 0, 5).'<br />
-                        Infos : '.$model->remarque.'<br />
-                        Moniteur(s) : '.  implode(', ', $nomMoniteurs)
-                ];
-                if (!empty($emails)) {
-                    SiteController::actionEmail($contenu, $emails);
+                if (!empty($infosEmail['emails'])) {
+                    $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'create');
+                    SiteController::actionEmail($contenu, $infosEmail['emails']);
                 }
                 
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
@@ -508,102 +500,102 @@ class CoursDateController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-        $alerte = [];
-        
-        if ($post = Yii::$app->request->post()) {
-            if (!empty($post['new_participant'])) {
-                $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                $modelClientsHasCoursDate->fk_cours_date = $model->cours_date_id;
-                $modelClientsHasCoursDate->fk_personne = $post['new_participant'];
-                $modelClientsHasCoursDate->is_present = true;
-                $modelClientsHasCoursDate->save(false);
-                $alerte['class'] = 'success';
-                $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
-            } else {
-                $model->load(Yii::$app->request->post());
-                $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
-
-                $transaction = \Yii::$app->db->beginTransaction();
-                try {
-                    if (!$model->save()) {
-                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
-                    }
-                    
-                    CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
-                    foreach ($moniteurs as $moniteur_id) {
-                        $addMoniteur = new CoursHasMoniteurs();
-                        $addMoniteur->fk_cours_date = $model->cours_date_id;
-                        $addMoniteur->fk_moniteur = $moniteur_id;
-                        $addMoniteur->is_responsable = 0;
-                        if (!($flag = $addMoniteur->save(false))) {
-                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
-                        }
-                    }
-                    
-                    $myCours = Cours::findOne($model->fk_cours);
-                    // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
-                    if ($myCours->is_actif == false && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
-                        $myCours->is_actif = true;
-                        $myCours->save();
-                    }
-
-                    $transaction->commit();
-                    if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
-                        return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
-                    } else {
-                        return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
-                    }
-                } catch (Exception $e) {
-                    $alerte = $e->getMessage();
-                    $transaction->rollBack();
-                }
-            }
-        }
-        $myCours = Cours::findOne($model->fk_cours);
-        $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
-        $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
-        foreach ($myMoniteurs as $moniteur) {
-	        $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
-        }
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
-        foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
-        }
-
-        // Gestion des participants
-        $participants = Personnes::find()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $model->cours_date_id]);
-        $listParticipants = $participants->all();
-        $excludePart = [];
-        foreach ($listParticipants as $participant) {
-            $excludePart[] = $participant->personne_id;
-        }
-        $dataClients = ArrayHelper::map(Personnes::find()->where(['not in', 'personne_id', $excludePart])->andWhere(['not in', 'fk_type', 2])->orderBy('nom, prenom')->all(), 'personne_id', 'NomPrenom');
-        $participantDataProvider = new ActiveDataProvider([
-            'query' => $participants,
-            'pagination' => [
-                'pageSize' => 20,
-            ],
-        ]);
-        $parametre = new Parametres();
-        $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
-
-        return $this->render('update', [
-	        'alerte' => $alerte,
-            'model' => $model,
-            'dataCours' => $dataCours,
-            'dataMoniteurs' => $dataMoniteurs,
-            'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : [],
-
-            'isInscriptionOk' => (Yii::$app->user->identity->id < 700 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
-            'dataClients' => $dataClients,
-            'participantDataProvider' => $participantDataProvider,
-            'parametre' => $parametre,
-            'emails' => $emails,
-        ]);
-    }
+//    public function actionUpdate($id)
+//    {
+//        $model = $this->findModel($id);
+//        $alerte = [];
+//        
+//        if ($post = Yii::$app->request->post()) {
+//            if (!empty($post['new_participant'])) {
+//                $modelClientsHasCoursDate = new ClientsHasCoursDate();
+//                $modelClientsHasCoursDate->fk_cours_date = $model->cours_date_id;
+//                $modelClientsHasCoursDate->fk_personne = $post['new_participant'];
+//                $modelClientsHasCoursDate->is_present = true;
+//                $modelClientsHasCoursDate->save(false);
+//                $alerte['class'] = 'success';
+//                $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+//            } else {
+//                $model->load(Yii::$app->request->post());
+//                $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
+//
+//                $transaction = \Yii::$app->db->beginTransaction();
+//                try {
+//                    if (!$model->save()) {
+//                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
+//                    }
+//                    
+//                    CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
+//                    foreach ($moniteurs as $moniteur_id) {
+//                        $addMoniteur = new CoursHasMoniteurs();
+//                        $addMoniteur->fk_cours_date = $model->cours_date_id;
+//                        $addMoniteur->fk_moniteur = $moniteur_id;
+//                        $addMoniteur->is_responsable = 0;
+//                        if (!($flag = $addMoniteur->save(false))) {
+//                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
+//                        }
+//                    }
+//                    
+//                    $myCours = Cours::findOne($model->fk_cours);
+//                    // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
+//                    if ($myCours->is_actif == false && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
+//                        $myCours->is_actif = true;
+//                        $myCours->save();
+//                    }
+//
+//                    $transaction->commit();
+//                    if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
+//                        return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
+//                    } else {
+//                        return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
+//                    }
+//                } catch (Exception $e) {
+//                    $alerte = $e->getMessage();
+//                    $transaction->rollBack();
+//                }
+//            }
+//        }
+//        $myCours = Cours::findOne($model->fk_cours);
+//        $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
+//        $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
+//        foreach ($myMoniteurs as $moniteur) {
+//	        $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
+//        }
+//        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
+//        foreach ($modelMoniteurs as $moniteur) {
+//            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
+//        }
+//
+//        // Gestion des participants
+//        $participants = Personnes::find()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $model->cours_date_id]);
+//        $listParticipants = $participants->all();
+//        $excludePart = [];
+//        foreach ($listParticipants as $participant) {
+//            $excludePart[] = $participant->personne_id;
+//        }
+//        $dataClients = ArrayHelper::map(Personnes::find()->where(['not in', 'personne_id', $excludePart])->andWhere(['not in', 'fk_type', 2])->orderBy('nom, prenom')->all(), 'personne_id', 'NomPrenom');
+//        $participantDataProvider = new ActiveDataProvider([
+//            'query' => $participants,
+//            'pagination' => [
+//                'pageSize' => 20,
+//            ],
+//        ]);
+//        $parametre = new Parametres();
+//        $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
+//
+//        return $this->render('update', [
+//	        'alerte' => $alerte,
+//            'model' => $model,
+//            'dataCours' => $dataCours,
+//            'dataMoniteurs' => $dataMoniteurs,
+//            'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : [],
+//
+//            'isInscriptionOk' => (Yii::$app->user->identity->id < 700 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
+//            'dataClients' => $dataClients,
+//            'participantDataProvider' => $participantDataProvider,
+//            'parametre' => $parametre,
+//            'emails' => $emails,
+//        ]);
+//    }
 
     /**
      * Deletes an existing CoursDate model.
@@ -613,6 +605,14 @@ class CoursDateController extends Controller
      */
     public function actionDelete($id, $from = null)
     {
+        $model = $this->findModel($id);
+        $moniteurs = $model->coursHasMoniteurs;
+        
+        foreach ($model->coursHasMoniteurs as $moniteur) {
+            $emails[] = $moniteur->fkMoniteur->email;
+            $nomMoniteurs[] = $moniteur->fkMoniteur->prenom.' '.$moniteur->fkMoniteur->nom;
+        }
+        
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             CoursHasMoniteurs::deleteAll(['fk_cours_date' => $id]);
@@ -621,6 +621,12 @@ class CoursDateController extends Controller
             $fk_cours = $model->fk_cours;
             $model->delete();
             $transaction->commit();
+            
+            // on envoi l'email à tous les moniteurs
+            if (!empty($emails)) {
+                $contenu = $this->generateMoniteurEmail($model, $nomMoniteurs, 'delete');
+                SiteController::actionEmail($contenu, $emails);
+            }
         } catch (Exception $e) {
             $transaction->rollBack();
             exit($e->getMessage());

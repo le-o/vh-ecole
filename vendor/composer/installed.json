@@ -1626,6 +1626,55 @@
         "description": "A comprehensive library for generating differences between two hashable objects (strings or arrays)."
     },
     {
+        "name": "spatie/calendar-links",
+        "version": "1.1.1",
+        "version_normalized": "1.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/spatie/calendar-links.git",
+            "reference": "a3515cfd8aa0a41018bc4800a023fcfa75a550b3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/spatie/calendar-links/zipball/a3515cfd8aa0a41018bc4800a023fcfa75a550b3",
+            "reference": "a3515cfd8aa0a41018bc4800a023fcfa75a550b3",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^7.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^6.0",
+            "spatie/phpunit-snapshot-assertions": "^1.0"
+        },
+        "time": "2018-10-08T09:21:33+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Spatie\\CalendarLinks\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Sebastian De Deyne",
+                "email": "sebastian@spatie.be",
+                "homepage": "https://spatie.be",
+                "role": "Developer"
+            }
+        ],
+        "description": "Generate add to calendar links for Google, iCal and other calendar systems",
+        "homepage": "https://github.com/spatie/calendar-links",
+        "keywords": [
+            "calendar-links",
+            "spatie"
+        ]
+    },
+    {
         "name": "swiftmailer/swiftmailer",
         "version": "v5.4.3",
         "version_normalized": "5.4.3.0",

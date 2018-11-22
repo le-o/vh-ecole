@@ -24,7 +24,7 @@ use kartik\mpdf\Pdf;
 /**
  * CoursController implements the CRUD actions for Cours model.
  */
-class CoursController extends Controller
+class CoursController extends CommonController
 {
     public function behaviors()
     {
@@ -553,6 +553,14 @@ class CoursController extends Controller
                 $newMoniteur = new CoursHasMoniteurs();
                 $newMoniteur->fk_moniteur = $post['new_moniteur'];
             } else {
+                
+                // préparation du tableau de comparaison
+                foreach ($model->coursDates as $coursDate) {
+                    $dateCours = date('Ymd', strtotime($coursDate->date));
+                    foreach ($coursDate->coursHasMoniteurs as $moniteur) {
+                        $arrayBefore[$dateCours][$moniteur->fk_cours_date.'|'.$moniteur->fk_moniteur] = true;
+                    }
+                }
             
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
@@ -588,19 +596,7 @@ class CoursController extends Controller
                             $dates[$addMoniteur->fk_cours_date]['remarque'] = $addMoniteur->fkCoursDate->remarque;
                         }
                     }
-                    
-                    $valeurEmail = 'Des modifications ont été apportées aux cours suivants. Prière de prendre bonne note.<br />Merci et à bientôt.<br /><br />
-                            Cours : '.$model->fkNom->nom.' <br />
-                            Session : '.$model->session.'<br />
-                            Année : '.$model->annee;
-                    foreach ($dates as $date) {
-                        $valeurEmail .= '<br />Date, heure | moniteur(s) : '.$date['date'].', '.$date['heure'].' | '.  implode(', ', $date['moniteurs']);
-                        if ($date['remarque'] != '') $valeurEmail .= ' - <i>Infos : '.$date['remarque'].'</i>';
-                    }
-                    
-                    // on envoi l'email à tous les moniteurs - y compris ceux qui ont été supprimé
-                    $contenu = ['nom' => $model->fkNom->nom.' - modifications', 'valeur' => $valeurEmail];
-                    SiteController::actionEmail($contenu, $emails);
+                    $this->sendNotifications($dates, $arrayBefore, $post['datemoniteur']);
 
                     $transaction->commit();
                     // on redirige vers la page du cours
@@ -633,7 +629,7 @@ class CoursController extends Controller
         if (isset($newMoniteur)) $arrayMoniteurs[$newMoniteur->fk_moniteur] = $newMoniteur;
         
         return $this->render('moniteurs', [
-	        'alerte' => $alerte,
+            'alerte' => $alerte,
             'model' => $model,
             'dataMoniteurs' => $dataMoniteurs,
             'arrayMoniteurs' => $arrayMoniteurs,
@@ -863,5 +859,52 @@ class CoursController extends Controller
         header('Content-Type: application/json; charset=utf-8');
         return $data;
         exit;
+    }
+    
+    /**
+     * 
+     * @param array $arrayMoniteursBefore
+     * @param array $arrayMoniteursAfter
+     * @return void
+     */
+    private function sendNotifications($dates, $arrayMoniteursBefore, $arrayMoniteursAfter) {
+        // suppression
+        $arraySupprime = $this->checkDiffMulti($arrayMoniteursBefore, $arrayMoniteursAfter);
+        // ajout
+        $arrayAjoute = $this->checkDiffMulti($arrayMoniteursAfter, $arrayMoniteursBefore);
+
+        // on gère les suppressions
+        foreach ($arraySupprime as $parDate) {
+            foreach ($parDate as $key => $v) {
+                $ids = explode('|', $key);
+                if (isset($dates[$ids[0]])) {
+                    $modelCoursDate = CoursDate::findOne($ids[0]);
+                    $modelMoniteur = Personnes::findOne($ids[1]);
+
+                    // on envoi un email au moniteur
+                    if (!empty($modelMoniteur->email)) {
+                        $contenu = $this->generateMoniteurEmail($modelCoursDate, $dates[$ids[0]]['moniteurs'], 'delete');
+                        SiteController::actionEmail($contenu, [$modelMoniteur->email]);
+                    }
+                }
+            }
+        }
+        
+        // on gère les ajouts
+        foreach ($arrayAjoute as $parDate) {
+            foreach ($parDate as $key => $v) {
+                $ids = explode('|', $key);
+                if (isset($dates[$ids[0]])) {
+                    $modelCoursDate = CoursDate::findOne($ids[0]);
+                    $modelMoniteur = Personnes::findOne($ids[1]);
+
+                    // on envoi un email au moniteur
+                    if (!empty($modelMoniteur->email)) {
+                        $contenu = $this->generateMoniteurEmail($modelCoursDate, $dates[$ids[0]]['moniteurs'], 'create');
+                        SiteController::actionEmail($contenu, [$modelMoniteur->email]);
+                    }
+                }
+            }
+        }
     }
 }
