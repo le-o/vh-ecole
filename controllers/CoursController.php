@@ -432,16 +432,32 @@ class CoursController extends CommonController
      */
     public function actionDelete($id)
     {
+        $firstDate = null;
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             $dates = CoursDate::findAll(['fk_cours' => $id]);
             foreach ($dates as $date) {
+                if ($firstDate === null) {
+                    $firstDate = $date;
+                }
+                $allDate[] = $date;
+                foreach ($date->coursHasMoniteurs as $moniteur) {
+                    $emails[$moniteur->fk_moniteur] = $moniteur->fkMoniteur->email;
+                    $nomMoniteurs[$moniteur->fk_moniteur] = $moniteur->fkMoniteur->prenom.' '.$moniteur->fkMoniteur->nom;
+                }
+                
                 CoursHasMoniteurs::deleteAll(['fk_cours_date' => $date->cours_date_id]);
                 ClientsHasCoursDate::deleteAll(['fk_cours_date' => $date->cours_date_id]);
             }
             CoursDate::deleteAll(['fk_cours' => $id]);
-
+            
+            // on envoi l'email à tous les moniteurs
+            if (!empty($emails)) {
+                $contenu = $this->generateMoniteurEmail($firstDate, $nomMoniteurs, 'delete', $allDate);
+                SiteController::actionEmail($contenu, $emails);
+            }
             $this->findModel($id)->delete();
+            
             $transaction->commit();
         } catch (Exception $e) {
             $msg = $e->getMessage();

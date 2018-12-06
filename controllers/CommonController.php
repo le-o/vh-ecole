@@ -59,7 +59,7 @@ class CommonController extends Controller
      * @param string $cud
      * @return array(nom, valeur)
      */
-    public function generateMoniteurEmail($model, $nomMoniteurs, $cud) {
+    public function generateMoniteurEmail($model, $nomMoniteurs, $cud, $allDate = []) {
         $withLink = true;
         if ('create' == $cud) {
             $cudObjet = 'nouveauté';
@@ -83,21 +83,30 @@ class CommonController extends Controller
             $from = DateTime::createFromFormat('Y-m-d H:i', date('Y-m-d H:i', strtotime($model->date.' '.$model->heure_debut)));
             $to = DateTime::createFromFormat('Y-m-d H:i', date('Y-m-d H:i', strtotime($model->date.' '.$model->heureFin)));
 
-            $link = Link::create($calNom, $from, $to)
+            $link = Link::create($calNom, $from, $to, false, $model->cours_date_id)
                 ->description($model->remarque)
                 ->address($model->lieu);
-
+            
             // Generate a link to create an event on Google calendar
             $calLink = '<br /><a href="'.$link->google().'" target="_blank"><img src="'.\yii\helpers\Url::base(true).'/images/cal-bw-01.png" style="width:20px;" /> Ajouter au calendrier google</a>'
                     . '<br /><a href="'.$link->ics().'" target="_blank"><img src="'.\yii\helpers\Url::base(true).'/images/cal-bw-01.png" style="width:20px;" /> Ajouter un événement iCal/Outlook</a>';
+        }
+        
+        if (!empty($allDate)) {
+            foreach($allDate as $date) {
+                $datesCours[] = date('d.m.Y', strtotime($date->date)).' '.substr($model->heure_debut, 0, 5);
+            }
+            $dateheure = 'Date : '.implode(', ', $datesCours).'<br />';
+        } else {
+            $dateheure = 'Date : '.date('d.m.Y', strtotime($model->date)).'<br />';
+            $dateheure .= 'Heure : '.substr($model->heure_debut, 0, 5).'<br />';
         }
         
         // on génère l'email à envoyer
         return ['nom' => $model->fkCours->fkNom->nom.' - '.$cudObjet, 
             'valeur' => $cudContent.'<br /><br />
                 '.$calNom.'<br />
-                Date : '.date('d.m.Y', strtotime($model->date)).'<br />
-                Heure : '.substr($model->heure_debut, 0, 5).'<br />
+                '.$dateheure.'
                 Infos : '.$model->remarque.'<br />
                 Moniteur(s) : '.  implode(', ', $nomMoniteurs).'</p>'.
                 $calLink
