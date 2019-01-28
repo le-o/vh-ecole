@@ -13,6 +13,8 @@ use kartik\export\ExportMenu;
 /* @var $searchModel app\models\PersonnesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+$this->registerCss('.table-responsive {overflow-x: visible;}');
+
 $this->title = Yii::t('app', 'Moniteurs');
 $this->params['breadcrumbs'][] = Yii::t('app', 'Personnes');
 $this->params['breadcrumbs'][] = $this->title;

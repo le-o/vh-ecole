@@ -240,7 +240,7 @@ class SiteController extends Controller
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
                     '#toutes-les-dates#', '#dates-inscrit#', '#statut-inscription#'], 
                 [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, 
-                    $myCours->session, $saison, $myCours->prix, $date,
+                    $myCours->session, $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] ? $myCoursDate->prix : $myCours->prix), $date,
                     implode(', ', $datesCours), implode(', ', $datesCoursInscrit), $statutInscription], 
                 $content
             );

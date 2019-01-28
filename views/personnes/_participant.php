@@ -40,9 +40,9 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
 <div class="cours-participant-form">
 
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (Yii::$app->user->identity->id < 1002) { ?>
         <div class="row">
-            <?php if ($isInscriptionOk) { ?>
+            <?php if ($isInscriptionOk && Yii::$app->user->identity->id < 1000) { ?>
 
                 <?php $form = ActiveForm::begin(); ?>
                     <div class="col-sm-4">
@@ -65,48 +65,51 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
             <?php $form = ActiveForm::begin(); ?>
             <div class="col-sm-5">
-                <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->getNombreClientsInscrits() == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
-                <?php Modal::begin([
-                    'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
-                    'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],
-                ]);
+                <?php if (Yii::$app->user->identity->id < 1000) { ?>
+                    <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->getNombreClientsInscrits() == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
+                    <?php Modal::begin([
+                        'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
+                        'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],
+                    ]);
 
-                echo '<a id="toggleEmail" href="#">'.Yii::t('app', 'Voir email(s)').'</a>';
-                echo '<div id="item" style="display:none;">';
-                echo $form->field($parametre, 'listeEmails')->textarea()->label(false);
-                echo '</div>';
-                
-                $parametre->keyForMail = $viewAndId[1];
-                $parametre->listePersonneId = implode('|', $participantIDs);
-                echo $form->field($parametre, 'keyForMail')->hiddenInput()->label(false);
-                echo $form->field($parametre, 'listePersonneId')->hiddenInput()->label(false);
+                    echo '<a id="toggleEmail" href="#">'.Yii::t('app', 'Voir email(s)').'</a>';
+                    echo '<div id="item" style="display:none;">';
+                    echo $form->field($parametre, 'listeEmails')->textarea()->label(false);
+                    echo '</div>';
 
-                echo $form->field($parametre, 'parametre_id')->dropDownList(
-                    $emails,
-                    ['onchange'=>"$.ajax({
-                        type: 'POST',
-                        cache: false,
-                        url: '".Url::toRoute('/parametres/getemail')."',
-                        data: {id: $(this).val()},
-                        dataType: 'json',
-                        success: function(response) {
-                            $.each( response, function( key, val ) {
-                                $('#parametres-nom').attr('value', val.sujet);
-                                $('.redactor-editor').html(val.contenu);
-                                $('#parametres-valeur').val(val.contenu);
-                            });
-                        }
-                    });return false;",
-                    ])->label(Yii::t('app', 'Modèle'));
+                    $parametre->keyForMail = $viewAndId[1];
+                    $parametre->listePersonneId = implode('|', $participantIDs);
+                    echo $form->field($parametre, 'keyForMail')->hiddenInput()->label(false);
+                    echo $form->field($parametre, 'listePersonneId')->hiddenInput()->label(false);
 
-                echo $form->field($parametre, 'nom')->textInput()->label(Yii::t('app', 'Sujet'));
-                echo $form->field($parametre, 'valeur')->widget(\yii\redactor\widgets\Redactor::className())->label(Yii::t('app', 'Texte'));
+                    echo $form->field($parametre, 'parametre_id')->dropDownList(
+                        $emails,
+                        ['onchange'=>"$.ajax({
+                            type: 'POST',
+                            cache: false,
+                            url: '".Url::toRoute('/parametres/getemail')."',
+                            data: {id: $(this).val()},
+                            dataType: 'json',
+                            success: function(response) {
+                                $.each( response, function( key, val ) {
+                                    $('#parametres-nom').attr('value', val.sujet);
+                                    $('.redactor-editor').html(val.contenu);
+                                    $('#parametres-valeur').val(val.contenu);
+                                });
+                            }
+                        });return false;",
+                        ])->label(Yii::t('app', 'Modèle'));
 
-                echo Html::submitButton(Yii::t('app', 'Envoyer'), ['class' => 'btn btn-primary']);
-                Modal::end(); ?>
+                    echo $form->field($parametre, 'nom')->textInput()->label(Yii::t('app', 'Sujet'));
+                    echo $form->field($parametre, 'valeur')->widget(\yii\redactor\widgets\Redactor::className())->label(Yii::t('app', 'Texte'));
+
+                    echo Html::submitButton(Yii::t('app', 'Envoyer'), ['class' => 'btn btn-primary']);
+                    Modal::end(); ?>
+                <?php } ?>
                     
-                <?php if (!$forPresenceOnly) { ?>
-                    <?= Html::a(Yii::t('app', 'Imprimer'), ['/cours/presence', 'id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => 'btn btn-default']) ?>
+                <?php if (!$forPresenceOnly || Yii::$app->user->identity->id == 1001) { ?>
+                    <?php $nomBouton = (Yii::$app->user->identity->id < 1000) ? Yii::t('app', 'Imprimer') : Yii::t('app', 'Imprimer la liste des participants'); ?>
+                    <?= Html::a($nomBouton, ['/cours/presence', 'id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => 'btn btn-default']) ?>
                 <?php } ?>
             </div>
             <?php ActiveForm::end(); ?>
