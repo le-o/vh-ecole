@@ -107,13 +107,11 @@ class CoursDateController extends CommonController
                 }
                 
                 $mailToMoniteurs = false;
-                if (array_diff($moniteursOld, $moniteurs)) {
+                if ($moniteurs != $moniteursOld) {
                     $mailToMoniteurs = true;
-                }
-                if (!$mailToMoniteurs && $model->date !== $clone->date) {
+                } elseif ($model->date !== $clone->date) {
                     $mailToMoniteurs = true;
-                }
-                if (!$mailToMoniteurs && ($model->heure_debut != $clone->heure_debut || $model->duree != $clone->duree)) {
+                } elseif ($model->heure_debut != $clone->heure_debut || $model->duree != $clone->duree) {
                     $mailToMoniteurs = true;
                 }
 
@@ -194,7 +192,7 @@ class CoursDateController extends CommonController
         $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
         $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
         foreach ($myMoniteurs as $moniteur) {
-	        $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
+            $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
         }
         $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
