@@ -216,7 +216,6 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                     dataType: "json",
                     data: {"personne": key, "coursdate": "'.$model->cours_date_id.'"},
                     success: function(data) {
-                        console.log("Personne ID " + key + " - " + data.message);
                         $("#msg").html(data.message).toggle();
                         $("#msg").delay(600).fadeOut("slow");
                     },

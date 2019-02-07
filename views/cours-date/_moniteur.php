@@ -6,7 +6,6 @@ use yii\grid\GridView;
 use kartik\select2\Select2;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
-use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
@@ -32,17 +31,6 @@ use yii\bootstrap\Modal;
             'lieu',
             'duree',
             'remarque',
-            
-//            ['class' => 'yii\grid\ActionColumn',
-//                'template'=>'{coursView}',
-//                'buttons'=>[
-//                    'coursView' => function ($model, $key, $index) {
-//                    	return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours/view', 'id' => $index]), [
-//							'title' => Yii::t('app', 'Voir'),
-//						]);
-//                    }
-//                ],
-//            ],
         ],
     ]); ?>
 
