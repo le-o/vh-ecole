@@ -117,10 +117,12 @@ class SiteController extends Controller
             ],
         ]);
         
+        // 408 = Groupe sans moniteurs / 352 et 448 = Cours annulé
+        $toExclude = array_merge(Yii::$app->params['sansEncadrant'], [408, 352, 448]);
         // liste des moniteurs actifs
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
+        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->andWhere(['NOT IN', 'personne_id', $toExclude])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
+            $dataMoniteurs[$moniteur->personne_id] = $moniteur->NomPrenom;
         }
         
         // set la valeur de la date début du calendrier

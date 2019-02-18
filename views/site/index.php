@@ -177,7 +177,7 @@ $this->title = 'VH Gestion des cours';
                     dataType: "json",
                 });
         } ',
-//        'ajaxEvents' => yii\helpers\Url::to(['/cours-date/jsoncalendar'])
+        'ajaxEvents' => yii\helpers\Url::to(['/cours-date/jsoncalendar'])
     ]); ?>
     
 </div>
