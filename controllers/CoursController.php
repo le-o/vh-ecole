@@ -115,6 +115,9 @@ class CoursController extends CommonController
         } elseif ($msg === 'presence') {
             $alerte['class'] = 'success';
             $alerte['message'] = Yii::t('app', 'Toutes les modifications sur les présences ont été enregistrées !');
+        } elseif ($msg === 'clone') {
+            $alerte['class'] = 'success';
+            $alerte['message'] = Yii::t('app', 'Le cours a été dupliqué avec succès.');
         } elseif ($msg !== '') {
             $alerte['class'] = 'danger';
             $alerte['message'] = $msg;
@@ -162,7 +165,7 @@ class CoursController extends CommonController
             }
         } elseif (!empty($new['Parametres'])) {
             // soit on envoi un email !
-            SiteController::actionEmail($new['Parametres'], explode(', ', $new['Parametres']['listeEmails']));
+            $this->actionEmail($new['Parametres'], explode(', ', $new['Parametres']['listeEmails']));
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
         } elseif (!empty($new['Cours'])) {
@@ -317,6 +320,24 @@ class CoursController extends CommonController
             'modelParams' => $modelParams,
         ]);
     }
+    
+    /**
+     * Clone a Cours model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionClone($id)
+    {
+        $model = $this->findModel($id);
+        $clone = new Cours();
+        $clone->attributes = $model->attributes;
+        $clone->fk_jours = $model->fk_jours;
+        $clone->fk_categories = $model->fk_categories;
+        $clone->isNewRecord = true;
+        $clone->save();
+        return $this->redirect(['view', 'id' => $clone->cours_id, 'msg' => 'clone']);
+    }
 
     /**
      * Updates an existing Cours model.
@@ -327,7 +348,7 @@ class CoursController extends CommonController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-		$alerte = '';
+        $alerte = '';
         if ($model->load(Yii::$app->request->post())) {
             // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
             $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
@@ -454,7 +475,7 @@ class CoursController extends CommonController
             // on envoi l'email à tous les moniteurs
             if (!empty($emails)) {
                 $contenu = $this->generateMoniteurEmail($firstDate, $nomMoniteurs, 'delete', $allDate);
-                SiteController::actionEmail($contenu, $emails);
+                $this->actionEmail($contenu, $emails);
             }
             $this->findModel($id)->delete();
             
@@ -900,7 +921,7 @@ class CoursController extends CommonController
                     // on envoi un email au moniteur
                     if (!empty($modelMoniteur->email)) {
                         $contenu = $this->generateMoniteurEmail($modelCoursDate, $dates[$ids[0]]['moniteurs'], 'delete');
-                        SiteController::actionEmail($contenu, [$modelMoniteur->email]);
+                        $this->actionEmail($contenu, [$modelMoniteur->email]);
                     }
                 }
             }
@@ -917,7 +938,7 @@ class CoursController extends CommonController
                     // on envoi un email au moniteur
                     if (!empty($modelMoniteur->email)) {
                         $contenu = $this->generateMoniteurEmail($modelCoursDate, $dates[$ids[0]]['moniteurs'], 'create');
-                        SiteController::actionEmail($contenu, [$modelMoniteur->email]);
+                        $this->actionEmail($contenu, [$modelMoniteur->email]);
                     }
                 }
             }

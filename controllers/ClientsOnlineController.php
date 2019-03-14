@@ -17,7 +17,7 @@ use yii\filters\AccessControl;
 /**
  * ClientsOnlineController implements the CRUD actions for ClientsOnline model.
  */
-class ClientsOnlineController extends Controller
+class ClientsOnlineController extends CommonController
 {
     /**
      * @inheritdoc
@@ -165,7 +165,7 @@ class ClientsOnlineController extends Controller
                     $transaction->commit();
 
                     $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInscriptionOnline']);
-                    SiteController::actionEmail($contenu, [$model->email], true);
+                    $this->actionEmail($contenu, [$model->email], true);
 
                     return $this->render('confirmation');
                 } catch (\Exception $e) {

@@ -136,4 +136,137 @@ class CommonController extends Controller
 
         return $result;
     }
+    
+    /**
+     * Permet l'envoi d'un email à tous les clients
+     * et stock l'email dans le dossier "Sent Items" sur le serveur infomaniak
+     *
+     * @param array $mail Le contenu du message
+     * @param array $adresses Liste de emails
+     * @param bool $public True si on se trouve sur une page public
+     */
+    public function actionEmail($mail, $adresses, $public = false)
+    {
+        foreach ($adresses as $a) {
+            if ($a !== 'none' && $a !== 'interloc.') {
+                $originEmails[] = $a;
+            }
+        }
+        if (YII_ENV === 'dev') {
+            $emails[] = Yii::$app->params['testEmail'];
+            $beginMail = '<i><b>Email non envoyé !</b><br />L\'email original était destiné à : ' . implode(', ', $originEmails) . '</i><br /><br />';
+        } else {
+            $emails = $originEmails;
+            $beginMail = '';
+        }
+            
+        $content = $beginMail . $mail['valeur'];
+        
+        if (isset($mail['personne_id']) && !empty($mail['personne_id'])) {
+            $myPersonne = Personnes::findOne($mail['personne_id']);
+            
+            $content = str_replace(
+                ['#prenom#', '#nom#', ' #tous-les-participants#'], 
+                [$myPersonne->prenom, $myPersonne->nom, ''], 
+                $content);
+        }
+        
+        if (isset($mail['listePersonneId']) && !empty($mail['listePersonneId'])) {
+            $ids = explode('|', $mail['listePersonneId']);
+            $participants = Personnes::find()->where(['IN', 'personne_id', $ids])->all();
+            
+            foreach ($participants as $p) {
+                $noms[] = $p->prenom.' '.$p->nom;
+            }
+            
+            $content = str_replace(
+                ['#tous-les-participants#', ' #prenom#', ' #nom#'],
+                [implode(', ', $noms), '', ''],
+                $content);
+        }
+        
+        if (isset($mail['keyForMail']) && !empty($mail['keyForMail'])) {
+            $indexs = explode('|', $mail['keyForMail']);
+            $myCours = Cours::findOne($indexs[0]);
+            // on a un cours vide, on va essayer de le trouver via les dates
+            if (empty($myCours)) {
+                $myCoursDate = CoursDate::findOne($indexs[0]);
+                $myCours = Cours::findOne($myCoursDate->fk_cours);
+            }
+            $saison = (isset($myCours->fkSaison)) ? $myCours->fkSaison->nom : '';
+            $dateCours = $myCours->nextCoursDate;
+            $allDatesCours = $myCours->coursDates;
+            $datesCours = [];
+            $datesCoursInscrit = [];
+            $statutTraite = false;
+            $statutInscription = 'n/a';
+            foreach ($allDatesCours as $date) {
+                if (isset($mail['personne_id']) && $date->getForPresence($mail['personne_id'])) {
+                    $datesCoursInscrit[] = $date->date;
+                }
+                $datesCours[] = $date->date;
+                // on traite le statut du participant
+                if ($statutTraite == false && isset($myPersonne)) {
+                    $inscriptions = $myPersonne->getClientsHasOneCoursDate($date->cours_date_id);
+                    if (!empty($inscriptions)) {
+                        $statutInscription = $inscriptions->fkStatut->nom;
+                        $statutTraite = true;
+                    }
+                }
+            }
+            if (isset($myCoursDate)) {
+                $heure_debut = $myCoursDate->heure_debut;
+                $heure_fin = $myCoursDate->heureFin;
+                $date = $myCoursDate->date;
+                $jour_cours = Yii::$app->params['joursSemaine'][date('w', strtotime($date))];
+            } else {
+                $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : $allDatesCours[0]->heure_debut;
+                $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : $allDatesCours[0]->heureFin;
+                $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
+                $jour_cours = $myCours->FkJoursNoms;
+            }
+            
+            $content = str_replace(
+                ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', 
+                    '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
+                    '#toutes-les-dates#', '#dates-inscrit#', '#statut-inscription#'], 
+                [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, 
+                    $myCours->session, $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] ? $myCoursDate->prix : $myCours->prix), $date,
+                    implode(', ', $datesCours), implode(', ', $datesCoursInscrit), $statutInscription], 
+                $content
+            );
+        }
+        
+        if (isset($emails)) {
+            if ($public || count($originEmails) == 1) {
+                $message = Yii::$app->mailer->compose()
+                    ->setFrom(Yii::$app->params['adminEmail'])
+                    ->setTo($emails)
+                    ->setSubject($mail['nom'])
+                    ->setHtmlBody($content);
+            } else {
+                $message = Yii::$app->mailer->compose()
+                    ->setFrom(Yii::$app->params['adminEmail'])
+                    ->setTo(Yii::$app->params['noreplyEmail'])
+                    ->setBcc($emails)
+                    ->setSubject($mail['nom'])
+                    ->setHtmlBody($content);
+            }
+
+            // we send the message !
+            $message->send();
+            if (YII_ENV != 'dev') {
+                //  (this creates the full MIME message required for imap_append()
+                $msg = $message->toString();
+
+                //  After this you can call imap_append like this:
+                // connect to IMAP (port 143)
+                $stream = imap_open("{mail.infomaniak.ch:143/imap}", Yii::$app->params['adminEmail'], "V-HSaxon2012");
+                // Saves message to Sent folder and marks it as read
+                imap_append($stream,"{mail.infomaniak.ch:143/imap}Envoyes appli",$msg."\r\n","\\Seen");
+                // Close connection to the server when you're done
+                imap_close($stream);
+            }
+        }
+    }
 }

@@ -22,7 +22,7 @@ use kartik\mpdf\Pdf;
 /**
  * PersonnesController implements the CRUD actions for Personnes model.
  */
-class PersonnesController extends Controller
+class PersonnesController extends CommonController
 {
     public function behaviors()
     {
@@ -80,7 +80,7 @@ class PersonnesController extends Controller
 
         if (!empty(Yii::$app->request->post())) {
             $mail = Yii::$app->request->post();
-            SiteController::actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
+            $this->actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
 
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à toutes les personnes sélectionnées');
@@ -357,7 +357,7 @@ class PersonnesController extends Controller
                 foreach ($model->personneHasInterlocuteurs as $pi) {
                     $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
                 }
-                SiteController::actionEmail($post['Parametres'], $listeEmails);
+                $this->actionEmail($post['Parametres'], $listeEmails);
                 $alerte['class'] = 'info';
                 $alerte['message'] = Yii::t('app', 'Email envoyé');
             } else {

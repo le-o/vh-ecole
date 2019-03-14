@@ -131,13 +131,14 @@ $this->registerJs($script, View::POS_END);
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         <?php if (!$model->isNewRecord) { ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Vous allez supprimer le cours ainsi que tous les participants et toutes les planifications. OK?'),
-                'method' => 'post',
-            ],
-        ]) ?>
+            <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => Yii::t('app', 'Vous allez supprimer le cours ainsi que tous les participants et toutes les planifications. OK?'),
+                    'method' => 'post',
+                ],
+            ]) ?>
+            <?= Html::a(Yii::t('app', 'Dupliquer'), ['clone', 'id' => $model->cours_id], ['class' => 'btn btn-info']) ?>
         <?php } ?>
     </div>
 

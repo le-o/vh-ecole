@@ -126,7 +126,7 @@ class CoursDateController extends CommonController
                         // on envoi l'email à tous les moniteurs
                         if (!empty($infosEmail['emails'])) {
                             $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'update');
-                            SiteController::actionEmail($contenu, $infosEmail['emails']);
+                            $this->actionEmail($contenu, $infosEmail['emails']);
                         }
                     }
                     
@@ -149,7 +149,7 @@ class CoursDateController extends CommonController
                 }
             } else {
                 // soit on envoi un email !
-                SiteController::actionEmail($post['Parametres'], explode(', ', $post['Parametres']['listeEmails']));
+                $this->actionEmail($post['Parametres'], explode(', ', $post['Parametres']['listeEmails']));
                 $alerte['class'] = 'info';
                 $alerte['message'] = Yii::t('app', 'Email envoyé à tous les participants');
             }
@@ -273,7 +273,7 @@ class CoursDateController extends CommonController
         
         if (!empty(Yii::$app->request->post())) {
             $mail = Yii::$app->request->post();
-            SiteController::actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
+            $this->actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
 
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à toutes les personnes sélectionnées');
@@ -350,7 +350,7 @@ class CoursDateController extends CommonController
                 // on envoi l'email à tous les moniteurs
                 if (!empty($infosEmail['emails'])) {
                     $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'create');
-                    SiteController::actionEmail($contenu, $infosEmail['emails']);
+                    $this->actionEmail($contenu, $infosEmail['emails']);
                 }
                 
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
@@ -623,7 +623,7 @@ class CoursDateController extends CommonController
             // on envoi l'email à tous les moniteurs
             if (!empty($emails)) {
                 $contenu = $this->generateMoniteurEmail($model, $nomMoniteurs, 'delete');
-                SiteController::actionEmail($contenu, $emails);
+                $this->actionEmail($contenu, $emails);
             }
         } catch (Exception $e) {
             $transaction->rollBack();
