@@ -33,7 +33,7 @@ $this->title = 'VH Gestion des cours';
         ]); 
     } ?>
     
-    <?php $form = ActiveForm::begin(); ?>
+    <?php /* $form = ActiveForm::begin(); ?>
         <div class="col-sm-4">
             <?php Modal::begin([
                 'options' => [
@@ -101,7 +101,7 @@ $this->title = 'VH Gestion des cours';
                 ],
             ],
         ]); 
-    } ?>
+    } */?>
     
     <?php if ($dataProviderNF->totalCount > 0) { ?>
         <h2><?= Yii::t('app', 'Cours actifs sans date future') ?></h2>
