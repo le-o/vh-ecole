@@ -20,6 +20,8 @@ use yii\db\Exception;
 use Spatie\CalendarLinks\Link;
 use DateTime;
 
+require_once('../vendor/le-o/simpleCalDAV/SimpleCalDAVClient.php');
+
 class SiteController extends Controller
 {
     public function behaviors()
@@ -70,32 +72,32 @@ class SiteController extends Controller
             ]);
         }
         
-        if (!empty(Yii::$app->request->post())) {
-            $post = Yii::$app->request->post();
-            
-            $addMoniteur = new CoursHasMoniteurs();
-            $addMoniteur->fk_cours_date = $post['coursDateId'];
-            $addMoniteur->fk_moniteur = $post['new_moniteur'];
-            $addMoniteur->is_responsable = 0;
-            try {
-                $transaction = \Yii::$app->db->beginTransaction();
-                
-                $existeMoniteurs = CoursHasMoniteurs::find()->where(['fk_moniteur'=>$addMoniteur->fk_moniteur])->andWhere(['fk_cours_date'=>$addMoniteur->fk_cours_date])->one();
-                if (!empty($existeMoniteurs)) {
-                    throw new Exception(Yii::t('app', 'Moniteur déjà inscrit pour ce cours.'));
-                }
-                if (!($flag = $addMoniteur->save(false))) {
-                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
-                }
-                // on doit supprimer le moniteur "Pas de moniteur" si il existe
-                CoursHasMoniteurs::find()->where(['IN', 'fk_moniteur', Yii::$app->params['sansEncadrant']])->andWhere(['fk_cours_date'=>$addMoniteur->fk_cours_date])->one()->delete();
-                $transaction->commit();
-                Yii::$app->session->setFlash('alerte', ['type'=>'success', 'info'=>Yii::t('app', 'Moniteur enregistré avec succès.')], false);
-            } catch (Exception $e) {
-                Yii::$app->session->setFlash('alerte', ['type'=>'danger', 'info'=>$e->getMessage()], false);
-                $transaction->rollBack();
-            }
-        }
+//        if (!empty(Yii::$app->request->post())) {
+//            $post = Yii::$app->request->post();
+//            
+//            $addMoniteur = new CoursHasMoniteurs();
+//            $addMoniteur->fk_cours_date = $post['coursDateId'];
+//            $addMoniteur->fk_moniteur = $post['new_moniteur'];
+//            $addMoniteur->is_responsable = 0;
+//            try {
+//                $transaction = \Yii::$app->db->beginTransaction();
+//                
+//                $existeMoniteurs = CoursHasMoniteurs::find()->where(['fk_moniteur'=>$addMoniteur->fk_moniteur])->andWhere(['fk_cours_date'=>$addMoniteur->fk_cours_date])->one();
+//                if (!empty($existeMoniteurs)) {
+//                    throw new Exception(Yii::t('app', 'Moniteur déjà inscrit pour ce cours.'));
+//                }
+//                if (!($flag = $addMoniteur->save(false))) {
+//                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
+//                }
+//                // on doit supprimer le moniteur "Pas de moniteur" si il existe
+//                CoursHasMoniteurs::find()->where(['IN', 'fk_moniteur', Yii::$app->params['sansEncadrant']])->andWhere(['fk_cours_date'=>$addMoniteur->fk_cours_date])->one()->delete();
+//                $transaction->commit();
+//                Yii::$app->session->setFlash('alerte', ['type'=>'success', 'info'=>Yii::t('app', 'Moniteur enregistré avec succès.')], false);
+//            } catch (Exception $e) {
+//                Yii::$app->session->setFlash('alerte', ['type'=>'danger', 'info'=>$e->getMessage()], false);
+//                $transaction->rollBack();
+//            }
+//        }
         
         $searchModel = new CoursDateSearch();
         $searchModel->depuis = date('d.m.Y');
@@ -109,21 +111,21 @@ class SiteController extends Controller
         $dataProviderNF = $searchNoFutur->search([]);
         
         // liste de tous les cours sans moniteur
-        $searchNoMoniteur = CoursDate::find()->distinct()->joinWith('coursHasMoniteurs', false)->where(['IN', 'cours_has_moniteurs.fk_moniteur', Yii::$app->params['sansEncadrant']])->andWhere(['>=', 'date', date('Y-m-d')])->orderBy('date ASC');
-        $dataProviderNM = new ActiveDataProvider([
-            'query' => $searchNoMoniteur,
-            'pagination' => [
-                'pageSize' => 10,
-            ],
-        ]);
+//        $searchNoMoniteur = CoursDate::find()->distinct()->joinWith('coursHasMoniteurs', false)->where(['IN', 'cours_has_moniteurs.fk_moniteur', Yii::$app->params['sansEncadrant']])->andWhere(['>=', 'date', date('Y-m-d')])->orderBy('date ASC');
+//        $dataProviderNM = new ActiveDataProvider([
+//            'query' => $searchNoMoniteur,
+//            'pagination' => [
+//                'pageSize' => 10,
+//            ],
+//        ]);
         
         // 408 = Groupe sans moniteurs / 352 et 448 = Cours annulé
-        $toExclude = array_merge(Yii::$app->params['sansEncadrant'], [408, 352, 448]);
-        // liste des moniteurs actifs
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->andWhere(['NOT IN', 'personne_id', $toExclude])->orderBy('nom, prenom')->all();
-        foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->personne_id] = $moniteur->NomPrenom;
-        }
+//        $toExclude = array_merge(Yii::$app->params['sansEncadrant'], [408, 352, 448]);
+//        // liste des moniteurs actifs
+//        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->andWhere(['NOT IN', 'personne_id', $toExclude])->orderBy('nom, prenom')->all();
+//        foreach ($modelMoniteurs as $moniteur) {
+//            $dataMoniteurs[$moniteur->personne_id] = $moniteur->NomPrenom;
+//        }
         
         // set la valeur de la date début du calendrier
         if (Yii::$app->session->get('home-cal-debut') === null) Yii::$app->session->set('home-cal-debut', date('Y-m-d'));
@@ -132,8 +134,8 @@ class SiteController extends Controller
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'dataProviderNF' => $dataProviderNF,
-            'dataProviderNM' => $dataProviderNM,
-            'dataMoniteurs' => $dataMoniteurs,
+//            'dataProviderNM' => $dataProviderNM,
+//            'dataMoniteurs' => $dataMoniteurs,
         ]);
     }
 
@@ -159,16 +161,91 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
-    public function actionContact()
+    public function actionCalendarsync()
     {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
+        $logTraitement = [];
+        
+        if (!isset(Yii::$app->params['syncCredentials'])) {
+            exit('Il manque le paramétrage du compte');
+        } elseif (!isset(Yii::$app->params['syncCredentials']['calendarID']) || empty(Yii::$app->params['syncCredentials']['calendarID'])) {
+            // on affiche les valeurs possible pour le paramétrage
+            $client = new \SimpleCalDAVClient();
+            $client->connect('https://sync.infomaniak.com/calendars/' . Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['password']);
+            $arrayOfCalendars = $client->findCalendars();
+            
+            echo "Valeur possible pour les identifiants de calendrier<pre>";
+            print_r($arrayOfCalendars);
+            echo "</pre>";
+            exit;
         }
-        return $this->render('contact', [
-            'model' => $model,
+        
+        if ($post = Yii::$app->request->post()) {
+            $query = CoursDate::find()
+                ->where(['>=', 'date', date('Y.m.d')])
+                ->andWhere(['IN', 'calendar_sync', [CoursDate::CALENDAR_NEW, CoursDate::CALENDAR_EDIT]])
+                ->orderBy('date ASC');
+            if ($post['nbATraiter'] > 0) {
+                $query->limit($post['nbATraiter']);
+            }
+            $modelCoursDate = $query->all();
+            
+            $client = new \SimpleCalDAVClient();
+            $transaction = \Yii::$app->db->beginTransaction();
+            try {
+                $client->connect('https://sync.infomaniak.com/calendars/' . Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['password']);
+                $arrayOfCalendars = $client->findCalendars();
+                $client->setCalendar($arrayOfCalendars["61df5126-f7c2-4526-b5c2-d92101428e12"]);
+                
+                foreach ($modelCoursDate as $coursDate) {
+                    $logTraitement[$coursDate->cours_date_id] = [
+                        'cours_date_id' => $coursDate->cours_date_id,
+                        'fk_cours' => $coursDate->fk_cours,
+                        'nom' => $coursDate->fkCours->fkNom->nom.' '.$coursDate->fkCours->session,
+                        'date' => $coursDate->date,
+                        'heure_debut' => $coursDate->heure_debut,
+                        'heure_fin' => $coursDate->getHeureFin(),
+                    ];
+                    
+                    $vevent = $coursDate->getVCalendarString();
+                    if (CoursDate::CALENDAR_NEW == $coursDate->calendar_sync) {
+                        // on ajoute un nouvel élément
+                        $newEvent = $client->create($vevent, true);
+                        $logTraitement[$coursDate->cours_date_id]['statut'] = 'ajout';
+                    } else {
+                        // on modifie un élément existant
+                        $filter = new \CalDAVFilter("VEVENT");
+                        $filter->mustIncludeMatchSubstr("UID", "VH-cours-" . $coursDate->cours_date_id);
+                        $events = $client->getCustomReport($filter->toXML());
+                        // l'enregistrement n'est probablement jamais passé sur le serveur infomaniak
+                        // on tente un nouvelle insertion !
+                        if (!isset($events[0])) {
+                            $newEvent = $client->create($vevent, true);
+                            $logTraitement[$coursDate->cours_date_id]['statut'] = 'ajout';
+                        } else {
+                            $client->change($events[0]->getHref(),$vevent, $events[0]->getEtag());
+                            $logTraitement[$coursDate->cours_date_id]['statut']  = 'modification';
+                        }
+                    }
+                    
+                    $coursDate->updateSync = false;
+                    $coursDate->calendar_sync = CoursDate::CALENDAR_SYNC;
+                    $coursDate->save();
+                }
+                
+                $transaction->commit();
+                Yii::$app->session->setFlash('syncOK');
+            } catch (Exception $e) {
+                $transaction->rollBack();
+                echo $e->__toString();
+                $alerte = $e->getMessage();
+                echo "<pre>";
+                print_r($alerte);
+                echo "</pre>";
+                exit;
+            }
+        }
+        return $this->render('calendrierSync', [
+            'logTraitement' => $logTraitement,
         ]);
     }
 

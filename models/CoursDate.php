@@ -16,11 +16,20 @@ use Yii;
  * @property float $prix
  * @property string $remarque
  * @property integer $nb_client_non_inscrit
+ * @property boolean $calendar_sync
+ * @property datetime $update_date
  *
  * @property Cours $fkCours
  */
 class CoursDate extends \yii\db\ActiveRecord
 {
+    
+    const CALENDAR_NEW = 0;
+    const CALENDAR_SYNC = 1;
+    const CALENDAR_EDIT = 2;
+    
+    public $updateSync = true;
+
     /**
      * @inheritdoc
      */
@@ -78,7 +87,15 @@ class CoursDate extends \yii\db\ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             $this->date = date('Y-m-d', strtotime($this->date));
-            $this->heure_debut = $this->heure_debut.':00';
+            if (strlen($this->heure_debut < 8)) {
+                $this->heure_debut = $this->heure_debut.':00';
+            }
+            
+            if (true == $this->updateSync) {
+                $this->calendar_sync = ($this->isNewRecord) ? self::CALENDAR_NEW : self::CALENDAR_EDIT;
+            } else {
+                $this->update_date = date('Y-m-d H:i:s');
+            }
             return true;
         } else {
             return false;
@@ -156,5 +173,70 @@ class CoursDate extends \yii\db\ActiveRecord
         $partEssai = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $this->cours_date_id])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['part2Essai']])->count();
         
         return ($partEssai != 0) ? $this->getNombreClientsInscrits().' ('.$partEssai.')' : $this->getNombreClientsInscrits();
+    }
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getVCalendarString()
+    {
+        if ($this->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
+            $title = (isset($this->clientsHasCoursDate[0]) ? $this->clientsHasCoursDate[0]->fkPersonne->suivi_client.' '.$this->clientsHasCoursDate[0]->fkPersonne->societe.' '.$this->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
+            $title .= ' '.$this->fkCours->fkNom->nom.' '.$this->fkCours->session;
+        } else {
+            $title = $this->fkCours->fkNom->nom.' '.$this->fkCours->session.'.'.$this->fkCours->annee;
+        }
+
+        $arrayMoniteurs = [];
+        $moniteurs = $this->coursHasMoniteurs;
+        foreach ($moniteurs as $m) {
+            $arrayMoniteurs[] = $m->fkMoniteur->nomPrenom;
+        }
+        $description = implode(', ', $arrayMoniteurs);
+        
+        $stringEvent = 'BEGIN:VCALENDAR
+PRODID:-//vertic-halle/gestion des cours//NONSGML v1.0//EN
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:Europe/Zurich
+X-LIC-LOCATION:Europe/Zurich
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+CREATED:' . $this->dateToCal(strtotime($this->update_date)) . '
+LAST-MODIFIED:' . $this->dateToCal(strtotime($this->update_date)) . '
+DTSTAMP:' . $this->dateToCal(time()) . '
+UID:VH-cours-' . $this->cours_date_id . '
+SUMMARY:' . $title . '
+DTSTART;TZID=Europe/Zurich:' . $this->dateToCal(strtotime($this->date . ' ' . $this->heure_debut)) . '
+DTEND;TZID=Europe/Zurich:' . $this->dateToCal(strtotime($this->date . ' ' . $this->getHeureFin())) . '
+LOCATION:' . $this->lieu . '
+DESCRIPTION:' . $description . '
+END:VEVENT
+END:VCALENDAR';
+        return $stringEvent;
+    }
+    
+    /**
+     * 
+     * @param time $timestamp
+     * @return date
+     */
+    private function dateToCal($timestamp) {
+        return date('Ymd\THis', $timestamp);
     }
 }
