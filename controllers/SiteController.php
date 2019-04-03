@@ -194,7 +194,7 @@ class SiteController extends Controller
             try {
                 $client->connect('https://sync.infomaniak.com/calendars/' . Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['password']);
                 $arrayOfCalendars = $client->findCalendars();
-                $client->setCalendar($arrayOfCalendars["61df5126-f7c2-4526-b5c2-d92101428e12"]);
+                $client->setCalendar($arrayOfCalendars[Yii::$app->params['syncCredentials']['calendarID']]);
                 
                 foreach ($modelCoursDate as $coursDate) {
                     $logTraitement[$coursDate->cours_date_id] = [

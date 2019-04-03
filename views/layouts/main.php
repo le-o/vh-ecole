@@ -59,6 +59,7 @@ AppAsset::register($this);
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Clients actifs'), 'url' => ['/cours-date/actif']] : '',
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres']] : '',
                          Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore']] : '',
+                         Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Synchro calendrier'), 'url' => ['/site/calendarsync']] : '',
                     ],
                 ] : '',
             Yii::$app->user->isGuest ?
