@@ -43,7 +43,7 @@ $this->registerJs($script, View::POS_END);
                 <div class="form-group">
                     <?= Html::label('Nombre à traiter', 'nbATraiter') ?>
                     <?= \kartik\helpers\Html::textInput('nbATraiter', 0, ['class' =>'form-control', 'type' => 'number', 'min' => 0, 'style' => 'width:50px']) ?>
-                    <span class="hint">Info: <tt>zéro</tt> pour illimité</span>
+                    <span class="hint">Info: <tt>zéro</tt> pour illimité, <?= $nombreATraiter ?> à traiter</span>
                 </div>
                 <div class="form-group">
                     <?= Html::submitButton('Synchroniser', ['class' => 'btn btn-primary', 'name' => 'sync-button']) ?>

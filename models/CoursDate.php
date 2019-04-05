@@ -175,6 +175,22 @@ class CoursDate extends \yii\db\ActiveRecord
         return ($partEssai != 0) ? $this->getNombreClientsInscrits().' ('.$partEssai.')' : $this->getNombreClientsInscrits();
     }
     
+    public function getDateToSync($count = false, $limit = 0) {
+        $query = self::find()
+                ->where(['>=', 'date', date('Y.m.d')])
+                ->andWhere(['IN', 'calendar_sync', [self::CALENDAR_NEW, self::CALENDAR_EDIT]])
+                ->orderBy('date ASC');
+        if ($limit > 0) {
+            $query->limit($limit);
+        }
+        $modelCoursDate = $query->all();
+        if (true == $count) {
+            return count($modelCoursDate);
+        } else {
+            return $modelCoursDate;
+        }
+    }
+    
     /**
      * 
      * @return string

@@ -161,10 +161,12 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
+    /**
+     * 
+     * @return type
+     */
     public function actionCalendarsync()
-    {
-        $logTraitement = [];
-        
+    {   
         if (!isset(Yii::$app->params['syncCredentials'])) {
             exit('Il manque le paramétrage du compte');
         } elseif (!isset(Yii::$app->params['syncCredentials']['calendarID']) || empty(Yii::$app->params['syncCredentials']['calendarID'])) {
@@ -179,19 +181,17 @@ class SiteController extends Controller
             exit;
         }
         
+        $logTraitement = [];
+        $model = new CoursDate();
+        $nombreATraiter = $model->getDateToSync(true);
+        
         if ($post = Yii::$app->request->post()) {
-            $query = CoursDate::find()
-                ->where(['>=', 'date', date('Y.m.d')])
-                ->andWhere(['IN', 'calendar_sync', [CoursDate::CALENDAR_NEW, CoursDate::CALENDAR_EDIT]])
-                ->orderBy('date ASC');
-            if ($post['nbATraiter'] > 0) {
-                $query->limit($post['nbATraiter']);
-            }
-            $modelCoursDate = $query->all();
+            $modelCoursDate = $model->getDateToSync(false, $post['nbATraiter']);
             
-            $client = new \SimpleCalDAVClient();
             $transaction = \Yii::$app->db->beginTransaction();
             try {
+                $client = new \SimpleCalDAVClient();
+
                 $client->connect('https://sync.infomaniak.com/calendars/' . Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['password']);
                 $arrayOfCalendars = $client->findCalendars();
                 $client->setCalendar($arrayOfCalendars[Yii::$app->params['syncCredentials']['calendarID']]);
@@ -246,6 +246,7 @@ class SiteController extends Controller
         }
         return $this->render('calendrierSync', [
             'logTraitement' => $logTraitement,
+            'nombreATraiter' => $nombreATraiter,
         ]);
     }
 
