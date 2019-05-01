@@ -63,6 +63,7 @@ class CoursDate extends \yii\db\ActiveRecord
             'date' => Yii::t('app', 'Date'),
             'heure_debut' => Yii::t('app', 'Heure début'),
             'fkLieu' => Yii::t('app', 'Lieu'),
+            'fk_lieu' => Yii::t('app', 'Lieu'),
             'duree' => Yii::t('app', 'Durée'),
             'prix' => Yii::t('app', 'Prix'),
             'remarque' => Yii::t('app', 'Remarque'),
