@@ -16,7 +16,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
+        
+    <div class="btn-toolbar" role="toolbar">
         <?= Html::a(Yii::t('app', 'Create Cours'), ['create'], ['class' => 'btn btn-success']) ?>
+        <div class="btn-group">
+            <?= Html::a(Yii::t('app', 'Saxon'), ['index', 'salle' => Yii::$app->params['saxon']], ['class' => 'btn btn-default' . $btnClassSaxon]) ?>
+            <?= Html::a(Yii::t('app', 'Monthey'), ['index', 'salle' => Yii::$app->params['monthey']], ['class' => 'btn btn-default' . $btnClassMonthey]) ?>
+        </div>
+    </div>
     </p>
 
     <?= GridView::widget([

@@ -74,10 +74,18 @@ class CoursController extends CommonController
      * Lists all Cours models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($salle = null)
     {
         $searchModel = new CoursSearch();
+        if ($salle === null) {
+            $salle = (isset(Yii::$app->session['salle'])) ? Yii::$app->session['salle'] : Yii::$app->params['saxon'];
+        }
+        $searchModel->fk_salle = $salle;
+        Yii::$app->session['salle'] = $salle;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        $btnClassSaxon = ($searchModel->fk_salle == Yii::$app->params['saxon']) ? ' btn-info' : '';
+        $btnClassMonthey = ($searchModel->fk_salle == Yii::$app->params['monthey']) ? ' btn-info' : '';
         
         $parametre = new Parametres();
         $saisonFilter = $parametre->optsSaison();
@@ -86,6 +94,8 @@ class CoursController extends CommonController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'saisonFilter' => $saisonFilter,
+            'btnClassSaxon' => $btnClassSaxon,
+            'btnClassMonthey' => $btnClassMonthey,
         ]);
     }
 

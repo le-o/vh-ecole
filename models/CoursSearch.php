@@ -76,6 +76,7 @@ class CoursSearch extends Cours
             'is_actif' => $this->is_actif,
             'is_publie' => $this->is_publie,
             'fk_saison' => $this->fkSaison,
+            'fk_salle' => $this->fk_salle,
         ])
         ->andFilterWhere(['like', 'session', $this->session]);
         

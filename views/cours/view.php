@@ -46,6 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => ($model->is_actif) ? 'Oui' : 'Non',
             ],
             [
+                'label' => Yii::t('app', 'Fk Salle'),
+                'attribute' => 'fkSalle.nom',
+            ],
+            [
                 'label' => Yii::t('app', 'Fk Niveau'),
                 'attribute' => 'fkNiveau.nom',
             ],

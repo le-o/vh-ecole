@@ -219,6 +219,20 @@ class Parametres extends \yii\db\ActiveRecord
     {
         return $this->optsDropDown(15, $selectedParam);
     }
+    /**
+     * @return array options salle for drop-down
+     */
+    public function optsSalle($selectedParam = null)
+    {
+        return $this->optsDropDown(16, $selectedParam);
+    }
+    /**
+     * @return array options lieu for drop-down
+     */
+    public function optsLieu($selectedParam = null)
+    {
+        return $this->optsDropDown(17, $selectedParam);
+    }
 
     /**
      * @return array options from classkey for drop-down
@@ -258,6 +272,8 @@ class Parametres extends \yii\db\ActiveRecord
             '13' => 'Nom session internet',
             '14' => 'Catégorie internet',
             '15' => 'Langue',
+            '16' => 'Salle',
+            '17' => 'Lieu',
         );
     }
     
