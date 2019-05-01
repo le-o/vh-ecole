@@ -232,6 +232,7 @@ class CoursDateController extends CommonController
             'participantIDs' => $excludePart,
             'parametre' => $parametre,
             'emails' => $emails,
+            'modelParams' => new Parametres,
         ]);
     }
     
@@ -405,11 +406,12 @@ class CoursDateController extends CommonController
         if ($model->prix == '') $model->prix = $myCours->prix;
         
         return $this->render('create', [
-	        'alerte' => $alerte,
+            'alerte' => $alerte,
             'model' => $model,
             'dataCours' => $dataCours,
             'dataMoniteurs' => $dataMoniteurs,
             'selectedMoniteurs' => [],
+            'modelParams' => new Parametres,
         ]);
     }
     
@@ -428,11 +430,11 @@ class CoursDateController extends CommonController
 
         if ($model->load(Yii::$app->request->post())) {
 	        
-	        $post = Yii::$app->request->post();
+            $post = Yii::$app->request->post();
             $date_range = $post['date_range_1'];
             $date_exclude = $post['date_exclude_1'];
             
-	        $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
+            $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
             $dateRange = explode(Yii::t('app', ' au '), $post['date_range_1']);
             $date_debut = date('Y-m-d', strtotime($dateRange[0]));
             $date_fin = date('Y-m-d', strtotime($dateRange[1]));
@@ -483,12 +485,13 @@ class CoursDateController extends CommonController
         if ($model->prix == '') $model->prix = $myCours->prix;
         
         return $this->render('recursive', [
-	        'alerte' => $alerte,
+            'alerte' => $alerte,
             'model' => $model,
             'dataCours' => $dataCours,
             'dataMoniteurs' => $dataMoniteurs,
             'selectedMoniteurs' => [],
             'date_range' => $date_range,
+            'modelParams' => new Parametres,
         ]);
     }
 

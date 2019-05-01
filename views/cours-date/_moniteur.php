@@ -28,7 +28,10 @@ use yii\helpers\Url;
                     return $data->heureFin;
                 },
             ],
-            'lieu',
+            [
+                'label' => Yii::t('app', 'Lieu'),
+                'value' => 'fkLieu.nom',
+            ],
             'duree',
             'remarque',
         ],

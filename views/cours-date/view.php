@@ -34,6 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataCours' => $dataCours,
         'dataMoniteurs' => $dataMoniteurs,
         'selectedMoniteurs' => $selectedMoniteurs,
+        'modelParams' => $modelParams,
     ]) ?>
     
     <?php } else { ?>
@@ -72,7 +73,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'fkCours.description',
                 'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
             ],
-            'lieu',
+            [
+                'label' => Yii::t('app', 'Lieu'),
+                'attribute' => 'fkLieu.nom',
+            ],
             [
                 'attribute' => 'coursHasMoniteurs',
                 'value' => $listeMoniteurs,

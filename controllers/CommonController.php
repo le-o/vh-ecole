@@ -85,7 +85,7 @@ class CommonController extends Controller
 
             $link = Link::create($calNom, $from, $to, false, $model->cours_date_id)
                 ->description($model->remarque)
-                ->address($model->lieu);
+                ->address($model->fkLieu->nom);
             
             // Generate a link to create an event on Google calendar
             $calLink = '<br /><a href="'.$link->google().'" target="_blank"><img src="'.\yii\helpers\Url::base(true).'/images/cal-bw-01.png" style="width:20px;" /> Ajouter au calendrier google</a>'

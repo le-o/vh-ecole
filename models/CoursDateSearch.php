@@ -28,8 +28,8 @@ class CoursDateSearch extends CoursDate
     public function rules()
     {
         return [
-            [['cours_date_id', 'fk_cours'], 'integer'],
-            [['date', 'heure_debut', 'lieu', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA', 'fkNom'], 'safe'],
+            [['cours_date_id', 'fk_cours', 'fk_lieu'], 'integer'],
+            [['date', 'heure_debut', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA', 'fkNom'], 'safe'],
         ];
     }
 
@@ -82,6 +82,7 @@ class CoursDateSearch extends CoursDate
         $query->andFilterWhere([
             'cours_date_id' => $this->cours_date_id,
             'fk_cours' => $this->fk_cours,
+            'fk_lieu' => $this->fk_lieu,
             'date' => $this->date,
             'heure_debut' => $this->heure_debut,
             'duree' => $this->duree,
@@ -90,7 +91,6 @@ class CoursDateSearch extends CoursDate
             'cours.participant_max' => $this->participantMax,
         ]);
 
-        $query->andFilterWhere(['like', 'lieu', $this->lieu]);
         $query->andFilterWhere(['like', 'remarque', $this->remarque]);
         $query->andFilterWhere(['like', 'nb_client_non_inscrit', $this->nb_client_non_inscrit]);
         $query->andFilterWhere(['like', 'parametres.nom', $this->fkCours]);

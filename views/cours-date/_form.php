@@ -76,7 +76,7 @@ use yii\bootstrap\Alert;
 			]); ?>
         </div>
         <div class="col-sm-6">
-			<?= $form->field($model, 'lieu')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu()) ?>
         </div>
     </div>
     

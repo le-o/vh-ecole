@@ -112,7 +112,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'prix',
                 'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
             ],
-            'lieu',
+            [
+                'label' => Yii::t('app', 'Lieu'),
+                'attribute' => 'fkLieu.nom',
+            ],
             [
                 'label' => Yii::t('app', 'Fk Moniteur'),
                 'value' => function($data) {

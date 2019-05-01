@@ -11,7 +11,7 @@ use Yii;
  * @property integer $fk_cours
  * @property string $date
  * @property string $heure_debut
- * @property string $lieu
+ * @property integer $fk_lieu
  * @property float $duree
  * @property float $prix
  * @property string $remarque
@@ -20,6 +20,7 @@ use Yii;
  * @property datetime $update_date
  *
  * @property Cours $fkCours
+ * @property Parametres $fkLieu
  */
 class CoursDate extends \yii\db\ActiveRecord
 {
@@ -44,10 +45,9 @@ class CoursDate extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_cours', 'date', 'heure_debut', 'lieu', 'duree', 'prix'], 'required'],
-            [['fk_cours', 'nb_client_non_inscrit'], 'integer'],
-            [['date', 'heure_debut', 'remarque'], 'safe'],
-            [['lieu'], 'string', 'max' => 150]
+            [['fk_cours', 'date', 'heure_debut', 'duree', 'prix', 'fk_lieu'], 'required'],
+            [['fk_cours', 'nb_client_non_inscrit', 'fk_lieu'], 'integer'],
+            [['date', 'heure_debut', 'remarque'], 'safe']
         ];
     }
 
@@ -62,7 +62,7 @@ class CoursDate extends \yii\db\ActiveRecord
             'fkCours' => Yii::t('app', 'Nom du cours'),
             'date' => Yii::t('app', 'Date'),
             'heure_debut' => Yii::t('app', 'Heure début'),
-            'lieu' => Yii::t('app', 'Lieu'),
+            'fkLieu' => Yii::t('app', 'Lieu'),
             'duree' => Yii::t('app', 'Durée'),
             'prix' => Yii::t('app', 'Prix'),
             'remarque' => Yii::t('app', 'Remarque'),
@@ -117,6 +117,14 @@ class CoursDate extends \yii\db\ActiveRecord
     public function getFkCours()
     {
         return $this->hasOne(Cours::className(), ['cours_id' => 'fk_cours']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkLieu()
+    {
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_lieu']);
     }
 
     /**
@@ -240,7 +248,7 @@ UID:VH-cours-' . $this->cours_date_id . '
 SUMMARY:' . $title . '
 DTSTART;TZID=Europe/Zurich:' . $this->dateToCal(strtotime($this->date . ' ' . $this->heure_debut)) . '
 DTEND;TZID=Europe/Zurich:' . $this->dateToCal(strtotime($this->date . ' ' . $this->getHeureFin())) . '
-LOCATION:' . $this->lieu . '
+LOCATION:' . $this->fkLieu->nom . '
 DESCRIPTION:' . $description . '
 END:VEVENT
 END:VCALENDAR';
