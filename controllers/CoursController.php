@@ -864,12 +864,14 @@ class CoursController extends CommonController
                     $categories[] = $cat->nom;
                 }
                 $dates = [];
+                $datesLieux = [];
                 $premierJourSession = '';
                 foreach ($c->coursDates as $d) {
                     if (empty($premierJourSession)) {
                         $premierJourSession = date('Y-m-d', strtotime($d->date));
                     }
                     $dates[] = date('r', strtotime($d->date.' '.$d->heure_debut));
+                    $datesLieux[] = ['date' => date('r', strtotime($d->date.' '.$d->heure_debut)), 'lieu' => $d->fkLieu->nom];
                 }
                 $data[] = [
                     'id' => $c->cours_id,
@@ -878,6 +880,7 @@ class CoursController extends CommonController
                     'semestre' => ($c->fk_semestre != '') ? $c->fkSemestre->nom : '',
                     'saison' => ($c->fk_saison != '') ? $c->fkSaison->nom : '',
                     'session' => $c->session,
+                    'salle' => $c->fkSalle->nom,
                     'jours_semaine' => $jours,
                     'type' => $c->fkType->nom,
                     'annee' => $c->annee,
@@ -891,6 +894,7 @@ class CoursController extends CommonController
                     'infos_tarifs' => $c->offre_speciale,
                     'premier_jour_session' => $premierJourSession,
                     'toutes_les_dates' => $dates,
+                    'toutes_les_dates_avec_lieu' => $datesLieux,
                     'extrait' => $c->extrait,
                     'description' => $c->description,
                     'offre_speciale' => $c->offre_speciale,
