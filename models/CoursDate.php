@@ -135,6 +135,7 @@ class CoursDate extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ClientsHasCoursDate::className(), ['fk_cours_date' => 'cours_date_id'])->orderBy(['fk_statut' => SORT_ASC]);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */

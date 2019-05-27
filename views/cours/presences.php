@@ -43,9 +43,10 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Participants');
             echo '<tr><td>'.$participant->fkPersonne->nom.' '.$participant->fkPersonne->prenom.'</td>';
             foreach ($arrayData as $data) {
                 $dateCours = date('Ymd', strtotime($data['model']->date));
-                if (isset($data['participants']) && array_key_exists($key, $data['participants'])) {
+                if (isset($data['participants']) && array_key_exists($key, $data['participants']) && $data['participants'][$key]->fk_statut != Yii::$app->params['partDesinscrit']) {
                     $isPresent = $data['participants'][$key]->is_present;
-                    echo '<td>'.yii\bootstrap\BaseHtml::checkbox('dateparticipant['.$dateCours.']['.$data['model']->cours_date_id.'|'.$key.']', $isPresent).'</td>';
+                    $options = ($data['participants'][$key]->fk_statut == Yii::$app->params['partDesinscrit']) ? ['disabled' => ''] : [];
+                    echo '<td>'.yii\bootstrap\BaseHtml::checkbox('dateparticipant['.$dateCours.']['.$data['model']->cours_date_id.'|'.$key.']', $isPresent, $options).'</td>';
                 } else echo '<td style="background-color: grey;"></td>';
             }
             echo '</tr>';

@@ -254,14 +254,16 @@ class CoursController extends CommonController
                 'pageSize' => 20,
             ],
         ]);
+        // on cherche à définir le statut actuelle des participants
+        // dernière date
+        $coursDate = CoursDate::find()->where(['fk_cours' => $model->cours_id])->andWhere(['<=', 'date', date('Y-m-d')])->orderBy('date DESC')->one();
+        if (null === $coursDate) {
+            // alors la prochaine date
+            $coursDate = CoursDate::find()->where(['fk_cours' => $model->cours_id])->andWhere(['>=', 'date', date('Y-m-d')])->orderBy('date DESC')->one();
+        }
         foreach($participantDataProvider->models as $part) {
-            foreach ($coursDate->all() as $date) {
-                $pres = $date->getForPresence($part->personne_id);
-                if (!empty($pres->fk_statut)) {
-                    $part->statutPart = $pres->fkStatut->nom;
-                    break;
-                }
-            }
+            $pres = $coursDate->getForPresence($part->personne_id);
+            $part->statutPart = $pres->fkStatut->nom;
         }
 
         $parametre = new Parametres();
@@ -517,29 +519,28 @@ class CoursController extends CommonController
                 $newParticipant = new ClientsHasCoursDate();
                 $newParticipant->fk_personne = $post['new_inscription'];
             } else {
-            
+                
+                $allParticipants = json_decode($post['allParticipants']);
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
-                    // on supprime toutes les inscriptions pour les cours en question
                     foreach ($model->coursDates as $coursDate) {
-                        foreach ($coursDate->clientsHasCoursDate as $participant) {
-                            $saveStatut[$participant->fk_personne]['part'] = $participant;
-                        }
-                        ClientsHasCoursDate::deleteAll('fk_cours_date = :cours_date_id', ['cours_date_id' => $coursDate->cours_date_id]);
-                    }
-
-                    // on reconstruit la liste d'après la saisie
-                    foreach ($post['dateparticipant'] as $parDate) {
-                        foreach ($parDate as $key => $v) {
-                            $ids = explode('|', $key);
-                            $addParticipant = new ClientsHasCoursDate();
-                            $addParticipant->fk_personne = $ids[1];
-                            $addParticipant->fk_cours_date = $ids[0];
-                            $addParticipant->is_present = 1;
-                            $addParticipant->fk_statut = (isset($saveStatut[$ids[1]])) ? $saveStatut[$ids[1]]['part']->fk_statut : Yii::$app->params['partInscrit'];
-                            if (!($flag = $addParticipant->save(false))) {
-                                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du participant (ID '.$ids[1].'.'));
+                        $laDate = date('Ymd', strtotime($coursDate->date));
+                        
+                        // on test si l'entrée existe déjà
+                        // si oui, on met à jour le statut
+                        // si non, on créé l'entrée avec le bon statut
+                        foreach ($allParticipants as $partID => $vide) {
+                            $key = $coursDate->cours_date_id . '|' . $partID;
+                            $toprint = $key;
+                            $statut = (in_array($key, $post['dateparticipant'][$laDate])) ? Yii::$app->params['partInscrit'] : Yii::$app->params['partDesinscrit'];
+                            $myClientsHasCoursDate = ClientsHasCoursDate::findOne(['fk_cours_date' => $coursDate->cours_date_id, 'fk_personne' => $partID]);
+                            if (null === $myClientsHasCoursDate) {
+                                $myClientsHasCoursDate = new ClientsHasCoursDate;
+                                $myClientsHasCoursDate->fk_cours_date = $coursDate->cours_date_id;
+                                $myClientsHasCoursDate->fk_personne = $partID;
                             }
+                            $myClientsHasCoursDate->fk_statut = $statut;
+                            $myClientsHasCoursDate->save(false);
                         }
                     }
 
@@ -777,12 +778,34 @@ class CoursController extends CommonController
             $todec[] = new CoursDate();
         }
         $decoupage[] = $todec;
-        $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate')->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->orderBy('clients_has_cours_date.fk_statut ASC');
+        $participants = Personnes::find()->distinct()->joinWith('clientsHasCoursDate')->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->orderBy('clients_has_cours_date.fk_statut ASC')->all();
+        
+        // on cherche à définir le statut actuelle des participants
+        // dernière date
+        $coursDate = CoursDate::find()->where(['fk_cours' => $model->cours_id])->andWhere(['<=', 'date', date('Y-m-d')])->orderBy('date DESC')->one();
+        if (null === $coursDate) {
+            // alors la prochaine date
+            $coursDate = CoursDate::find()->where(['fk_cours' => $model->cours_id])->andWhere(['>=', 'date', date('Y-m-d')])->orderBy('date DESC')->one();
+        }
+        foreach($participants as $part) {
+            $pres = $coursDate->getForPresence($part->personne_id);
+            $part->statutPart = $pres->fkStatut->nom;
+            
+            ${'allParticipants'.$pres->fk_statut}[] = $part;
+        }
+        
+        $allParticipants = [];
+        $lesStatuts = Parametres::find()->where(['class_key' => 9])->orderBy('tri')->all();
+        foreach ($lesStatuts as $statut) {
+            if (isset(${'allParticipants'.$statut->parametre_id})) {
+                $allParticipants = array_merge($allParticipants, ${'allParticipants'.$statut->parametre_id});
+            }
+        }
 
         // get your HTML raw content without any layouts or scripts
         $content = $this->renderPartial('_presence', [
             'model' => $model,
-            'participants' => $participants->all(),
+            'participants' => $allParticipants,
             'decoupage' => $decoupage,
         ]);
 //        return $content;
@@ -957,5 +980,63 @@ class CoursController extends CommonController
                 }
             }
         }
+    }
+    
+    /**
+     * Gestion des présences pour une date de cours
+     * @return json
+     */
+    public function actionToggleinscription() {
+        if (isset($_POST['key'])) {
+            $key = explode('|', $_POST['key']);
+            $toggle = ('true' == $_POST['isChecked']) ? Yii::$app->params['partInscrit'] : Yii::$app->params['partDesinscrit'];
+            $myClientsHasCoursDate = ClientsHasCoursDate::findOne(['fk_cours_date' => $key[0], 'fk_personne' => $key[1]]);
+            $myClientsHasCoursDate->fk_statut = $toggle;
+            $myClientsHasCoursDate->save(false);
+            return \yii\helpers\Json::encode([
+                'status' => 'success',
+                'message' => Yii::t('app', 'Modification enregistrée')
+            ]);
+        }
+    }
+    
+    public function actionCorrectifparticipant() {
+        // limité au cours à traiter, sinon ca va faire des problèmes (par exemple cours anniversaire)
+        $modelCours = Cours::find()->where(['IN', 'fk_type', Yii::$app->params['coursPlanifieS']])->all();
+        foreach ($modelCours as $cours) {
+            $listeCoursDate = [];
+            $coursDate = CoursDate::find()->where(['fk_cours' => $cours->cours_id])->orderBy('date');
+            foreach ($coursDate->all() as $date) {
+                $listeCoursDate[] = $date->cours_date_id;
+            }
+            $clients = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $listeCoursDate])->all();
+            
+            foreach ($listeCoursDate as $coursDateID) {
+                foreach ($clients as $c) {
+                    $myClientsHasCoursDate = ClientsHasCoursDate::findOne(['fk_cours_date' => $coursDateID, 'fk_personne' => $c->personne_id]);
+                    if (null === $myClientsHasCoursDate) {
+                        echo '<br />Le client ' . $c->personne_id . ' est inscrit au cours mais sans entrée dans clients_has_cours_date -> a créé';
+                        try {
+                            $modelClientsHasCoursDate = new ClientsHasCoursDate;
+                            $modelClientsHasCoursDate->fk_personne = $c->personne_id;
+                            $modelClientsHasCoursDate->fk_cours_date = $coursDateID;
+                            $modelClientsHasCoursDate->is_present = true;
+                            $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partDesinscrit'];
+                            $modelClientsHasCoursDate->save();
+                        } catch (Exception $ex) {
+                            echo "<pre>";
+                            print_r($ex->getMessage());
+                            echo "</pre>";
+                            exit;
+                        }
+                        
+                        echo '<br />OK - entrée créée ' . $c->personne_id . ' ' . $coursDateID;
+//                    } else {
+//                        echo '<br />OK - rien  à faire ' . $c->personne_id . ' ' . $coursDateID;
+                    }
+                }
+            }
+        }
+        echo '<br /><br /><br />################## FIN ##################';
     }
 }
