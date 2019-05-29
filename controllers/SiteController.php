@@ -8,6 +8,7 @@ use app\models\CoursDateSearch;
 use app\models\Cours;
 use app\models\CoursHasMoniteurs;
 use app\models\Personnes;
+use app\models\Parametres;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -24,6 +25,8 @@ require_once('../vendor/le-o/simpleCalDAV/SimpleCalDAVClient.php');
 
 class SiteController extends Controller
 {
+    public $layout = 'main_full.php';
+    
     public function behaviors()
     {
         return [
@@ -128,14 +131,18 @@ class SiteController extends Controller
 //        }
         
         // set la valeur de la date début du calendrier
-        if (Yii::$app->session->get('home-cal-debut') === null) Yii::$app->session->set('home-cal-debut', date('Y-m-d'));
-        if (Yii::$app->session->get('home-cal-view') === null) Yii::$app->session->set('home-cal-view', 'agendaWeek');
+        $dataSalles = Parametres::findAll(['class_key' => 16]);
+        foreach ($dataSalles as $salle) {
+            if (Yii::$app->session->get('home-cal-debut-' . $salle->parametre_id) === null) Yii::$app->session->set('home-cal-debut-' . $salle->parametre_id, date('Y-m-d'));
+            if (Yii::$app->session->get('home-cal-view-' . $salle->parametre_id) === null) Yii::$app->session->set('home-cal-view-' . $salle->parametre_id, 'agendaWeek');
+        }
         
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'dataProviderNF' => $dataProviderNF,
 //            'dataProviderNM' => $dataProviderNM,
 //            'dataMoniteurs' => $dataMoniteurs,
+            'dataSalles' => $dataSalles,
         ]);
     }
 
@@ -277,11 +284,11 @@ class SiteController extends Controller
         return $this->render('about');
     }
     
-    public function actionSetcalendarview() {
+    public function actionSetcalendarview($for) {
         if (Yii::$app->request->isAjax) {
             $data = Yii::$app->request->post();
-            Yii::$app->session->set('home-cal-view', $data['view']);
-            Yii::$app->session->set('home-cal-debut', $data['start']);
+            Yii::$app->session->set('home-cal-view-' . $for, $data['view']);
+            Yii::$app->session->set('home-cal-debut-' . $for, $data['start']);
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }

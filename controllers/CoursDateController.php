@@ -663,14 +663,16 @@ class CoursDateController extends CommonController
      * @param null $_
      * @return array
      */
-    public function actionJsoncalendar($start=NULL,$end=NULL,$_=NULL){
+    public function actionJsoncalendar($start=NULL,$end=NULL,$_=NULL,$for){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $times = CoursDate::find()
+            ->joinWith(['fkCours'])
             ->where(['>=', 'date', $start])
             ->andWhere(['<=', 'date', $end])
+            ->andWhere(['cours.fk_salle' => $for])
             ->all();
         
-        Yii::$app->session->set('home-cal-debut', $start);
+        Yii::$app->session->set('home-cal-debut-' . $for, $start);
 
         $events = [];
         foreach ($times AS $time){
