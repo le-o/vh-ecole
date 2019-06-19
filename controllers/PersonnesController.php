@@ -416,7 +416,7 @@ class PersonnesController extends CommonController
         $dataCours = [];
         foreach ($coursNot as $c) {
             if (in_array($c->fk_type, Yii::$app->params['coursPlanifieS'])) {
-                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->session.' '.$c->fkSaison->nom;
+                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->session.' '.$c->fkSaison->nom.' '.$c->fkSalle->nom;
             } else {
                 foreach ($c->coursDates as $coursDate) {
                     $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] = 
