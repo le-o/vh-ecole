@@ -83,6 +83,7 @@ class CoursSearch extends Cours
         
         if ($this->isPriorise == true) {
             $query->andWhere(['NOT', ['tri_internet' => null]]);
+            $query->orderBy('tri_internet');
         }
         
         $query->joinWith(['fkLangue' => function($langue) {
