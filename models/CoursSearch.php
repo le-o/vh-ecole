@@ -18,6 +18,7 @@ class CoursSearch extends Cours
     public $fkSaison;
     public $fkSemestre;
     public $fkJours;
+    public $isPriorise;
     
     /**
      * @inheritdoc
@@ -79,6 +80,10 @@ class CoursSearch extends Cours
             'fk_salle' => $this->fk_salle,
         ])
         ->andFilterWhere(['like', 'session', $this->session]);
+        
+        if ($this->isPriorise == true) {
+            $query->andWhere(['NOT', ['tri_internet' => null]]);
+        }
         
         $query->joinWith(['fkLangue' => function($langue) {
             $langue->alias('langue');

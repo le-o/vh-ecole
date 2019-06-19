@@ -32,8 +32,16 @@ $this->registerJs($script, View::POS_END);
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
     <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <?= $form->field($model, 'fk_niveau')->dropDownList($modelParams->optsNiveau(),['prompt'=>Yii::t('app', 'Choisir un niveau')]) ?>
+        </div>
+        <div class="col-sm-2">
+            <label></label>
+            <?= $form->field($model, 'is_materiel_compris')->checkbox() ?>
+        </div>
+        <div class="col-sm-2">
+            <label></label>
+            <?= $form->field($model, 'is_entree_compris')->checkbox() ?>
         </div>
         <div class="col-sm-2">
             <label></label>
@@ -44,12 +52,7 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'is_publie')->checkbox() ?>
         </div>
         <div class="col-sm-2">
-            <label></label>
-            <?= $form->field($model, 'is_materiel_compris')->checkbox() ?>
-        </div>
-        <div class="col-sm-2">
-            <label></label>
-            <?= $form->field($model, 'is_entree_compris')->checkbox() ?>
+            <?= $form->field($model, 'tri_internet')->textInput(['type' => 'number', 'min' => 1]) ?>
         </div>
     </div>
     

@@ -32,6 +32,7 @@ use Yii;
  * @property string $image_web 
  * @property integer $fk_langue
  * @property integer $fk_salle
+ * @property integer $tri_internet
  *
  * @property ClientsHasCours[] $clientsHasCours 
  * @property Personnes[] $fkPersonnes 
@@ -64,7 +65,7 @@ class Cours extends \yii\db\ActiveRecord
     {
         return [
             [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'session', 'prix', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie', 'fk_langue', 'fk_salle'], 'required'],
-            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'fk_saison', 'fk_semestre', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie', 'fk_langue', 'fk_salle'], 'integer'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'fk_saison', 'fk_semestre', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie', 'fk_langue', 'fk_salle', 'tri_internet'], 'integer'],
             [['duree', 'prix'], 'double'],
             [['extrait', 'description', 'session', 'offre_speciale'], 'string'],
             [['annee', 'image'], 'safe'],
@@ -101,6 +102,7 @@ class Cours extends \yii\db\ActiveRecord
             'is_publie' => Yii::t('app', 'Is Publié'),
             'fk_langue' => Yii::t('app', 'Langue'),
             'fk_salle' => Yii::t('app', 'Salle'),
+            'tri_internet' => Yii::t('app', 'Priorité sur site internet'),
         ];
     }
     

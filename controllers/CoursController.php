@@ -74,18 +74,22 @@ class CoursController extends CommonController
      * Lists all Cours models.
      * @return mixed
      */
-    public function actionIndex($salle = null)
+    public function actionIndex($salle = null, $onlyForWeb = null)
     {
         $searchModel = new CoursSearch();
-        if ($salle === null) {
+        if ($salle === null && $onlyForWeb === null) {
             $salle = (isset(Yii::$app->session['salle'])) ? Yii::$app->session['salle'] : Yii::$app->params['saxon'];
         }
         $searchModel->fk_salle = $salle;
+        if ($onlyForWeb !== null) {
+            $searchModel->isPriorise = $onlyForWeb;
+        }
         Yii::$app->session['salle'] = $salle;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
         $btnClassSaxon = ($searchModel->fk_salle == Yii::$app->params['saxon']) ? ' btn-info' : '';
         $btnClassMonthey = ($searchModel->fk_salle == Yii::$app->params['monthey']) ? ' btn-info' : '';
+        $btnClassPriorise = ($onlyForWeb == true) ? ' btn-info' : '';
         
         $parametre = new Parametres();
         $saisonFilter = $parametre->optsSaison();
@@ -96,6 +100,7 @@ class CoursController extends CommonController
             'saisonFilter' => $saisonFilter,
             'btnClassSaxon' => $btnClassSaxon,
             'btnClassMonthey' => $btnClassMonthey,
+            'btnClassPriorise' => $btnClassPriorise,
         ]);
     }
 
@@ -925,6 +930,7 @@ class CoursController extends CommonController
                     'image_web' => ($c->image_web != '') ? Url::home(true).'/../../_files/images/'.$c->image_web : '',
                     'langue' => $c->fkLangue->nom,
                     'tri' => $c->fkNom->tri,
+                    'tri_mise_en_avant' => $c->tri_internet,
                 ];
             }
         }

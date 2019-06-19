@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::a(Yii::t('app', 'Saxon'), ['index', 'salle' => Yii::$app->params['saxon']], ['class' => 'btn btn-default' . $btnClassSaxon]) ?>
             <?= Html::a(Yii::t('app', 'Monthey'), ['index', 'salle' => Yii::$app->params['monthey']], ['class' => 'btn btn-default' . $btnClassMonthey]) ?>
         </div>
+        <?= Html::a(Yii::t('app', 'Priorité internet'), ['index', 'onlyForWeb' => ($btnClassPriorise == '') ? true : false], ['class' => 'btn btn-default' . $btnClassPriorise]) ?>
     </div>
     </p>
 
