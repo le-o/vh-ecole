@@ -27,6 +27,10 @@ $gridColumns = [
         'value' => 'fkCours.session',
     ],
     [
+        'label' => Yii::t('app', 'Salle'),
+        'value' => 'fkCours.fkSalle.nom',
+    ],
+    [
         'label' => Yii::t('app', 'Fk Moniteur'),
         'value' => function($data) {
             $array_moniteurs = [];
