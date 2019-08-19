@@ -42,14 +42,14 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
         '1001' => [
             'id' => '1001',
             'username' => 'accueil',
-            'password' => 'm0t2Pa$$e',
+            'password' => 'LaccueildeVerticsa*1907',
             'authKey' => 'test1100key',
             'accessToken' => '1100-token',
         ],
         '1101' => [
             'id' => '1101',
             'username' => 'moniteurs',
-            'password' => 'm0nit3urs',
+            'password' => 'LescoursdeVerticsa*303',
             'authKey' => 'test1001key',
             'accessToken' => '1001-token',
         ],
