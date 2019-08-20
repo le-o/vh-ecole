@@ -20,8 +20,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="btn-toolbar" role="toolbar">
         <?= Html::a(Yii::t('app', 'Create Cours'), ['create'], ['class' => 'btn btn-success']) ?>
         <div class="btn-group">
-            <?= Html::a(Yii::t('app', 'Saxon'), ['index', 'salle' => Yii::$app->params['saxon']], ['class' => 'btn btn-default' . $btnClassSaxon]) ?>
-            <?= Html::a(Yii::t('app', 'Monthey'), ['index', 'salle' => Yii::$app->params['monthey']], ['class' => 'btn btn-default' . $btnClassMonthey]) ?>
+            <?php foreach ($btnSalle as $s) { ?>
+                <?= Html::a(Yii::t('app', $s['label']), ['index', 'salle' => $s['salleID']], ['class' => 'btn btn-default' . $s['class']]) ?>
+            <?php } ?>
         </div>
         <?= Html::a(Yii::t('app', 'Priorité internet'), ['index', 'onlyForWeb' => ($btnClassPriorise == '') ? true : false], ['class' => 'btn btn-default' . $btnClassPriorise]) ?>
     </div>

@@ -87,8 +87,14 @@ class CoursController extends CommonController
         Yii::$app->session['salle'] = $salle;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
-        $btnClassSaxon = ($searchModel->fk_salle == Yii::$app->params['saxon']) ? ' btn-info' : '';
-        $btnClassMonthey = ($searchModel->fk_salle == Yii::$app->params['monthey']) ? ' btn-info' : '';
+        $dataSalles = Parametres::findAll(['class_key' => 16]);
+        foreach ($dataSalles as $salle) {
+            $btnSalle[] = [
+                'salleID' => $salle->parametre_id,
+                'label' => $salle->nom,
+                'class' => ($searchModel->fk_salle == $salle->parametre_id) ? ' btn-info' : '',
+            ];
+        }
         $btnClassPriorise = ($onlyForWeb == true) ? ' btn-info' : '';
         
         $parametre = new Parametres();
@@ -98,8 +104,7 @@ class CoursController extends CommonController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'saisonFilter' => $saisonFilter,
-            'btnClassSaxon' => $btnClassSaxon,
-            'btnClassMonthey' => $btnClassMonthey,
+            'btnSalle' => $btnSalle,
             'btnClassPriorise' => $btnClassPriorise,
         ]);
     }
