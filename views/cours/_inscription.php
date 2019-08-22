@@ -83,6 +83,7 @@ $this->registerJs($modalJs, View::POS_END);
                     ])->label(Yii::t('app', 'Modèle'));
 
                 echo $form->field($parametre, 'nom')->textInput()->label(Yii::t('app', 'Sujet'));
+                echo Yii::$app->view->renderFile('@app/views/site/dynamicFields.php');
                 echo $form->field($parametre, 'valeur')->widget(\yii\redactor\widgets\Redactor::className())->label(Yii::t('app', 'Texte'));
 
                 echo Html::submitButton(Yii::t('app', 'Envoyer'), ['class' => 'btn btn-primary']);

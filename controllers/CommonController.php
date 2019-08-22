@@ -197,14 +197,18 @@ class CommonController extends Controller
             $dateCours = $myCours->nextCoursDate;
             $allDatesCours = $myCours->coursDates;
             $datesCours = [];
+            $datesCoursLieux = [];
             $datesCoursInscrit = [];
+            $datesCoursInscritLieux = [];
             $statutTraite = false;
             $statutInscription = 'n/a';
             foreach ($allDatesCours as $date) {
                 if (isset($mail['personne_id']) && $date->getForPresence($mail['personne_id'])) {
                     $datesCoursInscrit[] = $date->date;
+                    $datesCoursInscritLieux[] = $date->date . ' - ' . $date->fkLieu->nom;
                 }
                 $datesCours[] = $date->date;
+                $datesCoursLieux[] = $date->date . ' - ' . $date->fkLieu->nom;
                 // on traite le statut du participant
                 if ($statutTraite == false && isset($myPersonne)) {
                     $inscriptions = $myPersonne->getClientsHasOneCoursDate($date->cours_date_id);
@@ -227,12 +231,14 @@ class CommonController extends Controller
             }
             
             $content = str_replace(
-                ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', 
+                ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', '#salle-cours#',
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
-                    '#toutes-les-dates#', '#dates-inscrit#', '#statut-inscription#'], 
-                [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, 
+                    '#toutes-les-dates#', '#toutes-les-dates-avec-lieux#', '#dates-inscrit#', '#dates-inscrit-avec-lieux#', 
+                    '#statut-inscription#'], 
+                [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, $myCours->fkSalle->nom,
                     $myCours->session, $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] ? $myCoursDate->prix : $myCours->prix), $date,
-                    implode(', ', $datesCours), implode(', ', $datesCoursInscrit), $statutInscription], 
+                    implode(', ', $datesCours), implode(', ', $datesCoursLieux), implode(', ', $datesCoursInscrit), implode(', ', $datesCoursInscritLieux), 
+                    $statutInscription], 
                 $content
             );
         }
