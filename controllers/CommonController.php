@@ -202,8 +202,6 @@ class CommonController extends Controller
             $datesCoursLieux = [];
             $datesCoursInscrit = [];
             $datesCoursInscritLieux = [];
-            $statutTraite = false;
-            $statutInscription = 'n/a';
             foreach ($allDatesCours as $date) {
                 if (isset($mail['personne_id']) && $date->getForPresence($mail['personne_id'])) {
                     $datesCoursInscrit[] = $date->date;
@@ -211,14 +209,12 @@ class CommonController extends Controller
                 }
                 $datesCours[] = $date->date;
                 $datesCoursLieux[] = $date->date . ' - ' . $date->fkLieu->nom;
-                // on traite le statut du participant
-                if ($statutTraite == false && isset($myPersonne)) {
-                    $inscriptions = $myPersonne->getClientsHasOneCoursDate($date->cours_date_id);
-                    if (!empty($inscriptions)) {
-                        $statutInscription = $inscriptions->fkStatut->nom;
-                        $statutTraite = true;
-                    }
-                }
+            }
+            // on traite le statut du participant
+            $statutInscription = 'n/a';
+            if (isset($myPersonne)) {
+                $myClientsHasCours = ClientsHasCours::findOne(['fk_personne' => $myPersonne->personne_id, 'fk_cours' => $myCours->cours_id]);
+                $statutInscription = $myClientsHasCours->fkStatut->nom;
             }
             if (isset($myCoursDate)) {
                 $heure_debut = $myCoursDate->heure_debut;
