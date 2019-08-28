@@ -28,7 +28,7 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
         '413' => [
             'id' => '413',
             'username' => 'michael',
-            'password' => 'indiaPal3Ale!',
+            'password' => 'MikedeVerticsa*1907',
             'authKey' => 'test413key',
             'accessToken' => '413-token',
         ],
