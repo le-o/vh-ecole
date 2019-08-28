@@ -15,6 +15,8 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use yii\data\SqlDataProvider;
 use app\models\CoursHasMoniteurs;
+use app\models\ClientsHasCours;
+use app\models\ClientsHasCoursDate;
 
 use \Spatie\CalendarLinks\Link;
 use DateTime;
@@ -274,5 +276,40 @@ class CommonController extends Controller
                 imap_close($stream);
             }
         }
+    }
+    
+    protected function addClientToCours($modelDate, $personneID, $coursID) {
+        $transaction = \Yii::$app->db->beginTransaction();
+        try {
+            $modelClientsHasCours = new ClientsHasCours();
+            $modelClientsHasCours->fk_personne = $personneID;
+            $modelClientsHasCours->fk_cours = $coursID;
+            $modelClientsHasCours->fk_statut = Yii::$app->params['partInscrit'];
+            if (!$modelClientsHasCours->save()) {
+                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-cours.'));
+            }
+            foreach ($modelDate as $date) {
+                $modelClientsHasCoursDate = new ClientsHasCoursDate();
+                $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
+                $modelClientsHasCoursDate->fk_personne = $personneID;
+                $modelClientsHasCoursDate->is_present = true;
+                if (!$modelClientsHasCoursDate->save(false)) {
+                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-date de cours.'));
+                }
+                
+                // si cours ponctuel, on n'inscrit à une seul date
+                if ($date->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
+                    break;
+                }
+            }
+            $alerte['class'] = 'success';
+            $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+            $transaction->commit();
+        } catch (Exception $e) {
+            $alerte['class'] = 'danger';
+            $alerte['message'] = Yii::t('app', 'Inscription impossible - erreur inattendue, veuillez contactez le support.') . '<br />' . $e->getMessage();
+            $transaction->rollBack();
+        }
+        return $alerte;
     }
 }

@@ -78,7 +78,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Participants');
             foreach ($arrayData as $data) {
                 $dateCours = date('Ymd', strtotime($data['model']->date));
                 $isChecked = false;
-                if (isset($data['participants']) && array_key_exists($key, $data['participants']) && $data['participants'][$key]->fk_statut == Yii::$app->params['partInscrit']) {
+                if (isset($data['participants']) && array_key_exists($key, $data['participants'])) {
                     $isChecked = true;   
                 }
                 echo '<td>'.yii\bootstrap\BaseHtml::checkbox('dateparticipant['.$dateCours.']['.$data['model']->cours_date_id.'|'.$key.']', $isChecked, ['value' => $data['model']->cours_date_id.'|'.$key]).'</td>';
@@ -96,25 +96,4 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Participants');
         <?php ActiveForm::end(); ?>
 
     </div>
-    <?php if (true) {
-        $script = '
-        jQuery(document).ready(function() {
-            $(\'input[name^="dateparticipant"]\').click(function () {
-                var key = $(this).attr("value");
-                var isChecked = $(this).is(":checked");
-                console.log(key);
-                $.ajax({
-                    type: "POST",
-                    url: "'.yii\helpers\Url::to(['/cours/toggleinscription']).'", 
-                    dataType: "json",
-                    data: {"key": key, "isChecked": isChecked},
-                    success: function(data) {
-                        $("#msg").html(data.message).toggle();
-                        $("#msg").delay(600).fadeOut("slow");
-                    },
-                });
-            });
-        });';
-        $this->registerJs($script, \yii\web\View::POS_END);
-    } ?>
 </div>
