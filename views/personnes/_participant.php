@@ -179,7 +179,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                     },
                     'partUpdate' => function ($model, $key, $index) use ($viewAndId) {
                         if ($key->personne_id != '') {
-                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours-date/update', 'fk_personne' => $key->personne_id, 'fk_cours' => $viewAndId[1]]), [
+                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours/update', 'fk_personne' => $key->personne_id, 'fk_cours' => $viewAndId[1]]), [
                                 'title' => Yii::t('app', 'Modifier statut'),
                             ]);
                         }

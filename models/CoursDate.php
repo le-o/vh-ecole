@@ -133,7 +133,7 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getClientsHasCoursDate()
     {
-        return $this->hasMany(ClientsHasCoursDate::className(), ['fk_cours_date' => 'cours_date_id'])->orderBy(['fk_statut' => SORT_ASC]);
+        return $this->hasMany(ClientsHasCoursDate::className(), ['fk_cours_date' => 'cours_date_id']);
     }
 
     /**
@@ -172,7 +172,7 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getNombreClientsInscrits()
     {
-        return Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $this->cours_date_id])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['partInscrit']])->count();
+        return ClientsHasCours::find()->where(['fk_cours' => $this->fk_cours])->andWhere(['fk_statut' => Yii::$app->params['partInscrit']])->count();
     }
     
     /**
@@ -180,7 +180,7 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getNombreClientsInscritsForDataGrid()
     {
-        $partEssai = Personnes::find()->distinct()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $this->cours_date_id])->andWhere(['clients_has_cours_date.fk_statut' => Yii::$app->params['part2Essai']])->count();
+        $partEssai = ClientsHasCours::find()->where(['fk_cours' => $this->fk_cours])->andWhere(['fk_statut' => Yii::$app->params['part2Essai']])->count();
         
         return ($partEssai != 0) ? $this->getNombreClientsInscrits().' ('.$partEssai.')' : $this->getNombreClientsInscrits();
     }

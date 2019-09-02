@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\CoursDate;
 use app\models\CoursDateSearch;
+use app\models\ClientsHasCours;
 use app\models\ClientsHasCoursDate;
 use app\models\Cours;
 use app\models\CoursHasMoniteurs;
@@ -88,15 +89,7 @@ class CoursDateController extends CommonController
         if ($post = Yii::$app->request->post()) {
             if (!empty($post['new_participant'])) {
                 // soit on ajoute un participant
-                $participant = Personnes::findOne(['personne_id' => $post['new_participant']]);
-                $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                $modelClientsHasCoursDate->fk_cours_date = $model->cours_date_id;
-                $modelClientsHasCoursDate->fk_personne = $post['new_participant'];
-                $modelClientsHasCoursDate->is_present = true;
-                $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
-                $modelClientsHasCoursDate->save(false);
-                $alerte['class'] = 'success';
-                $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+                $alerte = $this->addClientToCours([$model], $post['new_participant'], $model->fk_cours);
             } elseif (!empty($post['CoursDate'])) {
                 $clone = clone($model);
                 $model->load(Yii::$app->request->post());
@@ -161,7 +154,7 @@ class CoursDateController extends CommonController
         $listeMoniteurs = (isset($moniteurs)) ? implode(', ', $moniteurs) : '';
 
         // Gestion des participants
-        $participants = Personnes::find()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $model->cours_date_id])->orderBy('clients_has_cours_date.fk_statut ASC');
+        $participants = Personnes::find()->distinct()->joinWith('clientsHasCours', false)->where(['IN', 'clients_has_cours.fk_cours', $model->fk_cours])->orderBy('clients_has_cours.fk_statut ASC');
         $listParticipants = $participants->all();
         $excludePart = [];
         $listeEmails = [];
@@ -207,9 +200,9 @@ class CoursDateController extends CommonController
             ],
         ]);
         foreach($participantDataProvider->allModels as $part) {
-            $pres = $model->getForPresence($part->personne_id);
-            if (isset($pres->fk_statut)) {
-                $part->statutPart = $pres->fkStatut->nom;
+            $isInscrit = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->fk_cours]);
+            if (isset($isInscrit->fk_statut)) {
+                $part->statutPart = $isInscrit->fkStatut->nom;
             }
         }
         
@@ -367,12 +360,7 @@ class CoursDateController extends CommonController
                             ->where(['=', 'fk_cours_date', $coursDate->cours_date_id])
                             ->all();
                         foreach ($participants as $part) {
-                            $cc = new ClientsHasCoursDate;
-                            $cc->fk_personne = $part->fk_personne;
-                            $cc->fk_cours_date = $model->cours_date_id;
-                            $cc->is_present = true;
-                            $cc->fk_statut = $part->fk_statut;
-                            $cc->save();
+                            $alerte = $this->addClientToCours([$coursDate], $part->fk_personne, $cours_id);
                         }
                     }
                 }
@@ -494,109 +482,6 @@ class CoursDateController extends CommonController
             'modelParams' => new Parametres,
         ]);
     }
-
-    /**
-     * Updates an existing CoursDate model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-//    public function actionUpdate($id)
-//    {
-//        $model = $this->findModel($id);
-//        $alerte = [];
-//        
-//        if ($post = Yii::$app->request->post()) {
-//            if (!empty($post['new_participant'])) {
-//                $modelClientsHasCoursDate = new ClientsHasCoursDate();
-//                $modelClientsHasCoursDate->fk_cours_date = $model->cours_date_id;
-//                $modelClientsHasCoursDate->fk_personne = $post['new_participant'];
-//                $modelClientsHasCoursDate->is_present = true;
-//                $modelClientsHasCoursDate->save(false);
-//                $alerte['class'] = 'success';
-//                $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
-//            } else {
-//                $model->load(Yii::$app->request->post());
-//                $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
-//
-//                $transaction = \Yii::$app->db->beginTransaction();
-//                try {
-//                    if (!$model->save()) {
-//                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
-//                    }
-//                    
-//                    CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $model->cours_date_id);
-//                    foreach ($moniteurs as $moniteur_id) {
-//                        $addMoniteur = new CoursHasMoniteurs();
-//                        $addMoniteur->fk_cours_date = $model->cours_date_id;
-//                        $addMoniteur->fk_moniteur = $moniteur_id;
-//                        $addMoniteur->is_responsable = 0;
-//                        if (!($flag = $addMoniteur->save(false))) {
-//                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
-//                        }
-//                    }
-//                    
-//                    $myCours = Cours::findOne($model->fk_cours);
-//                    // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
-//                    if ($myCours->is_actif == false && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
-//                        $myCours->is_actif = true;
-//                        $myCours->save();
-//                    }
-//
-//                    $transaction->commit();
-//                    if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
-//                        return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
-//                    } else {
-//                        return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
-//                    }
-//                } catch (Exception $e) {
-//                    $alerte = $e->getMessage();
-//                    $transaction->rollBack();
-//                }
-//            }
-//        }
-//        $myCours = Cours::findOne($model->fk_cours);
-//        $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
-//        $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
-//        foreach ($myMoniteurs as $moniteur) {
-//	        $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
-//        }
-//        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
-//        foreach ($modelMoniteurs as $moniteur) {
-//            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
-//        }
-//
-//        // Gestion des participants
-//        $participants = Personnes::find()->joinWith('clientsHasCoursDate', false)->where(['IN', 'clients_has_cours_date.fk_cours_date', $model->cours_date_id]);
-//        $listParticipants = $participants->all();
-//        $excludePart = [];
-//        foreach ($listParticipants as $participant) {
-//            $excludePart[] = $participant->personne_id;
-//        }
-//        $dataClients = ArrayHelper::map(Personnes::find()->where(['not in', 'personne_id', $excludePart])->andWhere(['not in', 'fk_type', 2])->orderBy('nom, prenom')->all(), 'personne_id', 'NomPrenom');
-//        $participantDataProvider = new ActiveDataProvider([
-//            'query' => $participants,
-//            'pagination' => [
-//                'pageSize' => 20,
-//            ],
-//        ]);
-//        $parametre = new Parametres();
-//        $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
-//
-//        return $this->render('update', [
-//	        'alerte' => $alerte,
-//            'model' => $model,
-//            'dataCours' => $dataCours,
-//            'dataMoniteurs' => $dataMoniteurs,
-//            'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : [],
-//
-//            'isInscriptionOk' => (Yii::$app->user->identity->id < 700 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
-//            'dataClients' => $dataClients,
-//            'participantDataProvider' => $participantDataProvider,
-//            'parametre' => $parametre,
-//            'emails' => $emails,
-//        ]);
-//    }
 
     /**
      * Deletes an existing CoursDate model.

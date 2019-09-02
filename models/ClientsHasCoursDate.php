@@ -10,7 +10,6 @@ use Yii;
  * @property integer $fk_personne
  * @property integer $fk_cours_date
  * @property integer $is_present
- * @property integer $fk_statut
  *
  * @property CoursDate $fkCoursDate
  * @property Personnes $fkPersonne
@@ -31,8 +30,8 @@ class ClientsHasCoursDate extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_personne', 'fk_cours_date', 'is_present', 'fk_statut'], 'required'],
-            [['fk_personne', 'fk_cours_date', 'is_present', 'fk_statut'], 'integer']
+            [['fk_personne', 'fk_cours_date', 'is_present'], 'required'],
+            [['fk_personne', 'fk_cours_date', 'is_present'], 'integer']
         ];
     }
 
@@ -45,7 +44,6 @@ class ClientsHasCoursDate extends \yii\db\ActiveRecord
             'fk_personne' => Yii::t('app', 'Fk Personne'),
             'fk_cours_date' => Yii::t('app', 'Fk Cours Date'),
             'is_present' => Yii::t('app', 'present?'),
-            'fk_statut' => Yii::t('app', 'statut'),
         ];
     }
 
@@ -63,13 +61,5 @@ class ClientsHasCoursDate extends \yii\db\ActiveRecord
     public function getFkPersonne()
     {
         return $this->hasOne(Personnes::className(), ['personne_id' => 'fk_personne']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getFkStatut()
-    {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_statut']);
     }
 }

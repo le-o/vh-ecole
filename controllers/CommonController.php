@@ -15,6 +15,8 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use yii\data\SqlDataProvider;
 use app\models\CoursHasMoniteurs;
+use app\models\ClientsHasCours;
+use app\models\ClientsHasCoursDate;
 
 use \Spatie\CalendarLinks\Link;
 use DateTime;
@@ -147,6 +149,7 @@ class CommonController extends Controller
      */
     public function actionEmail($mail, $adresses, $public = false)
     {
+        $originEmails = [];
         foreach ($adresses as $a) {
             if ($a !== 'none' && $a !== 'interloc.') {
                 $originEmails[] = $a;
@@ -200,8 +203,6 @@ class CommonController extends Controller
             $datesCoursLieux = [];
             $datesCoursInscrit = [];
             $datesCoursInscritLieux = [];
-            $statutTraite = false;
-            $statutInscription = 'n/a';
             foreach ($allDatesCours as $date) {
                 if (isset($mail['personne_id']) && $date->getForPresence($mail['personne_id'])) {
                     $datesCoursInscrit[] = $date->date;
@@ -209,14 +210,12 @@ class CommonController extends Controller
                 }
                 $datesCours[] = $date->date;
                 $datesCoursLieux[] = $date->date . ' - ' . $date->fkLieu->nom;
-                // on traite le statut du participant
-                if ($statutTraite == false && isset($myPersonne)) {
-                    $inscriptions = $myPersonne->getClientsHasOneCoursDate($date->cours_date_id);
-                    if (!empty($inscriptions)) {
-                        $statutInscription = $inscriptions->fkStatut->nom;
-                        $statutTraite = true;
-                    }
-                }
+            }
+            // on traite le statut du participant
+            $statutInscription = 'n/a';
+            if (isset($myPersonne)) {
+                $myClientsHasCours = ClientsHasCours::findOne(['fk_personne' => $myPersonne->personne_id, 'fk_cours' => $myCours->cours_id]);
+                $statutInscription = $myClientsHasCours->fkStatut->nom;
             }
             if (isset($myCoursDate)) {
                 $heure_debut = $myCoursDate->heure_debut;
@@ -243,7 +242,7 @@ class CommonController extends Controller
             );
         }
         
-        if (isset($emails)) {
+        if (isset($emails) && !empty($emails)) {
             if ($public || count($originEmails) == 1) {
                 $message = Yii::$app->mailer->compose()
                     ->setFrom(Yii::$app->params['adminEmail'])
@@ -274,5 +273,40 @@ class CommonController extends Controller
                 imap_close($stream);
             }
         }
+    }
+    
+    protected function addClientToCours($modelDate, $personneID, $coursID) {
+        $transaction = \Yii::$app->db->beginTransaction();
+        try {
+            $modelClientsHasCours = new ClientsHasCours();
+            $modelClientsHasCours->fk_personne = $personneID;
+            $modelClientsHasCours->fk_cours = $coursID;
+            $modelClientsHasCours->fk_statut = Yii::$app->params['partInscrit'];
+            if (!$modelClientsHasCours->save()) {
+                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-cours.'));
+            }
+            foreach ($modelDate as $date) {
+                $modelClientsHasCoursDate = new ClientsHasCoursDate();
+                $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
+                $modelClientsHasCoursDate->fk_personne = $personneID;
+                $modelClientsHasCoursDate->is_present = true;
+                if (!$modelClientsHasCoursDate->save(false)) {
+                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-date de cours.'));
+                }
+                
+                // si cours ponctuel, on n'inscrit à une seul date
+                if ($date->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
+                    break;
+                }
+            }
+            $alerte['class'] = 'success';
+            $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+            $transaction->commit();
+        } catch (Exception $e) {
+            $alerte['class'] = 'danger';
+            $alerte['message'] = Yii::t('app', 'Inscription impossible - erreur inattendue, veuillez contactez le support.') . '<br />' . $e->getMessage();
+            $transaction->rollBack();
+        }
+        return $alerte;
     }
 }
