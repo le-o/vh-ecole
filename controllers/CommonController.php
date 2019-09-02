@@ -149,6 +149,7 @@ class CommonController extends Controller
      */
     public function actionEmail($mail, $adresses, $public = false)
     {
+        $originEmails = [];
         foreach ($adresses as $a) {
             if ($a !== 'none' && $a !== 'interloc.') {
                 $originEmails[] = $a;
@@ -241,7 +242,7 @@ class CommonController extends Controller
             );
         }
         
-        if (isset($emails)) {
+        if (isset($emails) && !empty($emails)) {
             if ($public || count($originEmails) == 1) {
                 $message = Yii::$app->mailer->compose()
                     ->setFrom(Yii::$app->params['adminEmail'])
