@@ -20,6 +20,8 @@ class CoursSearch extends Cours
     public $fkJours;
     public $isPriorise;
     
+    public $bySalle;
+    
     /**
      * @inheritdoc
      */
@@ -77,9 +79,12 @@ class CoursSearch extends Cours
             'is_actif' => $this->is_actif,
             'is_publie' => $this->is_publie,
             'fk_saison' => $this->fkSaison,
-            'fk_salle' => $this->fk_salle,
+//            'fk_salle' => $this->fk_salle,
         ])
+        ->andFilterWhere(['IN', 'fk_salle', $this->bySalle])
         ->andFilterWhere(['like', 'session', $this->session]);
+        
+//        $query->andWhere(['IN', 'fk_salle', $this->bySalle]);
         
         if ($this->isPriorise == true) {
             $query->andWhere(['NOT', ['tri_internet' => null]]);

@@ -78,22 +78,40 @@ class CoursController extends CommonController
     public function actionIndex($salle = null, $onlyForWeb = null)
     {
         $searchModel = new CoursSearch();
-        if ($salle === null && $onlyForWeb === null) {
-            $salle = (isset(Yii::$app->session['salle'])) ? Yii::$app->session['salle'] : Yii::$app->params['saxon'];
+        $dataSalles = Parametres::findAll(['class_key' => 16]);
+        
+        $filterSalle = Yii::$app->session['salles'];
+        
+        if (empty($salle) && $onlyForWeb === null) {
+            if ($onlyForWeb === null) {
+                $filterSalle = [];
+                foreach ($dataSalles as $s) {
+                    $filterSalle[] = $s->parametre_id;
+                }
+            }
+        } elseif (!empty($salle)) {
+            if (($key = array_search($salle, $filterSalle)) !== false) {
+                unset($filterSalle[$key]);
+            } else {
+                $filterSalle[] = $salle;
+            }
         }
-        $searchModel->fk_salle = $salle;
+        
+        $searchModel->bySalle = $filterSalle;
         if ($onlyForWeb !== null) {
-            $searchModel->isPriorise = $onlyForWeb;
+            Yii::$app->session['onlyForWeb'] = $onlyForWeb;
+        } else {
+            $onlyForWeb = Yii::$app->session['onlyForWeb'];
         }
-        Yii::$app->session['salle'] = $salle;
+        $searchModel->isPriorise = $onlyForWeb;
+        Yii::$app->session['salles'] = $filterSalle;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
-        $dataSalles = Parametres::findAll(['class_key' => 16]);
-        foreach ($dataSalles as $salle) {
+        foreach ($dataSalles as $s) {
             $btnSalle[] = [
-                'salleID' => $salle->parametre_id,
-                'label' => $salle->nom,
-                'class' => ($searchModel->fk_salle == $salle->parametre_id) ? ' btn-info' : '',
+                'salleID' => $s->parametre_id,
+                'label' => $s->nom,
+                'class' => (in_array($s->parametre_id, $searchModel->bySalle)) ? ' btn-info' : '',
             ];
         }
         $btnClassPriorise = ($onlyForWeb == true) ? ' btn-info' : '';
