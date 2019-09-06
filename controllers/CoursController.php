@@ -419,9 +419,9 @@ class CoursController extends CommonController
                         ->andWhere(['>=', 'date', date('Y-m-d')])
                         ->all();
                     $from = 'cours';
-                    $coursDateAll = CoursDate::find()
-                        ->where(['=', 'fk_cours', $cours_ou_date_id])
-                        ->all();
+                    $clientsHasCours = ClientsHasCours::findOne(['fk_cours' => $cours_ou_date_id, 'fk_personne' => $personne_id]);
+                    $clientsHasCours->fk_statut = Yii::$app->params['partStatutDesinscritFutur'];
+                    $clientsHasCours->save();
                 } elseif ($from == 'cours-datefutur') {
                     $coursDateBase = CoursDate::find()
                         ->where(['=', 'cours_date_id', $cours_ou_date_id])
@@ -431,19 +431,17 @@ class CoursController extends CommonController
                         ->andWhere(['>=', 'date', date('Y-m-d', strtotime($coursDateBase->date))])
                         ->all();
                     $from = 'cours-date';
-                    $coursDateAll = CoursDate::find()
-                        ->where(['=', 'fk_cours', $coursDateBase->fk_cours])
-                        ->all();
+                    $clientsHasCours = ClientsHasCours::findOne(['fk_cours' => $coursDateBase->fk_cours, 'fk_personne' => $personne_id]);
+                    $clientsHasCours->fk_statut = Yii::$app->params['partStatutDesinscritFutur'];
+                    $clientsHasCours->save();
                 } else {
                     $coursDate = CoursDate::find()
                         ->where(['=', 'fk_cours', $cours_ou_date_id])
                         ->all();
-                    $coursDateAll = [];
+                    $clientsHasCours = ClientsHasCours::findOne(['fk_cours' => $cours_ou_date_id, 'fk_personne' => $personne_id]);
+                    $clientsHasCours->delete();
                 }
-                // on modifie le statut de toutes les dates du client
-                foreach($coursDateAll as $c) {
-                    ClientsHasCoursDate::updateAll(['fk_statut' => Yii::$app->params['partStatutDesinscritFutur']], ['fk_personne' => $personne_id, 'fk_cours_date' => $c->cours_date_id]);
-                }
+                // on supprime les dates du client
                 foreach ($coursDate as $date) {
                     ClientsHasCoursDate::deleteAll(['fk_personne' => $personne_id, 'fk_cours_date' => $date->cours_date_id]);
                 }
