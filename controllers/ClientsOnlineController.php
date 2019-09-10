@@ -124,14 +124,16 @@ class ClientsOnlineController extends CommonController
             }
             if (isset($post['pmt_tranche'])) {
                 $model->informations .= '
-                    + '.Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)');
+                    + '.Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches');
             }
             
             if (isset($modelCours)) {
                 $model->informations .= '
-                        INFO: '.Yii::t('app', 'Le client souhaite être inscrit au cours suivant').': '.
-                        $modelCours->cours_id.'-'.$modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom.' - '.
-                            $modelCours->fkSemestre->nom.' '.$modelCours->fkSaison->nom.' '.$modelCours->session;
+                    INFO: '.Yii::t('app', 'Le client souhaite être inscrit au cours suivant').': '.
+                    $modelCours->cours_id.'-'.$modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom.' - '.
+                        $modelCours->fkSemestre->nom.' '.$modelCours->fkSaison->nom.' '.$modelCours->session;
+                $model->informations .= '
+                    Salle concernée: '.$modelCours->fkSalle->nom;
             }
 
             $modelsClient = Model::createMultiple(ClientsOnline::classname(), [], 'client_online_id');

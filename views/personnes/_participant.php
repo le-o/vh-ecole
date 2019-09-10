@@ -166,8 +166,8 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'visibleButtons'=>[
                     'partView' => (Yii::$app->user->identity->id < 1100) ? true : false,
                     'partUpdate' => (Yii::$app->user->identity->id < 1100 && $viewAndId[0] != 'cours-date') ? true : false,
-                    'partDeleteFutur' => (Yii::$app->user->identity->id < 1000) ? (isset($model->fk_type) ? in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) : in_array($model->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) : false,
-                    'partDelete' => (Yii::$app->user->identity->id < 1000) ? true : false,
+                    'partDeleteFutur' => (Yii::$app->user->identity->id < 1000 && $model::className() == 'app\models\Cours') ? (isset($model->fk_type) ? in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) : in_array($model->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) : false,
+                    'partDelete' => (Yii::$app->user->identity->id < 1000 && $model::className() == 'app\models\Cours') ? true : false,
                 ],
                 'buttons'=>[
                     'partView' => function ($model, $key, $index) {
@@ -179,7 +179,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                     },
                     'partUpdate' => function ($model, $key, $index) use ($viewAndId) {
                         if ($key->personne_id != '') {
-                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours-date/update', 'fk_personne' => $key->personne_id, 'fk_cours' => $viewAndId[1]]), [
+                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours/update', 'fk_personne' => $key->personne_id, 'fk_cours' => $viewAndId[1]]), [
                                 'title' => Yii::t('app', 'Modifier statut'),
                             ]);
                         }

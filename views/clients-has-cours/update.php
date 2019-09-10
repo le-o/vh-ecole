@@ -10,7 +10,7 @@ use yii\bootstrap\Alert;
 
 $this->title = $modelPersonne->nom . ' ' . $modelPersonne->prenom;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Cours'), 'url' => ['/cours/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->fkCoursDate->fkCours->fkNom->nom, 'url' => ['/cours/view', 'id' => $model->fkCoursDate->fk_cours]];
+$this->params['breadcrumbs'][] = ['label' => $model->fkCours->fkNom->nom, 'url' => ['/cours/view', 'id' => $model->fk_cours]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

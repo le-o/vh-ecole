@@ -9,6 +9,7 @@ use app\models\PersonnesHasInterlocuteurs;
 use app\models\Parametres;
 use app\models\Cours;
 use app\models\CoursDate;
+use app\models\ClientsHasCours;
 use app\models\ClientsHasCoursDate;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -321,30 +322,11 @@ class PersonnesController extends CommonController
                         $alerte['class'] = 'warning';
                         $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
                     } else {
-                        foreach ($modelDate as $date) {
-                            $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                            $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
-                            $modelClientsHasCoursDate->fk_personne = $id;
-                            $modelClientsHasCoursDate->is_present = true;
-                            $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
-                            $modelClientsHasCoursDate->save(false);
-                        }
-                        $alerte['class'] = 'success';
-                        $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+                        $alerte = $this->addClientToCours($modelDate, $id, $newCours[0]);
                     }
                 } elseif ($newCours[1] == Yii::$app->params['coursPonctuel']) {
-                    $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                    $modelClientsHasCoursDate->fk_personne = $id;
-                    $modelClientsHasCoursDate->fk_cours_date = $newCours[0];
-                    $modelClientsHasCoursDate->is_present = true;
-                    $modelClientsHasCoursDate->fk_statut = Yii::$app->params['partInscrit'];
-                    if (!$modelClientsHasCoursDate->save()) {
-                        $alerte['class'] = 'danger';
-                        $alerte['message'] = Yii::t('app', 'Inscription impossible - erreur inattendue, veuillez contactez le support.');
-                    } else {
-                        $alerte['class'] = 'success';
-                        $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
-                    }
+                    $modelDate = CoursDate::findOne(['cours_date_id' => $newCours[0]]);
+                    $alerte = $this->addClientToCours([$modelDate], $id, $modelDate->fk_cours);
                 }
             } elseif (!empty($post['Parametres'])) {
                 // soit on envoi un email

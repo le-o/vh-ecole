@@ -223,6 +223,14 @@ class Personnes extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getClientsHasCours()
+    {
+        return $this->hasMany(ClientsHasCours::className(), ['fk_personne' => 'personne_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getClientsHasCoursDate()
     {
         return $this->hasMany(ClientsHasCoursDate::className(), ['fk_personne' => 'personne_id']);
