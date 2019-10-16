@@ -8,6 +8,7 @@ use yii\grid\GridView;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 use kartik\select2\Select2;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 
@@ -103,7 +104,7 @@ $this->title = 'VH Gestion des cours';
             ]); 
         } */?>
 
-        <?php if ($dataProviderNF->totalCount > 0) { ?>
+        <?php if ($dataProviderNF->totalCount > 0 && User::canRoute(['/cours/update'])) { ?>
             <h2><?= Yii::t('app', 'Cours actifs sans date future') ?></h2>
 
             <?= GridView::widget([
@@ -127,9 +128,6 @@ $this->title = 'VH Gestion des cours';
 
                     ['class' => 'yii\grid\ActionColumn',
                         'template'=>'{coursUpdate}',
-                        'visibleButtons'=>[
-                            'coursUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
-                        ],
                         'buttons'=>[
                             'coursUpdate' => function ($url, $model) {
                                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours/view', 'id' => $model->fk_cours]), [

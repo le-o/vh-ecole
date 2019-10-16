@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap\Alert;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Personnes */
@@ -25,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (User::canRoute(['personne/update']) || User::canRoute(['personne/delete'])) { ?>
     <p>
         <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->personne_id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->personne_id], [

@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 use yii\grid\GridView;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Cours */
@@ -27,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (User::canRoute(['cours/update'])) { ?>
     
      <?= $this->render('_form', [
             'alerte' => '',
@@ -82,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'alerte' => '',
         'model' => $model,
         'viewAndId' => ['cours', $model->cours_id],
-        'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->participant_max) ? true : false,
+        'isInscriptionOk' => (User::hasRole('Admin') || $participantDataProvider->totalCount < $model->participant_max) ? true : false,
         'dataClients' => $dataClients,
         'participantDataProvider' => $participantDataProvider,
         'participantIDs' => $participantIDs,
@@ -91,7 +92,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'forPresenceOnly' => false,
     ]) ?>
     
-    
+    <?php
+    $actionButtons = '';
+    $actionButtons .= (User::canRoute(['cours-date/create'])) ? Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary']) : '';
+    $actionButtons .= (User::canRoute(['cours-date/recursive']) && $participantDataProvider->totalCount == 0) ? '&nbsp;'.Html::a(Yii::t('app', 'Create Cours Date Multiple'), ['cours-date/recursive', 'cours_id' => $model->cours_id], ['class' => 'btn btn-info']) : '';
+    $actionButtons .= (User::canRoute(['cours/gestionmoniteurs'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Gestion moniteurs'), ['cours/gestionmoniteurs', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default']) : '';
+    $actionButtons .= (User::canRoute(['cours/gestionpresences'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Gestion présences'), ['cours/gestionpresences', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default']) : '';
+    ?>
     <?= GridView::widget([
         'dataProvider' => $coursDateProvider,
         'rowOptions' => function($model) {
@@ -110,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'duree',
             [
                 'attribute' => 'prix',
-                'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
+                'visible' => User::canRoute(['/cours/advanced']),
             ],
             [
                 'label' => Yii::t('app', 'Lieu'),
@@ -131,7 +138,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>'{coursDateView} {coursDateUpdate} {coursDateDelete}',
                 'visibleButtons'=>[
-                    'coursDateDelete' => (Yii::$app->user->identity->id < 1000) ? true : false,
+                    'coursDateDelete' => User::canRoute(['/cours-date/delete']),
                 ],
                 'buttons'=>[
                     'coursDateView' => function ($url, $model, $key) {
@@ -161,10 +168,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
         'caption' => '<div class="row"><div class="col-sm-2">'.Yii::t('app', 'Planification prévue').'</div>'.
-                        '<div class="col-sm-8">'.Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary'.$displayActions]).'
-                        '.Html::a(Yii::t('app', 'Create Cours Date Multiple'), ['cours-date/recursive', 'cours_id' => $model->cours_id], ['class' => 'btn btn-info'.$displayActions.$createR]).'
-                        '.Html::a(Yii::t('app', 'Gestion moniteurs'), ['cours/gestionmoniteurs', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default'.$displayActions]).'
-                        '.Html::a(Yii::t('app', 'Gestion présences'), ['cours/gestionpresences', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default'.$displayActions]).'</div>',
+                        '<div class="col-sm-8">'.$actionButtons.'</div>',
         'summary' => '',
     ]); ?>
 

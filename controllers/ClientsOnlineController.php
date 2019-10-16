@@ -19,6 +19,9 @@ use yii\filters\AccessControl;
  */
 class ClientsOnlineController extends CommonController
 {
+    
+    public $freeAccessActions = ['create'];
+    
     /**
      * @inheritdoc
      */
@@ -31,22 +34,8 @@ class ClientsOnlineController extends CommonController
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['create'],
-                        'roles' => ['?', '@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            return (Yii::$app->user->identity->id < 1000) ? true : false;
-                        }
-                    ],
-                ],
+            'ghost-access'=> [
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
         ];
     }

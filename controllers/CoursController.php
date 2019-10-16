@@ -27,6 +27,9 @@ use kartik\mpdf\Pdf;
  */
 class CoursController extends CommonController
 {
+    
+    public $freeAccessActions = ['getcoursjson'];
+    
     public function behaviors()
     {
         return [
@@ -36,28 +39,8 @@ class CoursController extends CommonController
                     'delete' => ['post'],
                 ],
             ],
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['getcoursjson'],
-//                        'ips' => ['127.0.0.1'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['view'],
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            if ($action->id == 'presence' && Yii::$app->user->identity->id == 1001) return true;
-                            return (Yii::$app->user->identity->id < 1000) ? true : false;
-                        }
-                    ],
-                ],
+            'ghost-access'=> [
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
             [
                 'class' => 'yii\filters\PageCache',
@@ -70,6 +53,9 @@ class CoursController extends CommonController
             ],
         ];
     }
+    
+    // for route purpose only
+    public function actionAdvanced() {}
 
     /**
      * Lists all Cours models.
@@ -273,11 +259,6 @@ class CoursController extends CommonController
         $parametre->listeEmails = implode(', ', $listeEmails);
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
         
-        // gestion affichage bouton
-        $displayActions = (Yii::$app->user->identity->id < 1000) ? '' : ' hidden';
-        // gestion affichage bouton recursive
-        $createR = ($participantDataProvider->totalCount == 0) ? '' : ' hidden';
-        
         // pour l'affichage des paramètres en mode édition
         $modelParams = new Parametres;
 	    
@@ -291,8 +272,6 @@ class CoursController extends CommonController
             'participantIDs' => $excludePart,
             'parametre' => $parametre,
             'emails' => $emails,
-            'displayActions' => $displayActions,
-            'createR' => $createR,
         ]);
     }
 
@@ -916,6 +895,7 @@ class CoursController extends CommonController
                 $data[] = [
                     'id' => $c->cours_id,
                     'nom' => $c->fkNom->nom,
+                    'nom_id' => $c->fk_nom,
                     'niveau' => $c->fkNiveau->nom,
                     'semestre' => ($c->fk_semestre != '') ? $c->fkSemestre->nom : '',
                     'saison' => ($c->fk_saison != '') ? $c->fkSaison->nom : '',

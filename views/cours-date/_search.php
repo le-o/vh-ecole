@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDateSearch */
@@ -23,7 +24,7 @@ use kartik\date\DatePicker;
         <div class="col-sm-2">
             <?= $form->field($model, 'session')->textInput(['placeholder' => Yii::t('app', 'Session')])->label(false) ?>
         </div>
-        <?php if (Yii::$app->user->identity->id < 1000) { ?>
+        <?php if (User::canRoute(['/cours-date/search'])) { ?>
         <div class="col-sm-3">
             <?php echo DatePicker::widget([
                 'model' => $model,

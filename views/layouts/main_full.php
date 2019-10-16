@@ -25,55 +25,8 @@ AppAsset::register($this);
 <?php $this->beginBody() ?>
 
 <div class="wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' => 'Vertic-Halle - Gestion des cours',
-        'brandUrl' => Yii::$app->homeUrl,
-        'innerContainerOptions' => ['class' => 'container-fluid'],
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
     
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Accueil', 'url' => ['/site/index']],
-            !Yii::$app->user->isGuest && Yii::$app->user->identity->id < 1100 ?
-                ['label' => Yii::t('app', 'Les personnes'),
-                    'items' => [
-                        ['label' => Yii::t('app', 'Les clients'), 'url' => ['/personnes']],
-                        ['label' => Yii::t('app', 'Les moniteurs'), 'url' => ['/personnes/moniteurs']],
-                    ]
-                ] : '',
-            !Yii::$app->user->isGuest ? 
-                ['label' => Yii::t('app', 'Les cours'),
-                    'items' => [
-                        ['label' => Yii::t('app', 'Planification'), 'url' => ['/cours-date/liste']],
-                        !Yii::$app->user->isGuest && Yii::$app->user->identity->id < 1000 ? ['label' => Yii::t('app', 'Gestion des cours'), 'url' => ['/cours']] : '',
-                    ],
-                ] : '',
-            !Yii::$app->user->isGuest && Yii::$app->user->identity->id < 1000 ?
-                ['label' => Yii::t('app', 'Outils'),
-                    'items' => [
-                         ['label' => Yii::t('app', 'Inscription online'), 'url' => ['/clients-online']],
-                         Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Clients actifs'), 'url' => ['/cours-date/actif']] : '',
-                         Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres']] : '',
-                         Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore']] : '',
-                         Yii::$app->user->identity->id < 500 ? ['label' => Yii::t('app', 'Synchro calendrier'), 'url' => ['/site/calendarsync']] : '',
-                    ],
-                ] : '',
-            Yii::$app->user->isGuest ?
-                ['label' => 'Se connecter', 'url' => ['/site/login']] :
-                [
-                    'label' => 'Se déconnecter (' . Yii::$app->user->identity->username . ')',
-                    'url' => ['/site/logout'],
-                    'linkOptions' => ['data-method' => 'post']
-                ],
-        ],
-    ]);
-    NavBar::end();
-    ?>
+    <?= $this->render('_menu'); ?>
 
     <div class="container-fluid">
         <?= Breadcrumbs::widget([
