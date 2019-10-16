@@ -7,6 +7,7 @@ use yii\bootstrap\Modal;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
 use yii\web\View;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PersonnesSearch */
@@ -122,8 +123,8 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             
             ['class' => 'yii\grid\ActionColumn',
                 'visibleButtons'=>[
-                    'update' => (Yii::$app->user->identity->id < 1000) ? true : false,
-                    'delete' => (Yii::$app->user->identity->id < 1000) ? true : false,
+                    'update' => User::canRoute(['personne/update']),
+                    'delete' => User::canRoute(['personne/delete']),
                 ],
             ],
         ],

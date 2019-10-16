@@ -20,6 +20,7 @@ use yii\helpers\Url;
 use yii\db\Exception;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
+use webvimark\modules\UserManagement\models\User;
 
 /**
  * CoursDateController implements the CRUD actions for CoursDate model.
@@ -35,26 +36,14 @@ class CoursDateController extends CommonController
                     'delete' => ['post'],
                 ],
             ],
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['view', 'liste', 'jsoncalendar'],
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            if ($action->id == 'presence' && Yii::$app->user->identity->id == 1001) return true;
-                            return (Yii::$app->user->identity->id < 1000) ? true : false;
-                        }
-                    ],
-                ],
+            'ghost-access'=> [
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
         ];
     }
+    
+    // for route purpose only
+    public function actionAdvanced() {}
 
     /**
      * Lists all CoursDate models.
@@ -219,7 +208,7 @@ class CoursDateController extends CommonController
             'dataMoniteurs' => $dataMoniteurs,
             'selectedMoniteurs' => (isset($selectedMoniteurs)) ? $selectedMoniteurs : [],
 
-            'isInscriptionOk' => (Yii::$app->user->identity->id < 700 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
+            'isInscriptionOk' => (User::hasRole('Admin') || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
             'dataClients' => $dataClients,
             'participantDataProvider' => $participantDataProvider,
             'participantIDs' => $excludePart,

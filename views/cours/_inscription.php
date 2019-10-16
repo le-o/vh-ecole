@@ -8,6 +8,7 @@ use yii\bootstrap\Alert;
 use yii\helpers\Url;
 use yii\web\View;
 use yii\bootstrap\Modal;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
@@ -27,7 +28,7 @@ $this->registerJs($modalJs, View::POS_END);
 
 <div class="cours-participant-form">
 
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (User::canRoute(['cours/gestioninscriptions'])) { ?>
     <div class="row">
 
         <?php $form = ActiveForm::begin(); ?>
@@ -117,6 +118,10 @@ $this->registerJs($modalJs, View::POS_END);
             
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>'{coursView} {coursEmail}',
+                'visibleButtons'=>[
+                    'coursView' => User::canRoute(['/cours/view']),
+                    'coursEmail' => User::canRoute(['/cours/email']),
+                ],
                 'buttons'=>[
                     'coursView' => function ($model, $key, $index) {
                         $key = explode('|', $index);

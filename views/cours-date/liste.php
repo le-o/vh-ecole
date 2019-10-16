@@ -5,6 +5,7 @@ use yii\helpers\Url;
 use kartik\grid\GridView;
 use yii\bootstrap\Alert;
 use kartik\export\ExportMenu;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\CoursDateSearch */
@@ -63,8 +64,10 @@ $gridColumns = [
     ['class' => 'yii\grid\ActionColumn',
         'template'=>'{coursPresence} {coursDateView} {coursDateUpdate} {coursDateDelete}',
         'visibleButtons'=>[
-            'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
-            'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
+            'coursPresence' => User::canRoute('/cours/presence'),
+            'coursDateView' => User::canRoute('/cours-date/view'),
+            'coursDateUpdate' => User::canRoute('/cours-date/update'),
+            'coursDateDelete' => User::canRoute('/cours-date/delete'),
         ],
         'buttons'=>[
             'coursPresence' => function ($url, $model, $key) {
@@ -112,7 +115,7 @@ $gridColumns = [
     <h1><?= Html::encode($this->title) ?></h1>
     <?php echo $this->render('_search', ['model' => $searchModel]); ?>
     
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (User::canRoute(['/gridview/export'])) { ?>
         <div style="margin-bottom: 10px;">
             <?php
             // Renders a export dropdown menu

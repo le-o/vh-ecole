@@ -34,7 +34,9 @@
         "open-ecommerce/yii2-backuprestore": "dev-master",
         "philippfrenzel/yii2fullcalendar":"*",
         "wbraganca/yii2-dynamicform": "dev-master",
-        "spatie/calendar-links": "^1.1"
+        "spatie/calendar-links": "^1.1",
+        "webvimark/module-user-management": "*",
+        "lajax/yii2-language-picker": "1.*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
@@ -43,7 +45,13 @@
         "yiisoft/yii2-faker": "*"
     },
     "config": {
-        "process-timeout": 1800
+        "process-timeout": 1800,
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "vendor/npm",
+                "bower-asset-library": "vendor/bower"
+            }
+        }
     },
     "scripts": {
         "post-create-project-cmd": [
@@ -62,10 +70,6 @@
             "generateCookieValidationKey": [
                 "config/web.php"
             ]
-        },
-        "asset-installer-paths": {
-            "npm-asset-library": "vendor/npm",
-            "bower-asset-library": "vendor/bower"
         }
     }
 }

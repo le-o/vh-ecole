@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Alert;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
@@ -26,10 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (User::canRoute(['/cours-date/advanced'])) { ?>
     
     <?= $this->render('_form', [
-	    'alerte' => $alerte,
+        'alerte' => $alerte,
         'model' => $model,
         'dataCours' => $dataCours,
         'dataMoniteurs' => $dataMoniteurs,
@@ -92,7 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $this->render('/personnes/_participant', [
         'model' => $model,
         'viewAndId' => ['cours-date', $model->cours_date_id],
-        'isInscriptionOk' => (Yii::$app->user->identity->id < 500 || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
+        'isInscriptionOk' => (User::hasRole('Admin') || $participantDataProvider->totalCount < $model->fkCours->participant_max) ? true : false,
         'dataClients' => $dataClients,
         'participantDataProvider' => $participantDataProvider,
         'participantIDs' => $participantIDs,

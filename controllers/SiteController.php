@@ -19,27 +19,23 @@ use yii\data\ActiveDataProvider;
 use yii\db\Exception;
 
 use Spatie\CalendarLinks\Link;
+use webvimark\modules\UserManagement\models\User;
 use DateTime;
 
 require_once('../vendor/le-o/simpleCalDAV/SimpleCalDAVClient.php');
 
 class SiteController extends Controller
 {
+    
+    public $freeAccessActions = ['index', 'login'];
     public $layout = 'main_full.php';
     
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
+            
+            'ghost-access'=> [
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -64,15 +60,13 @@ class SiteController extends Controller
     }
 
     public function actionIndex()
-    {
+    {   
         if (\Yii::$app->user->isGuest) {
             $model = new LoginForm();
             if ($model->load(Yii::$app->request->post()) && $model->login()) {
                 return $this->goBack();
             }
-            return $this->render('login', [
-                'model' => $model,
-            ]);
+            return $this->redirect(['/user-management/auth/login']);
         }
         
 //        if (!empty(Yii::$app->request->post())) {
@@ -156,9 +150,7 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+        return $this->redirect(['/user-management/auth/login']);
     }
 
     public function actionLogout()

@@ -8,6 +8,7 @@ use yii\bootstrap\Alert;
 use yii\helpers\Url;
 use yii\web\View;
 use yii\bootstrap\Modal;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
@@ -40,9 +41,9 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
 <div class="cours-participant-form">
 
-    <?php if (Yii::$app->user->identity->id < 1002) { ?>
+    <?php if (User::canRoute(['cours/gestionpresences']) || User::canRoute(['/cours/presence'])) { ?>
         <div class="row">
-            <?php if ($isInscriptionOk && Yii::$app->user->identity->id < 1000) { ?>
+            <?php if ($isInscriptionOk && User::canRoute(['cours/gestioninscriptions'])) { ?>
 
                 <?php $form = ActiveForm::begin(); ?>
                     <div class="col-sm-4">
@@ -65,7 +66,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
             <?php $form = ActiveForm::begin(); ?>
             <div class="col-sm-5">
-                <?php if (Yii::$app->user->identity->id < 1000) { ?>
+                <?php if (User::canRoute(['cours/gestioninscriptions'])) { ?>
                     <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->getNombreClientsInscrits() == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
                     <?php Modal::begin([
                         'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
@@ -108,8 +109,8 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                     Modal::end(); ?>
                 <?php } ?>
                     
-                <?php if (!$forPresenceOnly || Yii::$app->user->identity->id == 1001) { ?>
-                    <?php $nomBouton = (Yii::$app->user->identity->id < 1000) ? Yii::t('app', 'Imprimer') : Yii::t('app', 'Imprimer la liste des participants'); ?>
+                <?php if (!$forPresenceOnly || User::canRoute(['/cours/presence'])) { ?>
+                    <?php $nomBouton = (User::hasRole(['accueil', 'moniteurs'])) ? Yii::t('app', 'Imprimer la liste des participants') : Yii::t('app', 'Imprimer'); ?>
                     <?= Html::a($nomBouton, ['/cours/presence', 'id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => 'btn btn-default']) ?>
                 <?php } ?>
             </div>
@@ -135,11 +136,11 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             'age',
             [
                 'attribute' => 'email',
-                'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
+                'visible' => User::canRoute(['/personnes/advanced']),
             ],
             [
                 'attribute' => 'telephone',
-                'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
+                'visible' => User::canRoute(['/personnes/advanced']),
             ],
             [
                 'label' => Yii::t('app', 'interlocuteur'),
@@ -151,7 +152,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             [
                 'class' => 'yii\grid\CheckboxColumn',
                 'header' => Yii::t('app', 'present?'),
-                'visible' => $forPresenceOnly,
+                'visible' => ($forPresenceOnly && User::canRoute(['/cours-date/presence'])),
                 'checkboxOptions' => function ($data, $key, $index, $column) use ($model, $forPresenceOnly) {
                     if ($forPresenceOnly) {
                         $bool = $data->getClientsHasOneCoursDate($model->cours_date_id);
@@ -164,10 +165,10 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>'{partView} {partUpdate} {partDeleteFutur} {partDelete}',
                 'visibleButtons'=>[
-                    'partView' => (Yii::$app->user->identity->id < 1100) ? true : false,
-                    'partUpdate' => (Yii::$app->user->identity->id < 1100 && $viewAndId[0] != 'cours-date') ? true : false,
-                    'partDeleteFutur' => (Yii::$app->user->identity->id < 1000 && $model::className() == 'app\models\Cours') ? (isset($model->fk_type) ? in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) : in_array($model->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) : false,
-                    'partDelete' => (Yii::$app->user->identity->id < 1000 && $model::className() == 'app\models\Cours') ? true : false,
+                    'partView' => User::canRoute(['/personnes/view']),
+                    'partUpdate' => (User::canRoute(['/clients-has-cours/update']) && $viewAndId[0] != 'cours-date') ? true : false,
+                    'partDeleteFutur' => (User::canRoute(['/cours/participant-delete']) && $model::className() == 'app\models\Cours') ? (isset($model->fk_type) ? in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) : in_array($model->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) : false,
+                    'partDelete' => (User::canRoute(['/cours/participant-delete']) && $model::className() == 'app\models\Cours') ? true : false,
                 ],
                 'buttons'=>[
                     'partView' => function ($model, $key, $index) {
@@ -203,7 +204,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 ],
             ],
         ],
-        'caption' => ($isInscriptionOk) ? (Yii::$app->user->identity->id < 1000) ? '' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Liste des participants').'</div></div>' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Nombre participant max atteint').'</div></div>',
+        'caption' => ($isInscriptionOk) ? (!User::hasRole(['accueil', 'moniteurs'])) ? '' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Liste des participants').'</div></div>' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Nombre participant max atteint').'</div></div>',
     ]); ?>
     
     <?php if ($forPresenceOnly) {

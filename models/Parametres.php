@@ -219,6 +219,16 @@ class Parametres extends \yii\db\ActiveRecord
     {
         return $this->optsDropDown(15, $selectedParam);
     }
+    
+    /**
+     * @return array options langue for drop-down
+     */
+    public function optsLangueInterface($selectedParam = null)
+    {
+        $queryWhere = ['IN', 'parametre_id', Yii::$app->params['interface_language']];
+        return $this->optsDropDown(15, $selectedParam, $queryWhere);
+    }
+    
     /**
      * @return array options salle for drop-down
      */
@@ -237,12 +247,15 @@ class Parametres extends \yii\db\ActiveRecord
     /**
      * @return array options from classkey for drop-down
      */
-    public function optsDropDown($classKey, $selectedParam)
+    public function optsDropDown($classKey, $selectedParam, $queryWhere = null)
     {   
         $query = self::find()->where(['class_key' => $classKey])->orderBy('tri');
         
         $withId = ($selectedParam !== null) ? 'parametre_id = '.$selectedParam : '';
         $query->andWhere(['OR', $withId, 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
+        if ($queryWhere !== null) {
+            $query->andWhere($queryWhere);
+        }
         $codes = $query->all();
         $temp = array();
         foreach($codes as $code) {
