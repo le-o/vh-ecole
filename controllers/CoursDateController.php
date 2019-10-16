@@ -27,6 +27,9 @@ use webvimark\modules\UserManagement\models\User;
  */
 class CoursDateController extends CommonController
 {
+    
+    public $freeAccessActions = ['jsoncalendar'];
+    
     public function behaviors()
     {
         return [
