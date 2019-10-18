@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php if (User::canRoute(['personne/update']) || User::canRoute(['personne/delete'])) { ?>
+    <?php if (User::canRoute(['personnes/update']) || User::canRoute(['personnes/delete'])) { ?>
     <p>
         <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->personne_id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->personne_id], [

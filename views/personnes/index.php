@@ -123,8 +123,8 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             
             ['class' => 'yii\grid\ActionColumn',
                 'visibleButtons'=>[
-                    'update' => User::canRoute(['personne/update']),
-                    'delete' => User::canRoute(['personne/delete']),
+                    'update' => User::canRoute(['personnes/update']),
+                    'delete' => User::canRoute(['personnes/delete']),
                 ],
             ],
         ],
