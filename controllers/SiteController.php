@@ -62,6 +62,7 @@ class SiteController extends Controller
     public function actionIndex()
     {   
         if (\Yii::$app->user->isGuest) {
+            Yii::$app->response->cookies->remove('language');
             $model = new LoginForm();
             if ($model->load(Yii::$app->request->post()) && $model->login()) {
                 return $this->goBack();
