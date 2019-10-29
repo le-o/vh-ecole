@@ -105,7 +105,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]); ?>
             </div>
             <div class="col-sm-6">
-                <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu()) ?>
+                <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu($model->fk_lieu)) ?>
             </div>
         </div>
         

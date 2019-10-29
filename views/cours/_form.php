@@ -33,7 +33,7 @@ $this->registerJs($script, View::POS_END);
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
     <div class="row">
         <div class="col-sm-2">
-            <?= $form->field($model, 'fk_niveau')->dropDownList($modelParams->optsNiveau(),['prompt'=>Yii::t('app', 'Choisir un niveau')]) ?>
+            <?= $form->field($model, 'fk_niveau')->dropDownList($modelParams->optsNiveau($model->fk_niveau),['prompt'=>Yii::t('app', 'Choisir un niveau')]) ?>
         </div>
         <div class="col-sm-2">
             <label></label>
@@ -61,7 +61,7 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'fk_nom')->dropDownList($modelParams->optsNomCours($model->fk_nom),['prompt'=>Yii::t('app', 'Choisir un nom')]) ?>
         </div>
         <div class="col-sm-3">
-            <?= $form->field($model, 'fk_age')->dropDownList($modelParams->optsTrancheAge(),['prompt'=>Yii::t('app', 'Choisir une tranche d\'âge')]) ?>
+            <?= $form->field($model, 'fk_age')->dropDownList($modelParams->optsTrancheAge($model->fk_age),['prompt'=>Yii::t('app', 'Choisir une tranche d\'âge')]) ?>
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'session')->textInput(['maxlength' => true]) ?>
@@ -73,7 +73,7 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'fk_jours')->checkboxList($modelParams->optsJourSemaine()) ?>
         </div>
         <div class="col-sm-3">
-            <?= $form->field($model, 'fk_saison')->dropDownList($modelParams->optsSaison(),['prompt'=>Yii::t('app', 'Choisir une saison')]) ?>
+            <?= $form->field($model, 'fk_saison')->dropDownList($modelParams->optsSaison($model->fk_saison),['prompt'=>Yii::t('app', 'Choisir une saison')]) ?>
         </div>
     </div>
 
@@ -110,8 +110,8 @@ $this->registerJs($script, View::POS_END);
     <div class="row">
         <div class="col-sm-6">
             <?= $form->field($model, 'fk_categories')->checkboxList($modelParams->optsCategorie()) ?>
-            <?= $form->field($model, 'fk_langue')->dropDownList($modelParams->optsLangue()) ?>
-            <?= $form->field($model, 'fk_salle')->dropDownList($modelParams->optsSalle()) ?>
+            <?= $form->field($model, 'fk_langue')->dropDownList($modelParams->optsLangue($model->fk_langue)) ?>
+            <?= $form->field($model, 'fk_salle')->dropDownList($modelParams->optsSalle($model->fk_salle)) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'image')->widget(FileInput::classname(), [

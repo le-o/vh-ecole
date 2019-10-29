@@ -17,13 +17,13 @@ use yii\bootstrap\Alert;
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
         <div class="col-sm-4">
-            <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatut(),['prompt'=>'Choisir un statut']) ?>
+            <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatut($model->fk_statut),['prompt'=>'Choisir un statut']) ?>
         </div>
         <div class="col-sm-4">
-            <?= $form->field($model, 'fk_type')->dropDownList($modelParams->optsType(),['prompt'=>'Choisir un type']) ?>
+            <?= $form->field($model, 'fk_type')->dropDownList($modelParams->optsType($model->fk_type),['prompt'=>'Choisir un type']) ?>
         </div>
         <div class="col-sm-4">
-            <?= $form->field($model, 'fk_formation')->dropDownList($modelParams->optsNiveauFormation(),['prompt'=>'Choisir un niveau']) ?>
+            <?= $form->field($model, 'fk_formation')->dropDownList($modelParams->optsNiveauFormation($model->fk_formation),['prompt'=>'Choisir un niveau']) ?>
         </div>
     </div>
     <div class="row">

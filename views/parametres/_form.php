@@ -14,11 +14,13 @@ use kartik\color\ColorInput;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'class_key')->dropDownList($model->optsRegroupement(),['prompt'=>'Choisir une valeur']) ?>
+    <?= $form->field($model, 'class_key')->dropDownList($model->optsRegroupement(),['prompt'=>Yii::t('app', 'Choisir une valeur')]) ?>
 
     <?= $form->field($model, 'nom')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'valeur')->widget(\yii\redactor\widgets\Redactor::className()) ?>
+    
+    <?= $form->field($model, 'fk_langue')->dropDownList($model->languesInterface(),['prompt'=>Yii::t('app', 'Non renseigné')]) ?>
 
     <?= $form->field($model, 'info_special')->textInput(['maxlength' => true]) ?>
 

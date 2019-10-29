@@ -15,6 +15,7 @@ use Yii;
  * @property string $info_couleur
  * @property integer $tri
  * @property string $date_fin_validite
+ * @property integer $fk_langue
  *
  * @property Personnes[] $personnes
  * @property Personnes[] $personnes0
@@ -41,7 +42,7 @@ class Parametres extends \yii\db\ActiveRecord
     {
         return [
             [['class_key', 'nom'], 'required'],
-            [['class_key', 'tri'], 'integer'],
+            [['class_key', 'tri', 'fk_langue'], 'integer'],
             [['valeur'], 'string'],
             [['date_fin_validite'], 'safe'],
             [['nom'], 'string', 'max' => 50],
@@ -66,6 +67,7 @@ class Parametres extends \yii\db\ActiveRecord
             'info_couleur' => Yii::t('app', 'Info Couleur'),
             'tri' => Yii::t('app', 'Tri'),
             'date_fin_validite' => Yii::t('app', 'Invalide depuis le'),
+            'fk_langue' => Yii::t('app', 'Langue interface'),
         ];
     }
     
@@ -89,6 +91,14 @@ class Parametres extends \yii\db\ActiveRecord
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkLangue()
+    {
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_langue']);
     }
     
     /**
@@ -247,12 +257,20 @@ class Parametres extends \yii\db\ActiveRecord
     /**
      * @return array options from classkey for drop-down
      */
-    public function optsDropDown($classKey, $selectedParam, $queryWhere = null)
+    public function optsDropDown($classKey, $selectedParam, $queryWhere = null, $restrictLangue = true)
     {   
         $query = self::find()->where(['class_key' => $classKey])->orderBy('tri');
         
         $withId = ($selectedParam !== null) ? 'parametre_id = '.$selectedParam : '';
         $query->andWhere(['OR', $withId, 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
+        
+        // retrouver le code langue depuis la langue de l'interface
+        if ($restrictLangue) {
+            $langue = Yii::$app->language;
+            $codeLangue = array_search($langue, Yii::$app->params['interface_language_label']);
+            $query->andWhere(['OR', $withId, ['IN', 'fk_langue', [$codeLangue, Yii::$app->params['language_independant']]]]);
+        }
+        
         if ($queryWhere !== null) {
             $query->andWhere($queryWhere);
         }
@@ -288,6 +306,11 @@ class Parametres extends \yii\db\ActiveRecord
             '16' => 'Salle',
             '17' => 'Lieu',
         );
+    }
+    
+    public function languesInterface()
+    {
+        return $this->optsDropDown(15, null, ['info_special' => 'langue interface'], false);
     }
     
     /**

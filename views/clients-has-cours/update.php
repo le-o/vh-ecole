@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
         <div class="col-sm-4">
-            <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatutPart(),['prompt'=>'Choisir un statut']) ?>
+            <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatutPart($model->fk_statut),['prompt'=>'Choisir un statut']) ?>
         </div>
     </div>
     
