@@ -145,18 +145,24 @@ class CoursDateController extends CommonController
         }
         $listeMoniteurs = (isset($moniteurs)) ? implode(', ', $moniteurs) : '';
 
-        // Gestion des participants
-        $participants = Personnes::find()->distinct()->joinWith('clientsHasCours', false)->where(['IN', 'clients_has_cours.fk_cours', $model->fk_cours])->orderBy('clients_has_cours.fk_statut ASC');
-        $listParticipants = $participants->all();
+        // Gestion des participants - différente si planifié ou sur demande
+        if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
+            foreach ($model->clientsHasCoursDate as $c) {
+                $listParticipants[] = $c->fkPersonne;
+            }
+        } else {
+            $participants = Personnes::find()->distinct()->joinWith('clientsHasCours', false)->where(['IN', 'clients_has_cours.fk_cours', $model->fk_cours])->orderBy('clients_has_cours.fk_statut ASC');
+            $listParticipants = $participants->all();
+        }
         $excludePart = [];
         $listeEmails = [];
         foreach ($listParticipants as $participant) {
             $excludePart[] = $participant->personne_id;
-            
+
             if (strpos($participant->email, '@') !== false) {
                 $listeEmails[$participant->email] = trim($participant->email);
             }
-            
+
             foreach ($participant->personneHasInterlocuteurs as $pi) {
                 $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
             }
@@ -164,7 +170,7 @@ class CoursDateController extends CommonController
         
         $dataClients = Personnes::getClientsNotInCours($excludePart);
         
-        $arrayParticipants = $participants->all();
+        $arrayParticipants = $listParticipants;
         for ($i=0; $i<$model->nb_client_non_inscrit; $i++) {
             $fake = new Personnes();
             $fake->nom = 'Participant';
