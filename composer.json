@@ -50,7 +50,13 @@
             "installer-paths": {
                 "npm-asset-library": "vendor/npm",
                 "bower-asset-library": "vendor/bower"
-            }
+            },
+            "repositories": {
+                "twitter/typeahead": {
+                "type": "bower-vcs",
+                "url": "https://github.com/twitter/typeahead.js.git"
+                }
+              }
         }
     },
     "scripts": {
