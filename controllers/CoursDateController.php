@@ -146,6 +146,7 @@ class CoursDateController extends CommonController
         $listeMoniteurs = (isset($moniteurs)) ? implode(', ', $moniteurs) : '';
 
         // Gestion des participants - différente si planifié ou sur demande
+        $listParticipants = [];
         if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
             foreach ($model->clientsHasCoursDate as $c) {
                 $listParticipants[] = $c->fkPersonne;
