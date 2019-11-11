@@ -11,6 +11,8 @@ function translate(number, withoutSuffix, key, isFuture) {
     switch (key) {
         case 's':
             return (isFuture || withoutSuffix) ? 'néhány másodperc' : 'néhány másodperce';
+        case 'ss':
+            return num + (isFuture || withoutSuffix) ? ' másodperc' : ' másodperce';
         case 'm':
             return 'egy' + (isFuture || withoutSuffix ? ' perc' : ' perce');
         case 'mm':
@@ -38,7 +40,7 @@ function week(isFuture) {
     return (isFuture ? '' : '[múlt] ') + '[' + weekEndings[this.day()] + '] LT[-kor]';
 }
 
-export default moment.defineLocale('hu', {
+export default moment.updateLocale('hu', {
     months : 'január_február_március_április_május_június_július_augusztus_szeptember_október_november_december'.split('_'),
     monthsShort : 'jan_feb_márc_ápr_máj_jún_júl_aug_szept_okt_nov_dec'.split('_'),
     weekdays : 'vasárnap_hétfő_kedd_szerda_csütörtök_péntek_szombat'.split('_'),
@@ -79,6 +81,7 @@ export default moment.defineLocale('hu', {
         future : '%s múlva',
         past : '%s',
         s : translate,
+        ss : translate,
         m : translate,
         mm : translate,
         h : translate,
@@ -90,11 +93,11 @@ export default moment.defineLocale('hu', {
         y : translate,
         yy : translate
     },
-    ordinalParse: /\d{1,2}\./,
+    dayOfMonthOrdinalParse: /\d{1,2}\./,
     ordinal : '%d.',
     week : {
         dow : 1, // Monday is the first day of the week.
-        doy : 7  // The week that contains Jan 1st is the first week of the year.
+        doy : 4  // The week that contains Jan 4th is the first week of the year.
     }
 });
 

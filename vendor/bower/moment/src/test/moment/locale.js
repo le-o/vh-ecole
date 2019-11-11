@@ -145,29 +145,29 @@ test('library deprecations', function (assert) {
     assert.equal(moment.locale(), 'dude', 'setting the lang sets the locale');
     assert.equal(moment.lang(), moment.locale());
     assert.equal(moment.langData(), moment.localeData(), 'langData is localeData');
-    moment.defineLocale('dude', null);
+    moment.updateLocale('dude', null);
 });
 
 test('defineLocale', function (assert) {
     moment.locale('en');
-    moment.defineLocale('dude', {months: ['Movember']});
+    moment.updateLocale('dude', {months: ['Movember']});
     assert.equal(moment().locale(), 'dude', 'defineLocale also sets it');
     assert.equal(moment().locale('dude').locale(), 'dude', 'defineLocale defines a locale');
-    moment.defineLocale('dude', null);
+    moment.updateLocale('dude', null);
 });
 
 test('locales', function (assert) {
-    moment.defineLocale('dude', {months: ['Movember']});
+    moment.updateLocale('dude', {months: ['Movember']});
     assert.equal(true, !!~indexOf.call(moment.locales(), 'dude'), 'locales returns an array of defined locales');
     assert.equal(true, !!~indexOf.call(moment.locales(), 'en'), 'locales should always include english');
-    moment.defineLocale('dude', null);
+    moment.updateLocale('dude', null);
 });
 
 test('library convenience', function (assert) {
     moment.locale('something', {week: {dow: 3}});
     moment.locale('something');
     assert.equal(moment.locale(), 'something', 'locale can be used to create the locale too');
-    moment.defineLocale('something', null);
+    moment.updateLocale('something', null);
 });
 
 test('firstDayOfWeek firstDayOfYear locale getters', function (assert) {
@@ -175,7 +175,7 @@ test('firstDayOfWeek firstDayOfYear locale getters', function (assert) {
     moment.locale('something');
     assert.equal(moment.localeData().firstDayOfWeek(), 3, 'firstDayOfWeek');
     assert.equal(moment.localeData().firstDayOfYear(), 4, 'firstDayOfYear');
-    moment.defineLocale('something', null);
+    moment.updateLocale('something', null);
 });
 
 test('instance locale method', function (assert) {
@@ -336,9 +336,9 @@ test('instance locale used with from', function (assert) {
 });
 
 test('instance localeData', function (assert) {
-    moment.defineLocale('dude', {week: {dow: 3}});
+    moment.updateLocale('dude', {week: {dow: 3}});
     assert.equal(moment().locale('dude').localeData()._week.dow, 3);
-    moment.defineLocale('dude', null);
+    moment.updateLocale('dude', null);
 });
 
 test('month name callback function', function (assert) {
@@ -380,7 +380,7 @@ test('changing parts of a locale config', function (assert) {
 
     assert.equal(moment([2011, 0, 1]).format('MMMM MMM'), 'a A', 'should be able to set locale values after creating the localeuage');
 
-    moment.defineLocale('partial-lang', null);
+    moment.updateLocale('partial-lang', null);
 });
 
 test('start/endOf week feature for first-day-is-monday locales', function (assert) {
@@ -393,7 +393,7 @@ test('start/endOf week feature for first-day-is-monday locales', function (asser
     moment.locale('monday-lang');
     assert.equal(moment([2013, 0, 1]).startOf('week').day(), 1, 'for locale monday-lang first day of the week should be monday');
     assert.equal(moment([2013, 0, 1]).endOf('week').day(), 0, 'for locale monday-lang last day of the week should be sunday');
-    moment.defineLocale('monday-lang', null);
+    moment.updateLocale('monday-lang', null);
 });
 
 test('meridiem parsing', function (assert) {
@@ -407,7 +407,7 @@ test('meridiem parsing', function (assert) {
     moment.locale('meridiem-parsing');
     assert.equal(moment('2012-01-01 3b', 'YYYY-MM-DD ha').hour(), 15, 'Custom parsing of meridiem should work');
     assert.equal(moment('2012-01-01 3d', 'YYYY-MM-DD ha').hour(), 3, 'Custom parsing of meridiem should work');
-    moment.defineLocale('meridiem-parsing', null);
+    moment.updateLocale('meridiem-parsing', null);
 });
 
 test('invalid date formatting', function (assert) {
@@ -417,7 +417,7 @@ test('invalid date formatting', function (assert) {
 
     assert.equal(moment.invalid().format(), 'KHAAAAAAAAAAAN!');
     assert.equal(moment.invalid().format('YYYY-MM-DD'), 'KHAAAAAAAAAAAN!');
-    moment.defineLocale('has-invalid', null);
+    moment.updateLocale('has-invalid', null);
 });
 
 test('return locale name', function (assert) {
@@ -469,6 +469,39 @@ test('moment().lang with missing key doesn\'t change locale', function (assert) 
     test.expectedDeprecations('moment().lang()');
     assert.equal(moment().lang('boo').localeData(), moment.localeData(),
             'preserve global locale in case of bad locale id');
+});
+
+test('when in strict mode with inexact parsing, treat periods in short weekdays literally, not as the regex-period', function (assert) {
+    moment.updateLocale('periods-in-short-weekdays', {
+        weekdays : 'Monday_Tuesday_Wednesday_Thursday_Friday_Saturday_Sunday'.split('_'),
+        weekdaysShort : 'mon_t...s_wed_thurs_fri_sat_sun'.split('_'),
+        weekdaysParseExact : false
+    });
+
+    moment().locale('periods-in-short-weekdays');
+    assert.equal(moment('thurs', 'ddd', true).format('dddd'), 'Thursday');
+});
+
+test('when in strict mode with inexact parsing, treat periods in full weekdays literally, not as the regex-period', function (assert) {
+    moment.updateLocale('periods-in-full-weekdays', {
+        weekdays : 'Monday_T....day_Wednesday_Thursday_Friday_Saturday_Sunday'.split('_'),
+        weekdaysShort : 'mon_tues_wed_thurs_fri_sat_sun'.split('_'),
+        weekdaysParseExact : false
+    });
+
+    moment().locale('periods-in-full-weekdays');
+    assert.equal(moment('Thursday', 'dddd', true).format('ddd'), 'thurs');
+});
+
+test('when in strict mode with inexact parsing, treat periods in min-weekdays literally, not as the regex-period', function (assert) {
+    moment.updateLocale('periods-in-min-weekdays', {
+        weekdays : 'Monday_Tuesday_Wednesday_Thursday_Friday_Saturday_Sunday'.split('_'),
+        weekdaysMin : 'mon_t...s_wed_thurs_fri_sat_sun'.split('_'),
+        weekdaysParseExact : false
+    });
+
+    moment().locale('periods-in-min-weekdays');
+    assert.equal(moment('thurs', 'dd', true).format('dddd'), 'Thursday');
 });
 
 

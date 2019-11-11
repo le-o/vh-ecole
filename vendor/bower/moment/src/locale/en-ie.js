@@ -4,7 +4,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('en-ie', {
+export default moment.updateLocale('en-ie', {
     months : 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_'),
     monthsShort : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
     weekdays : 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_'),
@@ -13,7 +13,7 @@ export default moment.defineLocale('en-ie', {
     longDateFormat : {
         LT : 'HH:mm',
         LTS : 'HH:mm:ss',
-        L : 'DD-MM-YYYY',
+        L : 'DD/MM/YYYY',
         LL : 'D MMMM YYYY',
         LLL : 'D MMMM YYYY HH:mm',
         LLLL : 'dddd D MMMM YYYY HH:mm'
@@ -30,6 +30,7 @@ export default moment.defineLocale('en-ie', {
         future : 'in %s',
         past : '%s ago',
         s : 'a few seconds',
+        ss : '%d seconds',
         m : 'a minute',
         mm : '%d minutes',
         h : 'an hour',
@@ -41,7 +42,7 @@ export default moment.defineLocale('en-ie', {
         y : 'a year',
         yy : '%d years'
     },
-    ordinalParse: /\d{1,2}(st|nd|rd|th)/,
+    dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
     ordinal : function (number) {
         var b = number % 10,
             output = (~~(number % 100 / 10) === 1) ? 'th' :

@@ -4,7 +4,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('x-pseudo', {
+export default moment.updateLocale('x-pseudo', {
     months : 'J~áñúá~rý_F~ébrú~árý_~Márc~h_Áp~ríl_~Máý_~Júñé~_Júl~ý_Áú~gúst~_Sép~témb~ér_Ó~ctób~ér_Ñ~óvém~bér_~Décé~mbér'.split('_'),
     monthsShort : 'J~áñ_~Féb_~Már_~Ápr_~Máý_~Júñ_~Júl_~Áúg_~Sép_~Óct_~Ñóv_~Déc'.split('_'),
     monthsParseExact : true,
@@ -31,6 +31,7 @@ export default moment.defineLocale('x-pseudo', {
         future : 'í~ñ %s',
         past : '%s á~gó',
         s : 'á ~féw ~sécó~ñds',
+        ss : '%d s~écóñ~ds',
         m : 'á ~míñ~úté',
         mm : '%d m~íñú~tés',
         h : 'á~ñ hó~úr',
@@ -42,7 +43,7 @@ export default moment.defineLocale('x-pseudo', {
         y : 'á ~ýéár',
         yy : '%d ý~éárs'
     },
-    ordinalParse: /\d{1,2}(th|st|nd|rd)/,
+    dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
     ordinal : function (number) {
         var b = number % 10,
             output = (~~(number % 100 / 10) === 1) ? 'th' :

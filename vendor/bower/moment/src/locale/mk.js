@@ -4,7 +4,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('mk', {
+export default moment.updateLocale('mk', {
     months : 'јануари_февруари_март_април_мај_јуни_јули_август_септември_октомври_ноември_декември'.split('_'),
     monthsShort : 'јан_фев_мар_апр_мај_јун_јул_авг_сеп_окт_ное_дек'.split('_'),
     weekdays : 'недела_понеделник_вторник_среда_четврток_петок_сабота'.split('_'),
@@ -42,6 +42,7 @@ export default moment.defineLocale('mk', {
         future : 'после %s',
         past : 'пред %s',
         s : 'неколку секунди',
+        ss : '%d секунди',
         m : 'минута',
         mm : '%d минути',
         h : 'час',
@@ -53,7 +54,7 @@ export default moment.defineLocale('mk', {
         y : 'година',
         yy : '%d години'
     },
-    ordinalParse: /\d{1,2}-(ев|ен|ти|ви|ри|ми)/,
+    dayOfMonthOrdinalParse: /\d{1,2}-(ев|ен|ти|ви|ри|ми)/,
     ordinal : function (number) {
         var lastDigit = number % 10,
             last2Digits = number % 100;
@@ -75,7 +76,7 @@ export default moment.defineLocale('mk', {
     },
     week : {
         dow : 1, // Monday is the first day of the week.
-        doy : 7  // The week that contains Jan 1st is the first week of the year.
+        doy : 7  // The week that contains Jan 7th is the first week of the year.
     }
 });
 

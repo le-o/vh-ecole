@@ -1,4 +1,4 @@
-import { module, test, expect } from '../qunit';
+import { module, test } from '../qunit';
 import moment from '../../moment';
 
 module('add and subtract');
@@ -323,7 +323,7 @@ test('add across DST', function (assert) {
     // Detect Safari bug and bail. Hours on 13th March 2011 are shifted
     // with 1 ahead.
     if (new Date(2011, 2, 13, 5, 0, 0).getHours() !== 5) {
-        expect(0);
+        assert.expect(0);
         return;
     }
 
@@ -367,4 +367,14 @@ test('add decimal values of days and months', function (assert) {
     assert.equal(moment([2016, 0,1]).add(1.5, 'years').format('YYYY-MM-DD'), '2017-07-01', 'add 1.5 years adds 1 year six months');
     assert.equal(moment([2016, 0,1]).add(1.6, 'years').format('YYYY-MM-DD'), '2017-08-01', 'add 1.6 years becomes 1.6*12 = 19.2, round, 19 months');
     assert.equal(moment([2016,0,1]).add(1.1, 'quarters').format('YYYY-MM-DD'), '2016-04-01', 'add 1.1 quarters 1.1*3=3.3, round, 3 months');
+});
+
+test('add/subtract ISO week', function (assert) {
+    assert.equal(moment([2016,3,15]).subtract(1, 'W').date(), 8, 'subtract 1 iso week short');
+    assert.equal(moment([2016,3,15]).subtract(1, 'isoweek').date(), 8, 'subtract 1 iso week long singular');
+    assert.equal(moment([2016,3,15]).subtract(1, 'isoweeks').date(), 8, 'subtract 1 iso weeks long');
+
+    assert.equal(moment([2016,3,15]).add(1, 'W').date(), 22, 'add 1 iso week short');
+    assert.equal(moment([2016,3,15]).add(1, 'isoweek').date(), 22, 'add 1 week long singular');
+    assert.equal(moment([2016,3,15]).add(1, 'isoweeks').date(), 22, 'add 1 weeks long');
 });

@@ -4,7 +4,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('ka', {
+export default moment.updateLocale('ka', {
     months : {
         standalone: 'იანვარი_თებერვალი_მარტი_აპრილი_მაისი_ივნისი_ივლისი_აგვისტო_სექტემბერი_ოქტომბერი_ნოემბერი_დეკემბერი'.split('_'),
         format: 'იანვარს_თებერვალს_მარტს_აპრილის_მაისს_ივნისს_ივლისს_აგვისტს_სექტემბერს_ოქტომბერს_ნოემბერს_დეკემბერს'.split('_')
@@ -48,6 +48,7 @@ export default moment.defineLocale('ka', {
             }
         },
         s : 'რამდენიმე წამი',
+        ss : '%d წამი',
         m : 'წუთი',
         mm : '%d წუთი',
         h : 'საათი',
@@ -59,7 +60,7 @@ export default moment.defineLocale('ka', {
         y : 'წელი',
         yy : '%d წელი'
     },
-    ordinalParse: /0|1-ლი|მე-\d{1,2}|\d{1,2}-ე/,
+    dayOfMonthOrdinalParse: /0|1-ლი|მე-\d{1,2}|\d{1,2}-ე/,
     ordinal : function (number) {
         if (number === 0) {
             return number;

@@ -4,7 +4,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('vi', {
+export default moment.updateLocale('vi', {
     months : 'tháng 1_tháng 2_tháng 3_tháng 4_tháng 5_tháng 6_tháng 7_tháng 8_tháng 9_tháng 10_tháng 11_tháng 12'.split('_'),
     monthsShort : 'Th01_Th02_Th03_Th04_Th05_Th06_Th07_Th08_Th09_Th10_Th11_Th12'.split('_'),
     monthsParseExact : true,
@@ -47,6 +47,7 @@ export default moment.defineLocale('vi', {
         future : '%s tới',
         past : '%s trước',
         s : 'vài giây',
+        ss : '%d giây' ,
         m : 'một phút',
         mm : '%d phút',
         h : 'một giờ',
@@ -58,7 +59,7 @@ export default moment.defineLocale('vi', {
         y : 'một năm',
         yy : '%d năm'
     },
-    ordinalParse: /\d{1,2}/,
+    dayOfMonthOrdinalParse: /\d{1,2}/,
     ordinal : function (number) {
         return number;
     },

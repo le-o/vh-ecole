@@ -1,5 +1,22 @@
-yii2-field-range
-=================
+<h1 align="center">
+    <a href="http://demos.krajee.com" title="Krajee Demos" target="_blank">
+        <img src="http://kartik-v.github.io/bootstrap-fileinput-samples/samples/krajee-logo-b.png" alt="Krajee Logo"/>
+    </a>
+    <br>
+    yii2-field-range
+    <hr>
+    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DTP3NZQ6G2AYU"
+       title="Donate via Paypal" target="_blank">
+        <img src="http://kartik-v.github.io/bootstrap-fileinput-samples/samples/donate.png" alt="Donate"/>
+    </a>
+</h1>
+
+[![Stable Version](https://poser.pugx.org/kartik-v/yii2-field-range/v/stable)](https://packagist.org/packages/kartik-v/yii2-field-range)
+[![Unstable Version](https://poser.pugx.org/kartik-v/yii2-field-range/v/unstable)](https://packagist.org/packages/kartik-v/yii2-field-range)
+[![License](https://poser.pugx.org/kartik-v/yii2-field-range/license)](https://packagist.org/packages/kartik-v/yii2-field-range)
+[![Total Downloads](https://poser.pugx.org/kartik-v/yii2-field-range/downloads)](https://packagist.org/packages/kartik-v/yii2-field-range)
+[![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-field-range/d/monthly)](https://packagist.org/packages/kartik-v/yii2-field-range)
+[![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-field-range/d/daily)](https://packagist.org/packages/kartik-v/yii2-field-range)
 
 A Yii 2 extension that allows you to easily setup ActiveField range fields with Bootstrap 3 addons markup and more. This allows you to setup 
 the attributes joined together like a single field with a bootstrap addon separating the two. In addition, it enables you to display the field 
@@ -23,6 +40,10 @@ The key features supported by this widget extension are:
 
 ### Demo
 You can see detailed [documentation and demos](http://demos.krajee.com/field-range) on usage of the extension.
+
+## Release Changes
+
+> NOTE: Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-field-range/blob/master/CHANGE.md) for details on changes to various releases.
 
 ## Installation
 
@@ -66,4 +87,4 @@ ActiveForm::end();
 
 ## License
 
-**yii2-field-range** is released under the BSD 3-Clause License. See the bundled `LICENSE.md` for details.
+**yii2-field-range** is released under the BSD-3-Clause License. See the bundled `LICENSE.md` for details.

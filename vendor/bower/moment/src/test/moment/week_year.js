@@ -4,7 +4,7 @@ import moment from '../../moment';
 module('week year');
 
 test('iso week year', function (assert) {
-    // Some examples taken from http://en.wikipedia.org/wiki/ISO_week
+    // Some examples taken from https://en.wikipedia.org/wiki/ISO_week
     assert.equal(moment([2005, 0, 1]).isoWeekYear(), 2004);
     assert.equal(moment([2005, 0, 2]).isoWeekYear(), 2004);
     assert.equal(moment([2005, 0, 3]).isoWeekYear(), 2005);
@@ -27,7 +27,7 @@ test('iso week year', function (assert) {
 });
 
 test('week year', function (assert) {
-    // Some examples taken from http://en.wikipedia.org/wiki/ISO_week
+    // Some examples taken from https://en.wikipedia.org/wiki/ISO_week
     moment.locale('dow: 1,doy: 4', {week: {dow: 1, doy: 4}}); // like iso
     assert.equal(moment([2005, 0, 1]).weekYear(), 2004);
     assert.equal(moment([2005, 0, 2]).weekYear(), 2004);
@@ -92,7 +92,7 @@ test('week numbers 2012/2013', function (assert) {
     assert.equal(2, moment('2013-01-11', 'YYYY-MM-DD').week(), '2013-01-11 is week 2'); // 53 -- should be 2
     assert.equal(3, moment('2013-01-12', 'YYYY-MM-DD').week(), '2013-01-12 is week 3'); // 1 -- should be 3
     assert.equal(52, moment('2012-01-01', 'YYYY-MM-DD').weeksInYear(), 'weeks in 2012 are 52'); // 52
-    moment.defineLocale('dow: 6, doy: 12', null);
+    moment.updateLocale('dow: 6, doy: 12', null);
 });
 
 test('weeks numbers dow:1 doy:4', function (assert) {
@@ -137,7 +137,7 @@ test('weeks numbers dow:1 doy:4', function (assert) {
     assert.equal(moment([2011,  0,  3]).week(),  1, 'Jan  3 2011 should be week 1');
     assert.equal(moment([2011,  0,  9]).week(),  1, 'Jan  9 2011 should be week 1');
     assert.equal(moment([2011,  0, 10]).week(),  2, 'Jan 10 2011 should be week 2');
-    moment.defineLocale('dow: 1, doy: 4', null);
+    moment.updateLocale('dow: 1, doy: 4', null);
 });
 
 test('weeks numbers dow:6 doy:12', function (assert) {
@@ -180,7 +180,7 @@ test('weeks numbers dow:6 doy:12', function (assert) {
     assert.equal(moment([2011, 0,  8]).week(), 2, 'Jan  8 2011 should be week 2');
     assert.equal(moment([2011, 0, 14]).week(), 2, 'Jan 14 2011 should be week 2');
     assert.equal(moment([2011, 0, 15]).week(), 3, 'Jan 15 2011 should be week 3');
-    moment.defineLocale('dow: 6, doy: 12', null);
+    moment.updateLocale('dow: 6, doy: 12', null);
 });
 
 test('weeks numbers dow:1 doy:7', function (assert) {
@@ -225,7 +225,7 @@ test('weeks numbers dow:1 doy:7', function (assert) {
     assert.equal(moment([2011,  0,  3]).week(), 2, 'Jan  3 2011 should be week 2');
     assert.equal(moment([2011,  0,  9]).week(), 2, 'Jan  9 2011 should be week 2');
     assert.equal(moment([2011,  0, 10]).week(), 3, 'Jan 10 2011 should be week 3');
-    moment.defineLocale('dow: 1, doy: 7', null);
+    moment.updateLocale('dow: 1, doy: 7', null);
 });
 
 test('weeks numbers dow:0 doy:6', function (assert) {
@@ -270,7 +270,7 @@ test('weeks numbers dow:0 doy:6', function (assert) {
     assert.equal(moment([2011,  0,  2]).week(), 2, 'Jan  2 2011 should be week 2');
     assert.equal(moment([2011,  0,  8]).week(), 2, 'Jan  8 2011 should be week 2');
     assert.equal(moment([2011,  0,  9]).week(), 3, 'Jan  9 2011 should be week 3');
-    moment.defineLocale('dow: 0, doy: 6', null);
+    moment.updateLocale('dow: 0, doy: 6', null);
 });
 
 test('week year overflows', function (assert) {

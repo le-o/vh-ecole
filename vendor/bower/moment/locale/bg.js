@@ -1,16 +1,14 @@
 //! moment.js locale configuration
-//! locale : Bulgarian [bg]
-//! author : Krasen Borisov : https://github.com/kraz
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
-    var bg = moment.defineLocale('bg', {
+    var bg = moment.updateLocale('bg', {
         months : 'януари_февруари_март_април_май_юни_юли_август_септември_октомври_ноември_декември'.split('_'),
         monthsShort : 'янр_фев_мар_апр_май_юни_юли_авг_сеп_окт_ное_дек'.split('_'),
         weekdays : 'неделя_понеделник_вторник_сряда_четвъртък_петък_събота'.split('_'),
@@ -48,6 +46,7 @@
             future : 'след %s',
             past : 'преди %s',
             s : 'няколко секунди',
+            ss : '%d секунди',
             m : 'минута',
             mm : '%d минути',
             h : 'час',
@@ -59,7 +58,7 @@
             y : 'година',
             yy : '%d години'
         },
-        ordinalParse: /\d{1,2}-(ев|ен|ти|ви|ри|ми)/,
+        dayOfMonthOrdinalParse: /\d{1,2}-(ев|ен|ти|ви|ри|ми)/,
         ordinal : function (number) {
             var lastDigit = number % 10,
                 last2Digits = number % 100;
@@ -81,10 +80,10 @@
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
     return bg;
 
-}));
+})));

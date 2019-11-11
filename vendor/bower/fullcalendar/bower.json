@@ -8,8 +8,8 @@
     "full-sized",
     "jquery-plugin"
   ],
-  "homepage": "http://fullcalendar.io/",
-  "bugs": "http://fullcalendar.io/wiki/Reporting-Bugs/",
+  "homepage": "https://fullcalendar.io/",
+  "bugs": "https://fullcalendar.io/wiki/Reporting-Bugs/",
   "repository": {
     "type": "git",
     "url": "https://github.com/fullcalendar/fullcalendar.git"
@@ -20,19 +20,10 @@
     "email": "arshaw@arshaw.com",
     "url": "http://arshaw.com/"
   },
-  "copyright": "2016 Adam Shaw",
+  "copyright": "2018 Adam Shaw",
   "dependencies": {
-    "jquery": ">=1.7.1",
-    "moment": ">=2.5.0"
-  },
-  "devDependencies": {
-    "jquery-ui": ">=1.11.1",
-    "jquery-simulate": "~1.0.1",
-    "jasmine-jquery": "~2.1.1",
-    "jasmine-fixture": "~2.0.0",
-    "moment-timezone": "~0.2.1",
-    "bootstrap": "~3.2.0",
-    "jquery-mockjax": "~2.2.0"
+    "jquery": "2 - 3",
+    "moment": "^2.20.1"
   },
   "main": [
     "dist/fullcalendar.js",

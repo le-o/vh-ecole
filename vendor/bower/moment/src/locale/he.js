@@ -6,7 +6,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('he', {
+export default moment.updateLocale('he', {
     months : 'ינואר_פברואר_מרץ_אפריל_מאי_יוני_יולי_אוגוסט_ספטמבר_אוקטובר_נובמבר_דצמבר'.split('_'),
     monthsShort : 'ינו׳_פבר׳_מרץ_אפר׳_מאי_יוני_יולי_אוג׳_ספט׳_אוק׳_נוב׳_דצמ׳'.split('_'),
     weekdays : 'ראשון_שני_שלישי_רביעי_חמישי_שישי_שבת'.split('_'),
@@ -36,6 +36,7 @@ export default moment.defineLocale('he', {
         future : 'בעוד %s',
         past : 'לפני %s',
         s : 'מספר שניות',
+        ss : '%d שניות',
         m : 'דקה',
         mm : '%d דקות',
         h : 'שעה',

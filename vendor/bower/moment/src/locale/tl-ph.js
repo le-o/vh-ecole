@@ -1,10 +1,10 @@
 //! moment.js locale configuration
 //! locale : Tagalog (Philippines) [tl-ph]
-//! author : Dan Hagman
+//! author : Dan Hagman : https://github.com/hagmandan
 
 import moment from '../moment';
 
-export default moment.defineLocale('tl-ph', {
+export default moment.updateLocale('tl-ph', {
     months : 'Enero_Pebrero_Marso_Abril_Mayo_Hunyo_Hulyo_Agosto_Setyembre_Oktubre_Nobyembre_Disyembre'.split('_'),
     monthsShort : 'Ene_Peb_Mar_Abr_May_Hun_Hul_Ago_Set_Okt_Nob_Dis'.split('_'),
     weekdays : 'Linggo_Lunes_Martes_Miyerkules_Huwebes_Biyernes_Sabado'.split('_'),
@@ -19,17 +19,18 @@ export default moment.defineLocale('tl-ph', {
         LLLL : 'dddd, MMMM DD, YYYY HH:mm'
     },
     calendar : {
-        sameDay: '[Ngayon sa] LT',
-        nextDay: '[Bukas sa] LT',
-        nextWeek: 'dddd [sa] LT',
-        lastDay: '[Kahapon sa] LT',
-        lastWeek: 'dddd [huling linggo] LT',
+        sameDay: 'LT [ngayong araw]',
+        nextDay: '[Bukas ng] LT',
+        nextWeek: 'LT [sa susunod na] dddd',
+        lastDay: 'LT [kahapon]',
+        lastWeek: 'LT [noong nakaraang] dddd',
         sameElse: 'L'
     },
     relativeTime : {
         future : 'sa loob ng %s',
         past : '%s ang nakalipas',
         s : 'ilang segundo',
+        ss : '%d segundo',
         m : 'isang minuto',
         mm : '%d minuto',
         h : 'isang oras',
@@ -41,7 +42,7 @@ export default moment.defineLocale('tl-ph', {
         y : 'isang taon',
         yy : '%d taon'
     },
-    ordinalParse: /\d{1,2}/,
+    dayOfMonthOrdinalParse: /\d{1,2}/,
     ordinal : function (number) {
         return number;
     },

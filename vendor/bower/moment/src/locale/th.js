@@ -4,7 +4,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('th', {
+export default moment.updateLocale('th', {
     months : 'มกราคม_กุมภาพันธ์_มีนาคม_เมษายน_พฤษภาคม_มิถุนายน_กรกฎาคม_สิงหาคม_กันยายน_ตุลาคม_พฤศจิกายน_ธันวาคม'.split('_'),
     monthsShort : 'ม.ค._ก.พ._มี.ค._เม.ย._พ.ค._มิ.ย._ก.ค._ส.ค._ก.ย._ต.ค._พ.ย._ธ.ค.'.split('_'),
     monthsParseExact: true,
@@ -13,12 +13,12 @@ export default moment.defineLocale('th', {
     weekdaysMin : 'อา._จ._อ._พ._พฤ._ศ._ส.'.split('_'),
     weekdaysParseExact : true,
     longDateFormat : {
-        LT : 'H นาฬิกา m นาที',
-        LTS : 'H นาฬิกา m นาที s วินาที',
-        L : 'YYYY/MM/DD',
+        LT : 'H:mm',
+        LTS : 'H:mm:ss',
+        L : 'DD/MM/YYYY',
         LL : 'D MMMM YYYY',
-        LLL : 'D MMMM YYYY เวลา H นาฬิกา m นาที',
-        LLLL : 'วันddddที่ D MMMM YYYY เวลา H นาฬิกา m นาที'
+        LLL : 'D MMMM YYYY เวลา H:mm',
+        LLLL : 'วันddddที่ D MMMM YYYY เวลา H:mm'
     },
     meridiemParse: /ก่อนเที่ยง|หลังเที่ยง/,
     isPM: function (input) {
@@ -43,6 +43,7 @@ export default moment.defineLocale('th', {
         future : 'อีก %s',
         past : '%sที่แล้ว',
         s : 'ไม่กี่วินาที',
+        ss : '%d วินาที',
         m : '1 นาที',
         mm : '%d นาที',
         h : '1 ชั่วโมง',

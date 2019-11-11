@@ -27,7 +27,7 @@ var suffixes = {
     100: '-ші'
 };
 
-export default moment.defineLocale('kk', {
+export default moment.updateLocale('kk', {
     months : 'қаңтар_ақпан_наурыз_сәуір_мамыр_маусым_шілде_тамыз_қыркүйек_қазан_қараша_желтоқсан'.split('_'),
     monthsShort : 'қаң_ақп_нау_сәу_мам_мау_шіл_там_қыр_қаз_қар_жел'.split('_'),
     weekdays : 'жексенбі_дүйсенбі_сейсенбі_сәрсенбі_бейсенбі_жұма_сенбі'.split('_'),
@@ -53,6 +53,7 @@ export default moment.defineLocale('kk', {
         future : '%s ішінде',
         past : '%s бұрын',
         s : 'бірнеше секунд',
+        ss : '%d секунд',
         m : 'бір минут',
         mm : '%d минут',
         h : 'бір сағат',
@@ -64,7 +65,7 @@ export default moment.defineLocale('kk', {
         y : 'бір жыл',
         yy : '%d жыл'
     },
-    ordinalParse: /\d{1,2}-(ші|шы)/,
+    dayOfMonthOrdinalParse: /\d{1,2}-(ші|шы)/,
     ordinal : function (number) {
         var a = number % 10,
             b = number >= 100 ? 100 : null;
@@ -72,6 +73,6 @@ export default moment.defineLocale('kk', {
     },
     week : {
         dow : 1, // Monday is the first day of the week.
-        doy : 7  // The week that contains Jan 1st is the first week of the year.
+        doy : 7  // The week that contains Jan 7th is the first week of the year.
     }
 });

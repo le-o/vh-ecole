@@ -1,17 +1,15 @@
 //! moment.js locale configuration
-//! locale : Sinhalese [si]
-//! author : Sampath Sitinamaluwa : https://github.com/sampathsris
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
     /*jshint -W100*/
-    var si = moment.defineLocale('si', {
+    var si = moment.updateLocale('si', {
         months : 'ජනවාරි_පෙබරවාරි_මාර්තු_අප්‍රේල්_මැයි_ජූනි_ජූලි_අගෝස්තු_සැප්තැම්බර්_ඔක්තෝබර්_නොවැම්බර්_දෙසැම්බර්'.split('_'),
         monthsShort : 'ජන_පෙබ_මාර්_අප්_මැයි_ජූනි_ජූලි_අගෝ_සැප්_ඔක්_නොවැ_දෙසැ'.split('_'),
         weekdays : 'ඉරිදා_සඳුදා_අඟහරුවාදා_බදාදා_බ්‍රහස්පතින්දා_සිකුරාදා_සෙනසුරාදා'.split('_'),
@@ -38,6 +36,7 @@
             future : '%sකින්',
             past : '%sකට පෙර',
             s : 'තත්පර කිහිපය',
+            ss : 'තත්පර %d',
             m : 'මිනිත්තුව',
             mm : 'මිනිත්තු %d',
             h : 'පැය',
@@ -49,7 +48,7 @@
             y : 'වසර',
             yy : 'වසර %d'
         },
-        ordinalParse: /\d{1,2} වැනි/,
+        dayOfMonthOrdinalParse: /\d{1,2} වැනි/,
         ordinal : function (number) {
             return number + ' වැනි';
         },
@@ -68,4 +67,4 @@
 
     return si;
 
-}));
+})));

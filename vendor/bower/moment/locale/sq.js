@@ -1,18 +1,14 @@
 //! moment.js locale configuration
-//! locale : Albanian [sq]
-//! author : Flakërim Ismani : https://github.com/flakerimi
-//! author: Menelion Elensúle: https://github.com/Oire (tests)
-//! author : Oerd Cukalla : https://github.com/oerd (fixes)
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
-    var sq = moment.defineLocale('sq', {
+    var sq = moment.updateLocale('sq', {
         months : 'Janar_Shkurt_Mars_Prill_Maj_Qershor_Korrik_Gusht_Shtator_Tetor_Nëntor_Dhjetor'.split('_'),
         monthsShort : 'Jan_Shk_Mar_Pri_Maj_Qer_Kor_Gus_Sht_Tet_Nën_Dhj'.split('_'),
         weekdays : 'E Diel_E Hënë_E Martë_E Mërkurë_E Enjte_E Premte_E Shtunë'.split('_'),
@@ -46,6 +42,7 @@
             future : 'në %s',
             past : '%s më parë',
             s : 'disa sekonda',
+            ss : '%d sekonda',
             m : 'një minutë',
             mm : '%d minuta',
             h : 'një orë',
@@ -57,7 +54,7 @@
             y : 'një vit',
             yy : '%d vite'
         },
-        ordinalParse: /\d{1,2}\./,
+        dayOfMonthOrdinalParse: /\d{1,2}\./,
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
@@ -67,4 +64,4 @@
 
     return sq;
 
-}));
+})));

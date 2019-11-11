@@ -43,7 +43,7 @@ module('preparse and postformat', {
         });
     },
     teardown: function () {
-        moment.defineLocale('symbol', null);
+        moment.updateLocale('symbol', null);
     }
 });
 

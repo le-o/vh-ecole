@@ -4,7 +4,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('tzm', {
+export default moment.updateLocale('tzm', {
     months : 'ⵉⵏⵏⴰⵢⵔ_ⴱⵕⴰⵢⵕ_ⵎⴰⵕⵚ_ⵉⴱⵔⵉⵔ_ⵎⴰⵢⵢⵓ_ⵢⵓⵏⵢⵓ_ⵢⵓⵍⵢⵓⵣ_ⵖⵓⵛⵜ_ⵛⵓⵜⴰⵏⴱⵉⵔ_ⴽⵟⵓⴱⵕ_ⵏⵓⵡⴰⵏⴱⵉⵔ_ⴷⵓⵊⵏⴱⵉⵔ'.split('_'),
     monthsShort : 'ⵉⵏⵏⴰⵢⵔ_ⴱⵕⴰⵢⵕ_ⵎⴰⵕⵚ_ⵉⴱⵔⵉⵔ_ⵎⴰⵢⵢⵓ_ⵢⵓⵏⵢⵓ_ⵢⵓⵍⵢⵓⵣ_ⵖⵓⵛⵜ_ⵛⵓⵜⴰⵏⴱⵉⵔ_ⴽⵟⵓⴱⵕ_ⵏⵓⵡⴰⵏⴱⵉⵔ_ⴷⵓⵊⵏⴱⵉⵔ'.split('_'),
     weekdays : 'ⴰⵙⴰⵎⴰⵙ_ⴰⵢⵏⴰⵙ_ⴰⵙⵉⵏⴰⵙ_ⴰⴽⵔⴰⵙ_ⴰⴽⵡⴰⵙ_ⴰⵙⵉⵎⵡⴰⵙ_ⴰⵙⵉⴹⵢⴰⵙ'.split('_'),
@@ -30,6 +30,7 @@ export default moment.defineLocale('tzm', {
         future : 'ⴷⴰⴷⵅ ⵙ ⵢⴰⵏ %s',
         past : 'ⵢⴰⵏ %s',
         s : 'ⵉⵎⵉⴽ',
+        ss : '%d ⵉⵎⵉⴽ',
         m : 'ⵎⵉⵏⵓⴺ',
         mm : '%d ⵎⵉⵏⵓⴺ',
         h : 'ⵙⴰⵄⴰ',
@@ -43,7 +44,7 @@ export default moment.defineLocale('tzm', {
     },
     week : {
         dow : 6, // Saturday is the first day of the week.
-        doy : 12  // The week that contains Jan 1st is the first week of the year.
+        doy : 12  // The week that contains Jan 12th is the first week of the year.
     }
 });
 

@@ -6,6 +6,7 @@ import moment from '../moment';
 
 var translator = {
     words: { //Different grammatical cases
+        ss: ['sekund', 'sekunda', 'sekundi'],
         m: ['jedan minut', 'jednog minuta'],
         mm: ['minut', 'minuta', 'minuta'],
         h: ['jedan sat', 'jednog sata'],
@@ -27,7 +28,7 @@ var translator = {
     }
 };
 
-export default moment.defineLocale('me', {
+export default moment.updateLocale('me', {
     months: 'januar_februar_mart_april_maj_jun_jul_avgust_septembar_oktobar_novembar_decembar'.split('_'),
     monthsShort: 'jan._feb._mar._apr._maj_jun_jul_avg._sep._okt._nov._dec.'.split('_'),
     monthsParseExact : true,
@@ -38,7 +39,7 @@ export default moment.defineLocale('me', {
     longDateFormat: {
         LT: 'H:mm',
         LTS : 'H:mm:ss',
-        L: 'DD. MM. YYYY',
+        L: 'DD.MM.YYYY',
         LL: 'D. MMMM YYYY',
         LLL: 'D. MMMM YYYY H:mm',
         LLLL: 'dddd, D. MMMM YYYY H:mm'
@@ -81,6 +82,7 @@ export default moment.defineLocale('me', {
         future : 'za %s',
         past   : 'prije %s',
         s      : 'nekoliko sekundi',
+        ss     : translator.translate,
         m      : translator.translate,
         mm     : translator.translate,
         h      : translator.translate,
@@ -92,10 +94,10 @@ export default moment.defineLocale('me', {
         y      : 'godinu',
         yy     : translator.translate
     },
-    ordinalParse: /\d{1,2}\./,
+    dayOfMonthOrdinalParse: /\d{1,2}\./,
     ordinal : '%d.',
     week : {
         dow : 1, // Monday is the first day of the week.
-        doy : 7  // The week that contains Jan 1st is the first week of the year.
+        doy : 7  // The week that contains Jan 7th is the first week of the year.
     }
 });

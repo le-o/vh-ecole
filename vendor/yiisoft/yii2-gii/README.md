@@ -1,5 +1,10 @@
-Gii Extension for Yii 2
-========================
+<p align="center">
+    <a href="https://github.com/yiisoft" target="_blank">
+        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
+    </a>
+    <h1 align="center">Gii Extension for Yii 2</h1>
+    <br>
+</p>
 
 This extension provides a Web-based code generator, called Gii, for [Yii framework 2.0](http://www.yiiframework.com) applications.
 You can use Gii to quickly generate models, forms, modules, CRUD, etc.
@@ -27,7 +32,7 @@ php composer.phar require --dev --prefer-dist yiisoft/yii2-gii
 or add
 
 ```
-"yiisoft/yii2-gii": "~2.0.0"
+"yiisoft/yii2-gii": "~2.1.0"
 ```
 
 to the require-dev section of your `composer.json` file.

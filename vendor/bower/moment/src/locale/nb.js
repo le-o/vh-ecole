@@ -5,7 +5,7 @@
 
 import moment from '../moment';
 
-export default moment.defineLocale('nb', {
+export default moment.updateLocale('nb', {
     months : 'januar_februar_mars_april_mai_juni_juli_august_september_oktober_november_desember'.split('_'),
     monthsShort : 'jan._feb._mars_april_mai_juni_juli_aug._sep._okt._nov._des.'.split('_'),
     monthsParseExact : true,
@@ -33,6 +33,7 @@ export default moment.defineLocale('nb', {
         future : 'om %s',
         past : '%s siden',
         s : 'noen sekunder',
+        ss : '%d sekunder',
         m : 'ett minutt',
         mm : '%d minutter',
         h : 'en time',
@@ -44,7 +45,7 @@ export default moment.defineLocale('nb', {
         y : 'ett år',
         yy : '%d år'
     },
-    ordinalParse: /\d{1,2}\./,
+    dayOfMonthOrdinalParse: /\d{1,2}\./,
     ordinal : '%d.',
     week : {
         dow : 1, // Monday is the first day of the week.

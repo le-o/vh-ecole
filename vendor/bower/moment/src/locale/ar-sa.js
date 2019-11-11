@@ -28,7 +28,7 @@ var symbolMap = {
     '٠': '0'
 };
 
-export default moment.defineLocale('ar-sa', {
+export default moment.updateLocale('ar-sa', {
     months : 'يناير_فبراير_مارس_أبريل_مايو_يونيو_يوليو_أغسطس_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split('_'),
     monthsShort : 'يناير_فبراير_مارس_أبريل_مايو_يونيو_يوليو_أغسطس_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split('_'),
     weekdays : 'الأحد_الإثنين_الثلاثاء_الأربعاء_الخميس_الجمعة_السبت'.split('_'),
@@ -66,6 +66,7 @@ export default moment.defineLocale('ar-sa', {
         future : 'في %s',
         past : 'منذ %s',
         s : 'ثوان',
+        ss : '%d ثانية',
         m : 'دقيقة',
         mm : '%d دقائق',
         h : 'ساعة',
@@ -88,8 +89,8 @@ export default moment.defineLocale('ar-sa', {
         }).replace(/,/g, '،');
     },
     week : {
-        dow : 6, // Saturday is the first day of the week.
-        doy : 12  // The week that contains Jan 1st is the first week of the year.
+        dow : 0, // Sunday is the first day of the week.
+        doy : 6  // The week that contains Jan 6th is the first week of the year.
     }
 });
 

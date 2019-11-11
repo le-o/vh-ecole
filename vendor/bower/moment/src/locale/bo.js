@@ -29,7 +29,7 @@ numberMap = {
     '༠': '0'
 };
 
-export default moment.defineLocale('bo', {
+export default moment.updateLocale('bo', {
     months : 'ཟླ་བ་དང་པོ_ཟླ་བ་གཉིས་པ_ཟླ་བ་གསུམ་པ_ཟླ་བ་བཞི་པ_ཟླ་བ་ལྔ་པ_ཟླ་བ་དྲུག་པ_ཟླ་བ་བདུན་པ_ཟླ་བ་བརྒྱད་པ_ཟླ་བ་དགུ་པ_ཟླ་བ་བཅུ་པ_ཟླ་བ་བཅུ་གཅིག་པ_ཟླ་བ་བཅུ་གཉིས་པ'.split('_'),
     monthsShort : 'ཟླ་བ་དང་པོ_ཟླ་བ་གཉིས་པ_ཟླ་བ་གསུམ་པ_ཟླ་བ་བཞི་པ_ཟླ་བ་ལྔ་པ_ཟླ་བ་དྲུག་པ_ཟླ་བ་བདུན་པ_ཟླ་བ་བརྒྱད་པ_ཟླ་བ་དགུ་པ_ཟླ་བ་བཅུ་པ_ཟླ་བ་བཅུ་གཅིག་པ_ཟླ་བ་བཅུ་གཉིས་པ'.split('_'),
     weekdays : 'གཟའ་ཉི་མ་_གཟའ་ཟླ་བ་_གཟའ་མིག་དམར་_གཟའ་ལྷག་པ་_གཟའ་ཕུར་བུ_གཟའ་པ་སངས་_གཟའ་སྤེན་པ་'.split('_'),
@@ -55,6 +55,7 @@ export default moment.defineLocale('bo', {
         future : '%s ལ་',
         past : '%s སྔན་ལ',
         s : 'ལམ་སང',
+        ss : '%d སྐར་ཆ།',
         m : 'སྐར་མ་གཅིག',
         mm : '%d སྐར་མ',
         h : 'ཆུ་ཚོད་གཅིག',
@@ -104,7 +105,7 @@ export default moment.defineLocale('bo', {
     },
     week : {
         dow : 0, // Sunday is the first day of the week.
-        doy : 6  // The week that contains Jan 1st is the first week of the year.
+        doy : 6  // The week that contains Jan 6th is the first week of the year.
     }
 });
 

@@ -1,16 +1,14 @@
 //! moment.js locale configuration
-//! locale : Swahili [sw]
-//! author : Fahad Kassim : https://github.com/fadsel
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
-    var sw = moment.defineLocale('sw', {
+    var sw = moment.updateLocale('sw', {
         months : 'Januari_Februari_Machi_Aprili_Mei_Juni_Julai_Agosti_Septemba_Oktoba_Novemba_Desemba'.split('_'),
         monthsShort : 'Jan_Feb_Mac_Apr_Mei_Jun_Jul_Ago_Sep_Okt_Nov_Des'.split('_'),
         weekdays : 'Jumapili_Jumatatu_Jumanne_Jumatano_Alhamisi_Ijumaa_Jumamosi'.split('_'),
@@ -37,6 +35,7 @@
             future : '%s baadaye',
             past : 'tokea %s',
             s : 'hivi punde',
+            ss : 'sekunde %d',
             m : 'dakika moja',
             mm : 'dakika %d',
             h : 'saa limoja',
@@ -50,10 +49,10 @@
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
     return sw;
 
-}));
+})));

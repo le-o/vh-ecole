@@ -1,7 +1,7 @@
 {
 	"name": "philippfrenzel/yii2fullcalendar",
 	"description": "Yii2 fullcalendar Widgets",
-	"keywords": ["yii2", "fullcalendar"],
+	"keywords": ["yii2", "fullcalendar","widget"],
 	"homepage": "http://www.frenzel.net/",
 	"type": "yii2-extension",
 	"license": "MIT",
@@ -18,10 +18,10 @@
 	},
 	"minimum-stability": "stable",
 	"require": {
-		"php": ">=5.4.0",
 		"yiisoft/yii2" : "*",
-		"yiisoft/yii2-jui": "*",
-		"bower-asset/fullcalendar" : "2.*"
+		"yiisoft/yii2-jui" : "*",
+		"bower-asset/fullcalendar" : "^3.9.0@stable",
+		"bower-asset/fullcalendar-scheduler" : "^1.9.2@stable"
 	},
 	"require-dev": {
 		"codeception/codeception": "*"

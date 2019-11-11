@@ -1,9 +1,10 @@
 //! moment.js locale configuration
 //! locale : English (Australia) [en-au]
+//! author : Jared Morse : https://github.com/jarcoal
 
 import moment from '../moment';
 
-export default moment.defineLocale('en-au', {
+export default moment.updateLocale('en-au', {
     months : 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_'),
     monthsShort : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
     weekdays : 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_'),
@@ -29,6 +30,7 @@ export default moment.defineLocale('en-au', {
         future : 'in %s',
         past : '%s ago',
         s : 'a few seconds',
+        ss : '%d seconds',
         m : 'a minute',
         mm : '%d minutes',
         h : 'an hour',
@@ -40,7 +42,7 @@ export default moment.defineLocale('en-au', {
         y : 'a year',
         yy : '%d years'
     },
-    ordinalParse: /\d{1,2}(st|nd|rd|th)/,
+    dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
     ordinal : function (number) {
         var b = number % 10,
             output = (~~(number % 100 / 10) === 1) ? 'th' :
@@ -54,4 +56,3 @@ export default moment.defineLocale('en-au', {
         doy : 4  // The week that contains Jan 4th is the first week of the year.
     }
 });
-

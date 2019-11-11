@@ -1,11 +1,11 @@
 //! moment.js locale configuration
-//! locale : Swazi [ss]
+//! locale : siSwati [ss]
 //! author : Nicolai Davies<mail@nicolai.io> : https://github.com/nicolaidavies
 
 
 import moment from '../moment';
 
-export default moment.defineLocale('ss', {
+export default moment.updateLocale('ss', {
     months : "Bhimbidvwane_Indlovana_Indlov'lenkhulu_Mabasa_Inkhwekhweti_Inhlaba_Kholwane_Ingci_Inyoni_Imphala_Lweti_Ingongoni".split('_'),
     monthsShort : 'Bhi_Ina_Inu_Mab_Ink_Inh_Kho_Igc_Iny_Imp_Lwe_Igo'.split('_'),
     weekdays : 'Lisontfo_Umsombuluko_Lesibili_Lesitsatfu_Lesine_Lesihlanu_Umgcibelo'.split('_'),
@@ -32,6 +32,7 @@ export default moment.defineLocale('ss', {
         future : 'nga %s',
         past : 'wenteka nga %s',
         s : 'emizuzwana lomcane',
+        ss : '%d mzuzwana',
         m : 'umzuzu',
         mm : '%d emizuzu',
         h : 'lihora',
@@ -70,7 +71,7 @@ export default moment.defineLocale('ss', {
             return hour + 12;
         }
     },
-    ordinalParse: /\d{1,2}/,
+    dayOfMonthOrdinalParse: /\d{1,2}/,
     ordinal : '%d',
     week : {
         dow : 1, // Monday is the first day of the week.
