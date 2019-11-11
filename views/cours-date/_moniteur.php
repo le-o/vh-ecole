@@ -16,6 +16,7 @@ use yii\helpers\Url;
     
     <?= GridView::widget([
         'dataProvider' => $coursDateDataProvider,
+        'showFooter' => $withSum,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             
@@ -31,9 +32,17 @@ use yii\helpers\Url;
             [
                 'label' => Yii::t('app', 'Lieu'),
                 'value' => 'fkLieu.nom',
+                'footer' => '<strong>' . Yii::t('app', 'Total') . '</strong>',
             ],
-            'duree',
-            'remarque',
+            [
+                'attribute' => 'duree',
+                'format' => ['decimal', 2],
+                'footer' => '<strong>' . $sum . '</strong>',
+            ],
+            [
+                'attribute' => 'remarque',
+                'visible' => !$withSum,
+            ],
         ],
     ]); ?>
 

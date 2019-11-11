@@ -257,6 +257,7 @@ class PersonnesController extends CommonController
                 'model' => $model,
                 'coursDateDataProvider' => $coursDateDataProvider,
                 'fromData' => $fromData,
+                'sum' => $coursDate->sum('duree'),
             ]);
         }
         
@@ -264,6 +265,7 @@ class PersonnesController extends CommonController
             'model' => $model,
             'coursDateDataProvider' => $coursDateDataProvider,
             'fromData' => $fromData,
+            'sum' => $coursDate->sum('duree'),
         ]);
         
         // setup kartik\mpdf\Pdf component
