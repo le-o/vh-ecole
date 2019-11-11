@@ -577,7 +577,7 @@ class CoursDateController extends CommonController
             foreach ($moniteurs as $m) {
                 $arrayMoniteurs[] = $m->fkMoniteur->nomPrenom;
             }
-            $Event->description = implode(', ', $arrayMoniteurs);
+            $Event->nonstandard = implode(', ', $arrayMoniteurs);
             $Event->start = date('Y-m-d\TH:i:s\Z',strtotime($time->date.' '.$time->heure_debut));
             $Event->end = date('Y-m-d\TH:i:s\Z',strtotime($time->date.' '.$time->HeureFin));
             

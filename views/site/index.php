@@ -168,7 +168,7 @@ $this->title = 'VH Gestion des cours';
                         'right'=>'agendaDay,agendaWeek,month'
                     ],
                     'eventRender' => 'function(event, element) {
-                        element.find(\'.fc-title\').append("<br/><br/><i>" + event.description + "</i>");
+                        element.find(\'.fc-title\').append("<br/><br/><i>" + event.nonstandard + "</i>");
                     } ',
                     'eventAfterAllRender' => 'function(event) {
                         var moment = $(\'#myCalendar' . $salle->parametre_id . '\').fullCalendar(\'getDate\');
