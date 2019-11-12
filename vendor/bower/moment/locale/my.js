@@ -1,13 +1,11 @@
 //! moment.js locale configuration
-//! locale : Burmese [my]
-//! author : Squar team, mysquar.com
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
     var symbolMap = {
@@ -34,7 +32,7 @@
         '၀': '0'
     };
 
-    var my = moment.defineLocale('my', {
+    var my = moment.updateLocale('my', {
         months: 'ဇန်နဝါရီ_ဖေဖော်ဝါရီ_မတ်_ဧပြီ_မေ_ဇွန်_ဇူလိုင်_သြဂုတ်_စက်တင်ဘာ_အောက်တိုဘာ_နိုဝင်ဘာ_ဒီဇင်ဘာ'.split('_'),
         monthsShort: 'ဇန်_ဖေ_မတ်_ပြီ_မေ_ဇွန်_လိုင်_သြ_စက်_အောက်_နို_ဒီ'.split('_'),
         weekdays: 'တနင်္ဂနွေ_တနင်္လာ_အင်္ဂါ_ဗုဒ္ဓဟူး_ကြာသပတေး_သောကြာ_စနေ'.split('_'),
@@ -61,6 +59,7 @@
             future: 'လာမည့် %s မှာ',
             past: 'လွန်ခဲ့သော %s က',
             s: 'စက္ကန်.အနည်းငယ်',
+            ss : '%d စက္ကန့်',
             m: 'တစ်မိနစ်',
             mm: '%d မိနစ်',
             h: 'တစ်နာရီ',
@@ -84,10 +83,10 @@
         },
         week: {
             dow: 1, // Monday is the first day of the week.
-            doy: 4 // The week that contains Jan 1st is the first week of the year.
+            doy: 4 // The week that contains Jan 4th is the first week of the year.
         }
     });
 
     return my;
 
-}));
+})));

@@ -1,13 +1,11 @@
 //! moment.js locale configuration
-//! locale : Tamil [ta]
-//! author : Arjunkumar Krishnamoorthy : https://github.com/tk120404
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
     var symbolMap = {
@@ -34,7 +32,7 @@
         '௦': '0'
     };
 
-    var ta = moment.defineLocale('ta', {
+    var ta = moment.updateLocale('ta', {
         months : 'ஜனவரி_பிப்ரவரி_மார்ச்_ஏப்ரல்_மே_ஜூன்_ஜூலை_ஆகஸ்ட்_செப்டெம்பர்_அக்டோபர்_நவம்பர்_டிசம்பர்'.split('_'),
         monthsShort : 'ஜனவரி_பிப்ரவரி_மார்ச்_ஏப்ரல்_மே_ஜூன்_ஜூலை_ஆகஸ்ட்_செப்டெம்பர்_அக்டோபர்_நவம்பர்_டிசம்பர்'.split('_'),
         weekdays : 'ஞாயிற்றுக்கிழமை_திங்கட்கிழமை_செவ்வாய்கிழமை_புதன்கிழமை_வியாழக்கிழமை_வெள்ளிக்கிழமை_சனிக்கிழமை'.split('_'),
@@ -60,6 +58,7 @@
             future : '%s இல்',
             past : '%s முன்',
             s : 'ஒரு சில விநாடிகள்',
+            ss : '%d விநாடிகள்',
             m : 'ஒரு நிமிடம்',
             mm : '%d நிமிடங்கள்',
             h : 'ஒரு மணி நேரம்',
@@ -71,7 +70,7 @@
             y : 'ஒரு வருடம்',
             yy : '%d ஆண்டுகள்'
         },
-        ordinalParse: /\d{1,2}வது/,
+        dayOfMonthOrdinalParse: /\d{1,2}வது/,
         ordinal : function (number) {
             return number + 'வது';
         },
@@ -120,10 +119,10 @@
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
     return ta;
 
-}));
+})));

@@ -37,6 +37,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     echo $this->render('/cours-date/_moniteur', [
         'coursDateDataProvider' => $coursDateDataProvider,
+        'withSum' => true,
+        'sum' => $sum,
     ]);
     ?>
 

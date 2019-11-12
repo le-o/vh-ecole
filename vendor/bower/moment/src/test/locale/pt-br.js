@@ -1,9 +1,10 @@
-import {localeModule, test} from '../qunit';
+import {test} from '../qunit';
+import {localeModule} from '../qunit-locale';
 import moment from '../../moment';
 localeModule('pt-br');
 
 test('parse', function (assert) {
-    var tests = 'janeiro jan_fevereiro fev_março mar_abril abr_maio mai_junho jun_julho jul_agosto ago_setembro set_outubro out_novembro nov_dezembro dez'.split('_'), i;
+    var tests = 'Janeiro Jan_Fevereiro Fev_Março Mar_Abril Abr_Maio Mai_Junho Jun_Julho Jul_Agosto Ago_Setembro Set_Outubro Out_Novembro Nov_Dezembro Dez'.split('_'), i;
 
     function equalTest(input, mmm, i) {
         assert.equal(moment(input, mmm).month(), i, input + ' should be month ' + (i + 1));
@@ -100,9 +101,9 @@ test('format month', function (assert) {
 });
 
 test('format week', function (assert) {
-    var expected = 'Domingo Dom_Segunda-feira Seg_Terça-feira Ter_Quarta-feira Qua_Quinta-feira Qui_Sexta-feira Sex_Sábado Sáb'.split('_'), i;
+    var expected = 'Domingo Dom Do_Segunda-feira Seg 2ª_Terça-feira Ter 3ª_Quarta-feira Qua 4ª_Quinta-feira Qui 5ª_Sexta-feira Sex 6ª_Sábado Sáb Sá'.split('_'), i;
     for (i = 0; i < expected.length; i++) {
-        assert.equal(moment([2011, 0, 2 + i]).format('dddd ddd'), expected[i], expected[i]);
+        assert.equal(moment([2011, 0, 2 + i]).format('dddd ddd dd'), expected[i], expected[i]);
     }
 });
 
@@ -140,7 +141,7 @@ test('from', function (assert) {
 
 test('suffix', function (assert) {
     assert.equal(moment(30000).from(0), 'em poucos segundos', 'prefix');
-    assert.equal(moment(0).from(30000), 'poucos segundos atrás', 'suffix');
+    assert.equal(moment(0).from(30000), 'há poucos segundos', 'prefix');
 });
 
 test('fromNow', function (assert) {
@@ -203,5 +204,19 @@ test('weeks year starting sunday format', function (assert) {
     assert.equal(moment([2012, 0,  8]).format('w ww wo'), '2 02 2º', 'Jan  8 2012 should be week 2');
     assert.equal(moment([2012, 0, 14]).format('w ww wo'), '2 02 2º', 'Jan 14 2012 should be week 2');
     assert.equal(moment([2012, 0, 15]).format('w ww wo'), '3 03 3º', 'Jan 15 2012 should be week 3');
+});
+
+test('relative time threshold', function (assert) {
+    var rts = moment(),
+        rtsDefault = moment.relativeTimeThreshold('ss');
+
+    moment.relativeTimeThreshold('ss', 3);
+
+    rts.subtract(3, 'seconds');
+    assert.equal(rts.fromNow(), 'há poucos segundos', 'Below custom a few seconds to seconds threshold');
+    rts.subtract(1, 'seconds');
+    assert.equal(rts.fromNow(), 'há 4 segundos', 'Above custom a few seconds to seconds threshold');
+
+    moment.relativeTimeThreshold('ss', rtsDefault);
 });
 

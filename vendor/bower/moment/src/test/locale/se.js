@@ -1,5 +1,6 @@
-import {localeModule, test} from '../qunit';
-import {moment} from '../../moment';
+import {test} from '../qunit';
+import {localeModule} from '../qunit-locale';
+import moment from '../../moment';
 localeModule('se');
 
 test('parse', function (assert) {

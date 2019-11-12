@@ -1,4 +1,5 @@
-import {localeModule, test} from '../qunit';
+import {test} from '../qunit';
+import {localeModule} from '../qunit-locale';
 import moment from '../../moment';
 localeModule('es');
 
@@ -209,5 +210,10 @@ test('weeks year starting sunday formatted', function (assert) {
     assert.equal(moment([2012, 0,  8]).format('w ww wo'),   '1 01 1º', 'Jan  8 2012 should be week 1');
     assert.equal(moment([2012, 0,  9]).format('w ww wo'),   '2 02 2º', 'Jan  9 2012 should be week 2');
     assert.equal(moment([2012, 0, 15]).format('w ww wo'),   '2 02 2º', 'Jan 15 2012 should be week 2');
+});
+
+test('test short months proper', function (assert) {
+    var str = '02-ago-2016';
+    assert.equal(moment(str, 'DD-MMM-YYYY').month(), '7', '02-ago-2016 month should be 7');
 });
 

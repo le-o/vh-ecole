@@ -1,4 +1,5 @@
-import {localeModule, test} from '../qunit';
+import {test} from '../qunit';
+import {localeModule} from '../qunit-locale';
 import moment from '../../moment';
 localeModule('ru');
 
@@ -43,13 +44,14 @@ test('format', function (assert) {
             ['D Do DD',                            '14 14-го 14'],
             ['d do dddd ddd dd',                   '0 0-й воскресенье вс вс'],
             ['DDD DDDo DDDD',                      '45 45-й 045'],
-            ['w wo ww',                            '7 7-я 07'],
+            ['w wo ww',                            '6 6-я 06'],
             ['h hh',                               '3 03'],
             ['H HH',                               '15 15'],
             ['m mm',                               '25 25'],
             ['s ss',                               '50 50'],
             ['a A',                                'дня дня'],
             ['DDDo [день года]',                   '45-й день года'],
+            ['LT',                                 '15:25'],
             ['LTS',                                '15:25:50'],
             ['L',                                  '14.02.2010'],
             ['LL',                                 '14 февраля 2010 г.'],
@@ -227,12 +229,13 @@ test('fromNow', function (assert) {
 test('calendar day', function (assert) {
     var a = moment().hours(12).minutes(0).seconds(0);
 
-    assert.equal(moment(a).calendar(),                   'Сегодня в 12:00',     'today at the same time');
-    assert.equal(moment(a).add({m: 25}).calendar(),      'Сегодня в 12:25',     'Now plus 25 min');
-    assert.equal(moment(a).add({h: 1}).calendar(),       'Сегодня в 13:00',     'Now plus 1 hour');
-    assert.equal(moment(a).add({d: 1}).calendar(),       'Завтра в 12:00',      'tomorrow at the same time');
-    assert.equal(moment(a).subtract({h: 1}).calendar(),  'Сегодня в 11:00',     'Now minus 1 hour');
-    assert.equal(moment(a).subtract({d: 1}).calendar(),  'Вчера в 12:00',       'yesterday at the same time');
+    assert.equal(moment(a).calendar(),                   'Сегодня, в 12:00',     'today at the same time');
+    assert.equal(moment(a).add({m: 25}).calendar(),      'Сегодня, в 12:25',     'Now plus 25 min');
+    assert.equal(moment(a).add({h: 1}).calendar(),       'Сегодня, в 13:00',     'Now plus 1 hour');
+    assert.equal(moment(a).add({d: 1}).calendar(),       'Завтра, в 12:00',      'tomorrow at the same time');
+    assert.equal(moment(a).subtract({h: 1}).calendar(),  'Сегодня, в 11:00',     'Now minus 1 hour');
+    assert.equal(moment(a).subtract({h: 4}).calendar(),  'Сегодня, в 8:00',     'Now minus 4 hours');
+    assert.equal(moment(a).subtract({d: 1}).calendar(),  'Вчера, в 12:00',       'yesterday at the same time');
 });
 
 test('calendar next week', function (assert) {
@@ -241,24 +244,24 @@ test('calendar next week', function (assert) {
     function makeFormatNext(d) {
         switch (d.day()) {
             case 0:
-                return '[В следующее] dddd [в] LT';
+                return '[В следующее] dddd, [в] LT';
             case 1:
             case 2:
             case 4:
-                return '[В следующий] dddd [в] LT';
+                return '[В следующий] dddd, [в] LT';
             case 3:
             case 5:
             case 6:
-                return '[В следующую] dddd [в] LT';
+                return '[В следующую] dddd, [в] LT';
         }
     }
 
     function makeFormatThis(d) {
         if (d.day() === 2) {
-            return '[Во] dddd [в] LT';
+            return '[Во] dddd, [в] LT';
         }
         else {
-            return '[В] dddd [в] LT';
+            return '[В] dddd, [в] LT';
         }
     }
 
@@ -289,24 +292,24 @@ test('calendar last week', function (assert) {
     function makeFormatLast(d) {
         switch (d.day()) {
             case 0:
-                return '[В прошлое] dddd [в] LT';
+                return '[В прошлое] dddd, [в] LT';
             case 1:
             case 2:
             case 4:
-                return '[В прошлый] dddd [в] LT';
+                return '[В прошлый] dddd, [в] LT';
             case 3:
             case 5:
             case 6:
-                return '[В прошлую] dddd [в] LT';
+                return '[В прошлую] dddd, [в] LT';
         }
     }
 
     function makeFormatThis(d) {
         if (d.day() === 2) {
-            return '[Во] dddd [в] LT';
+            return '[Во] dddd, [в] LT';
         }
         else {
-            return '[В] dddd [в] LT';
+            return '[В] dddd, [в] LT';
         }
     }
 
@@ -345,11 +348,10 @@ test('calendar all else', function (assert) {
     assert.equal(weeksFromNow.calendar(),   weeksFromNow.format('L'),  'in 2 weeks');
 });
 
-test('weeks year starting sunday formatted', function (assert) {
-    assert.equal(moment([2011, 11, 26]).format('w ww wo'), '1 01 1-я', 'Dec 26 2011 should be week 1');
-    assert.equal(moment([2012,  0,  1]).format('w ww wo'), '1 01 1-я', 'Jan  1 2012 should be week 1');
-    assert.equal(moment([2012,  0,  2]).format('w ww wo'), '2 02 2-я', 'Jan  2 2012 should be week 2');
-    assert.equal(moment([2012,  0,  8]).format('w ww wo'), '2 02 2-я', 'Jan  8 2012 should be week 2');
-    assert.equal(moment([2012,  0,  9]).format('w ww wo'), '3 03 3-я', 'Jan  9 2012 should be week 3');
+test('weeks year starting monday formatted', function (assert) {
+    assert.equal(moment([2011, 11, 26]).format('w ww wo'), '52 52 52-я', 'Dec 26 2011 should be week 52');
+    assert.equal(moment([2012,  0,  1]).format('w ww wo'), '52 52 52-я', 'Jan  1 2012 should be week 52');
+    assert.equal(moment([2012,  0,  2]).format('w ww wo'), '1 01 1-я', 'Jan  2 2012 should be week 1');
+    assert.equal(moment([2012,  0,  8]).format('w ww wo'), '1 01 1-я', 'Jan  8 2012 should be week 1');
+    assert.equal(moment([2012,  0,  9]).format('w ww wo'), '2 02 2-я', 'Jan  9 2012 should be week 2');
 });
-

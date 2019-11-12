@@ -1,13 +1,11 @@
 //! moment.js locale configuration
-//! locale : Breton [br]
-//! author : Jean-Baptiste Le Duigou : https://github.com/jbleduigou
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
     function relativeTimeWithMutation(number, withoutSuffix, key) {
@@ -54,7 +52,7 @@
         return mutationTable[text.charAt(0)] + text.substring(1);
     }
 
-    var br = moment.defineLocale('br', {
+    var br = moment.updateLocale('br', {
         months : 'Genver_C\'hwevrer_Meurzh_Ebrel_Mae_Mezheven_Gouere_Eost_Gwengolo_Here_Du_Kerzu'.split('_'),
         monthsShort : 'Gen_C\'hwe_Meu_Ebr_Mae_Eve_Gou_Eos_Gwe_Her_Du_Ker'.split('_'),
         weekdays : 'Sul_Lun_Meurzh_Merc\'her_Yaou_Gwener_Sadorn'.split('_'),
@@ -81,6 +79,7 @@
             future : 'a-benn %s',
             past : '%s \'zo',
             s : 'un nebeud segondennoù',
+            ss : '%d eilenn',
             m : 'ur vunutenn',
             mm : relativeTimeWithMutation,
             h : 'un eur',
@@ -92,7 +91,7 @@
             y : 'ur bloaz',
             yy : specialMutationForYears
         },
-        ordinalParse: /\d{1,2}(añ|vet)/,
+        dayOfMonthOrdinalParse: /\d{1,2}(añ|vet)/,
         ordinal : function (number) {
             var output = (number === 1) ? 'añ' : 'vet';
             return number + output;
@@ -105,4 +104,4 @@
 
     return br;
 
-}));
+})));

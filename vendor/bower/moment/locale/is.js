@@ -1,13 +1,11 @@
 //! moment.js locale configuration
-//! locale : Icelandic [is]
-//! author : Hinrik Örn Sigurðsson : https://github.com/hinrik
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
     function plural(n) {
@@ -23,6 +21,11 @@
         switch (key) {
             case 's':
                 return withoutSuffix || isFuture ? 'nokkrar sekúndur' : 'nokkrum sekúndum';
+            case 'ss':
+                if (plural(number)) {
+                    return result + (withoutSuffix || isFuture ? 'sekúndur' : 'sekúndum');
+                }
+                return result + 'sekúnda';
             case 'm':
                 return withoutSuffix ? 'mínúta' : 'mínútu';
             case 'mm':
@@ -77,7 +80,7 @@
         }
     }
 
-    var is = moment.defineLocale('is', {
+    var is = moment.updateLocale('is', {
         months : 'janúar_febrúar_mars_apríl_maí_júní_júlí_ágúst_september_október_nóvember_desember'.split('_'),
         monthsShort : 'jan_feb_mar_apr_maí_jún_júl_ágú_sep_okt_nóv_des'.split('_'),
         weekdays : 'sunnudagur_mánudagur_þriðjudagur_miðvikudagur_fimmtudagur_föstudagur_laugardagur'.split('_'),
@@ -103,6 +106,7 @@
             future : 'eftir %s',
             past : 'fyrir %s síðan',
             s : translate,
+            ss : translate,
             m : translate,
             mm : translate,
             h : 'klukkustund',
@@ -114,7 +118,7 @@
             y : translate,
             yy : translate
         },
-        ordinalParse: /\d{1,2}\./,
+        dayOfMonthOrdinalParse: /\d{1,2}\./,
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
@@ -124,4 +128,4 @@
 
     return is;
 
-}));
+})));

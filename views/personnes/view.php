@@ -99,6 +99,8 @@ $this->params['breadcrumbs'][] = $this->title;
         echo '<br /><h3>'.Yii::t('app', 'Mes cours comme moniteurs').'</h3>';
         echo $this->render('/cours-date/_moniteur', [
             'coursDateDataProvider' => $coursDateDataProvider,
+            'withSum' => false,
+            'sum' => 0,
         ]);
     } ?>
     

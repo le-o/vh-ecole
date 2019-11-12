@@ -4,7 +4,7 @@ import moment from '../../moment';
 module('locale inheritance');
 
 test('calendar', function (assert) {
-    moment.defineLocale('base-cal', {
+    moment.updateLocale('base-cal', {
         calendar : {
             sameDay: '[Today at] HH:mm',
             nextDay: '[Tomorrow at] HH:mm',
@@ -14,7 +14,7 @@ test('calendar', function (assert) {
             sameElse: '[whatever]'
         }
     });
-    moment.defineLocale('child-cal', {
+    moment.updateLocale('child-cal', {
         parentLocale: 'base-cal',
         calendar: {
             sameDay: '[Today] HH:mm',
@@ -36,7 +36,7 @@ test('calendar', function (assert) {
 });
 
 test('missing', function (assert) {
-    moment.defineLocale('base-cal-2', {
+    moment.updateLocale('base-cal-2', {
         calendar: {
             sameDay: '[Today at] HH:mm',
             nextDay: '[Tomorrow at] HH:mm',
@@ -46,7 +46,7 @@ test('missing', function (assert) {
             sameElse: '[whatever]'
         }
     });
-    moment.defineLocale('child-cal-2', {
+    moment.updateLocale('child-cal-2', {
         parentLocale: 'base-cal-2'
     });
     moment.locale('child-cal-2');
@@ -63,7 +63,7 @@ test('missing', function (assert) {
 // Test function vs obj both directions
 
 test('long date format', function (assert) {
-    moment.defineLocale('base-ldf', {
+    moment.updateLocale('base-ldf', {
         longDateFormat : {
             LTS  : 'h:mm:ss A',
             LT   : 'h:mm A',
@@ -73,7 +73,7 @@ test('long date format', function (assert) {
             LLLL : 'dddd, MMMM D, YYYY h:mm A'
         }
     });
-    moment.defineLocale('child-ldf', {
+    moment.updateLocale('child-ldf', {
         parentLocale: 'base-ldf',
         longDateFormat: {
             LLL  : '[child] MMMM D, YYYY h:mm A',
@@ -96,20 +96,20 @@ test('long date format', function (assert) {
 });
 
 test('ordinal', function (assert) {
-    moment.defineLocale('base-ordinal-1', {
+    moment.updateLocale('base-ordinal-1', {
         ordinal : '%dx'
     });
-    moment.defineLocale('child-ordinal-1', {
+    moment.updateLocale('child-ordinal-1', {
         parentLocale: 'base-ordinal-1',
         ordinal : '%dy'
     });
 
     assert.equal(moment.utc('2015-02-03', moment.ISO_8601).format('Do'), '3y', 'ordinal uses child string');
 
-    moment.defineLocale('base-ordinal-2', {
+    moment.updateLocale('base-ordinal-2', {
         ordinal : '%dx'
     });
-    moment.defineLocale('child-ordinal-2', {
+    moment.updateLocale('child-ordinal-2', {
         parentLocale: 'base-ordinal-2',
         ordinal : function (num) {
             return num + 'y';
@@ -118,12 +118,12 @@ test('ordinal', function (assert) {
 
     assert.equal(moment.utc('2015-02-03', moment.ISO_8601).format('Do'), '3y', 'ordinal uses child function');
 
-    moment.defineLocale('base-ordinal-3', {
+    moment.updateLocale('base-ordinal-3', {
         ordinal : function (num) {
             return num + 'x';
         }
     });
-    moment.defineLocale('child-ordinal-3', {
+    moment.updateLocale('child-ordinal-3', {
         parentLocale: 'base-ordinal-3',
         ordinal : '%dy'
     });
@@ -132,34 +132,62 @@ test('ordinal', function (assert) {
 });
 
 test('ordinal parse', function (assert) {
-    moment.defineLocale('base-ordinal-parse-1', {
-        ordinalParse : /\d{1,2}x/
+    moment.updateLocale('base-ordinal-parse-1', {
+        dayOfMonthOrdinalParse : /\d{1,2}x/
     });
-    moment.defineLocale('child-ordinal-parse-1', {
+    moment.updateLocale('child-ordinal-parse-1', {
         parentLocale: 'base-ordinal-parse-1',
-        ordinalParse : /\d{1,2}y/
+        dayOfMonthOrdinalParse : /\d{1,2}y/
     });
 
     assert.ok(moment.utc('2015-01-1y', 'YYYY-MM-Do', true).isValid(), 'ordinal parse uses child');
 
-    moment.defineLocale('base-ordinal-parse-2', {
-        ordinalParse : /\d{1,2}x/
+    moment.updateLocale('base-ordinal-parse-2', {
+        dayOfMonthOrdinalParse : /\d{1,2}x/
     });
-    moment.defineLocale('child-ordinal-parse-2', {
+    moment.updateLocale('child-ordinal-parse-2', {
         parentLocale: 'base-ordinal-parse-2',
-        ordinalParse : /\d{1,2}/
+        dayOfMonthOrdinalParse : /\d{1,2}/
     });
 
     assert.ok(moment.utc('2015-01-1', 'YYYY-MM-Do', true).isValid(), 'ordinal parse uses child (default)');
 });
 
 test('months', function (assert) {
-    moment.defineLocale('base-months', {
+    moment.updateLocale('base-months', {
         months : 'One_Two_Three_Four_Five_Six_Seven_Eight_Nine_Ten_Eleven_Twelve'.split('_')
     });
-    moment.defineLocale('child-months', {
+    moment.updateLocale('child-months', {
         parentLocale: 'base-months',
         months : 'First_Second_Third_Fourth_Fifth_Sixth_Seventh_Eighth_Ninth_Tenth_Eleventh_Twelveth '.split('_')
     });
     assert.ok(moment.utc('2015-01-01', 'YYYY-MM-DD').format('MMMM'), 'First', 'months uses child');
+});
+
+test('define child locale before parent', function (assert) {
+    moment.updateLocale('months-x', null);
+    moment.updateLocale('base-months-x', null);
+
+    moment.updateLocale('months-x', {
+        parentLocale: 'base-months-x',
+        months : 'First_Second_Third_Fourth_Fifth_Sixth_Seventh_Eighth_Ninth_Tenth_Eleventh_Twelveth '.split('_')
+    });
+    assert.equal(moment.locale(), 'en', 'failed to set a locale requiring missing parent');
+
+    assert.equal(moment('00:00:00 01/January/2017', 'HH:mm:ss DD/MMM/YYYY', 'months-x').locale(), 'en', 'creating moment using child with undefined parent defaults to global');
+
+    moment.updateLocale('base-months-x', {
+        months : 'One_Two_Three_Four_Five_Six_Seven_Eight_Nine_Ten_Eleven_Twelve'.split('_')
+    });
+    assert.equal(moment.locale(), 'base-months-x', 'defineLocale should also set the locale (regardless of child locales)');
+
+    assert.equal(moment().locale('months-x').month(0).format('MMMM'), 'First', 'loading child before parent locale works');
+});
+
+test('lazy load parentLocale', function (assert) {
+    moment.updateLocale('de_test', {
+        parentLocale: 'de',
+        monthsShort: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12']
+    });
+    assert.equal(moment.locale(), 'de_test', 'failed to lazy load parentLocale');
 });

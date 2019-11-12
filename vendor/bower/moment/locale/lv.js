@@ -1,17 +1,15 @@
 //! moment.js locale configuration
-//! locale : Latvian [lv]
-//! author : Kristaps Karlsons : https://github.com/skakri
-//! author : Jānis Elmeris : https://github.com/JanisE
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
     var units = {
+        'ss': 'sekundes_sekundēm_sekunde_sekundes'.split('_'),
         'm': 'minūtes_minūtēm_minūte_minūtes'.split('_'),
         'mm': 'minūtes_minūtēm_minūte_minūtes'.split('_'),
         'h': 'stundas_stundām_stunda_stundas'.split('_'),
@@ -46,7 +44,7 @@
         return withoutSuffix ? 'dažas sekundes' : 'dažām sekundēm';
     }
 
-    var lv = moment.defineLocale('lv', {
+    var lv = moment.updateLocale('lv', {
         months : 'janvāris_februāris_marts_aprīlis_maijs_jūnijs_jūlijs_augusts_septembris_oktobris_novembris_decembris'.split('_'),
         monthsShort : 'jan_feb_mar_apr_mai_jūn_jūl_aug_sep_okt_nov_dec'.split('_'),
         weekdays : 'svētdiena_pirmdiena_otrdiena_trešdiena_ceturtdiena_piektdiena_sestdiena'.split('_'),
@@ -73,6 +71,7 @@
             future : 'pēc %s',
             past : 'pirms %s',
             s : relativeSeconds,
+            ss : relativeTimeWithPlural,
             m : relativeTimeWithSingular,
             mm : relativeTimeWithPlural,
             h : relativeTimeWithSingular,
@@ -84,7 +83,7 @@
             y : relativeTimeWithSingular,
             yy : relativeTimeWithPlural
         },
-        ordinalParse: /\d{1,2}\./,
+        dayOfMonthOrdinalParse: /\d{1,2}\./,
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
@@ -94,4 +93,4 @@
 
     return lv;
 
-}));
+})));

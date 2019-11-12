@@ -27,12 +27,12 @@
         "kartik-v/yii2-helpers": "dev-master",
         "kartik-v/yii2-grid": "@dev",
         "kartik-v/yii2-widget-fileinput": "@dev",
-        "kartik-v/yii2-export": "@dev",
+        "kartik-v/yii2-export": "1.4.0",
         "kartik-v/yii2-widget-colorinput": "*",
         "kartik-v/yii2-mpdf": "*",
         "yiidoc/yii2-redactor": "*",
         "open-ecommerce/yii2-backuprestore": "dev-master",
-        "philippfrenzel/yii2fullcalendar":"*",
+        "philippfrenzel/yii2fullcalendar":"3.9.0",
         "wbraganca/yii2-dynamicform": "dev-master",
         "spatie/calendar-links": "^1.1",
         "webvimark/module-user-management": "*",
@@ -56,7 +56,7 @@
                 "type": "bower-vcs",
                 "url": "https://github.com/twitter/typeahead.js.git"
                 }
-              }
+            }
         }
     },
     "scripts": {

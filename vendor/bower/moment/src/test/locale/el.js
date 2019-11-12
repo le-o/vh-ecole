@@ -1,4 +1,5 @@
-import {localeModule, test} from '../qunit';
+import {test} from '../qunit';
+import {localeModule} from '../qunit-locale';
 import moment from '../../moment';
 localeModule('el');
 
@@ -258,3 +259,8 @@ test('weeks year starting sunday format', function (assert) {
     assert.equal(moment([2012, 0, 15]).format('w ww wo'),   '2 02 2η', 'Jan 15 2012 should be week 2');
 });
 
+test('localeData months calls', function (assert) {
+    var jan = moment('2012-01-01');
+    assert.equal(moment.localeData().months(jan),           'Ιανουάριος', 'should return the nominative month name');
+    assert.equal(moment.localeData().months(jan, 'D MMMM'), 'Ιανουαρίου', 'should return the genitive month name');
+});

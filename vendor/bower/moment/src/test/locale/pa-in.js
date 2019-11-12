@@ -1,4 +1,5 @@
-import {localeModule, test} from '../qunit';
+import {test} from '../qunit';
+import {localeModule} from '../qunit-locale';
 import moment from '../../moment';
 localeModule('pa-in');
 
@@ -164,11 +165,11 @@ test('calendar next week', function (assert) {
     var i, m;
     for (i = 2; i < 7; i++) {
         m = moment().add({d: i});
-        assert.equal(m.calendar(),       m.format('dddd[,] LT'),  'Today + ' + i + ' days current time');
+        assert.equal(m.calendar(),       m.format('[ਅਗਲਾ] dddd[,] LT'),  'Today + ' + i + ' days current time');
         m.hours(0).minutes(0).seconds(0).milliseconds(0);
-        assert.equal(m.calendar(),       m.format('dddd[,] LT'),  'Today + ' + i + ' days beginning of day');
+        assert.equal(m.calendar(),       m.format('[ਅਗਲਾ] dddd[,] LT'),  'Today + ' + i + ' days beginning of day');
         m.hours(23).minutes(59).seconds(59).milliseconds(999);
-        assert.equal(m.calendar(),       m.format('dddd[,] LT'),  'Today + ' + i + ' days end of day');
+        assert.equal(m.calendar(),       m.format('[ਅਗਲਾ] dddd[,] LT'),  'Today + ' + i + ' days end of day');
     }
 });
 
@@ -284,38 +285,38 @@ test('weeks year starting sunday formatted', function (assert) {
     assert.equal(moment([2012, 0, 15]).format('w ww wo'), '੩ ੦੩ ੩', 'Jan 15 2012 should be week 3');
 });
 
-test('lenient ordinal parsing', function (assert) {
+test('lenient day of month ordinal parsing', function (assert) {
     var i, ordinalStr, testMoment;
     for (i = 1; i <= 31; ++i) {
         ordinalStr = moment([2014, 0, i]).format('YYYY MM Do');
         testMoment = moment(ordinalStr, 'YYYY MM Do');
         assert.equal(testMoment.year(), 2014,
-                'lenient ordinal parsing ' + i + ' year check');
+                'lenient day of month ordinal parsing ' + i + ' year check');
         assert.equal(testMoment.month(), 0,
-                'lenient ordinal parsing ' + i + ' month check');
+                'lenient day of month ordinal parsing ' + i + ' month check');
         assert.equal(testMoment.date(), i,
-                'lenient ordinal parsing ' + i + ' date check');
+                'lenient day of month ordinal parsing ' + i + ' date check');
     }
 });
 
-test('lenient ordinal parsing of number', function (assert) {
+test('lenient day of month ordinal parsing of number', function (assert) {
     var i, testMoment;
     for (i = 1; i <= 31; ++i) {
         testMoment = moment('2014 01 ' + i, 'YYYY MM Do');
         assert.equal(testMoment.year(), 2014,
-                'lenient ordinal parsing of number ' + i + ' year check');
+                'lenient day of month ordinal parsing of number ' + i + ' year check');
         assert.equal(testMoment.month(), 0,
-                'lenient ordinal parsing of number ' + i + ' month check');
+                'lenient day of month ordinal parsing of number ' + i + ' month check');
         assert.equal(testMoment.date(), i,
-                'lenient ordinal parsing of number ' + i + ' date check');
+                'lenient day of month ordinal parsing of number ' + i + ' date check');
     }
 });
 
-test('strict ordinal parsing', function (assert) {
+test('strict day of month ordinal parsing', function (assert) {
     var i, ordinalStr, testMoment;
     for (i = 1; i <= 31; ++i) {
         ordinalStr = moment([2014, 0, i]).format('YYYY MM Do');
         testMoment = moment(ordinalStr, 'YYYY MM Do', true);
-        assert.ok(testMoment.isValid(), 'strict ordinal parsing ' + i);
+        assert.ok(testMoment.isValid(), 'strict day of month ordinal parsing ' + i);
     }
 });

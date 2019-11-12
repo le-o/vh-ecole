@@ -1,16 +1,14 @@
 //! moment.js locale configuration
-//! locale : Uzbek [uz]
-//! author : Sardor Muminov : https://github.com/muminoff
 
 ;(function (global, factory) {
    typeof exports === 'object' && typeof module !== 'undefined'
        && typeof require === 'function' ? factory(require('../moment')) :
    typeof define === 'function' && define.amd ? define(['../moment'], factory) :
    factory(global.moment)
-}(this, function (moment) { 'use strict';
+}(this, (function (moment) { 'use strict';
 
 
-    var uz = moment.defineLocale('uz', {
+    var uz = moment.updateLocale('uz', {
         months : 'январ_феврал_март_апрел_май_июн_июл_август_сентябр_октябр_ноябр_декабр'.split('_'),
         monthsShort : 'янв_фев_мар_апр_май_июн_июл_авг_сен_окт_ноя_дек'.split('_'),
         weekdays : 'Якшанба_Душанба_Сешанба_Чоршанба_Пайшанба_Жума_Шанба'.split('_'),
@@ -36,6 +34,7 @@
             future : 'Якин %s ичида',
             past : 'Бир неча %s олдин',
             s : 'фурсат',
+            ss : '%d фурсат',
             m : 'бир дакика',
             mm : '%d дакика',
             h : 'бир соат',
@@ -55,4 +54,4 @@
 
     return uz;
 
-}));
+})));
