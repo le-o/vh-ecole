@@ -67,7 +67,23 @@ class CoursController extends CommonController
         $dataSalles = Parametres::findAll(['class_key' => 16]);
         
         $filterSalle = Yii::$app->session['salles'];
-        
+
+        // on sauve les filtres et la pagination
+        $params = Yii::$app->request->queryParams;
+        if (count($params) <= 1) {
+            if (isset(Yii::$app->session['CoursSearch'])) {
+                $params = Yii::$app->session['CoursSearch'];
+            } else {
+                Yii::$app->session['CoursSearch'] = $params;
+            }
+        } else {
+            if (isset(Yii::$app->request->queryParams['CoursSearch'])) {
+                Yii::$app->session['CoursSearch'] = $params;
+            } else {
+                $params = Yii::$app->session['CoursSearch'];
+            }
+        }
+
         if (empty($salle) && $onlyForWeb === null) {
             if ($onlyForWeb === null) {
                 $filterSalle = [];
@@ -76,10 +92,14 @@ class CoursController extends CommonController
                 }
             }
         } elseif (!empty($salle)) {
-            if (($key = array_search($salle, $filterSalle)) !== false) {
-                unset($filterSalle[$key]);
-            } else {
-                $filterSalle[] = $salle;
+            $plusOuMoins = substr($salle, 0, 1);
+            $salleID = substr($salle, 1);
+            if ('+' == $plusOuMoins) {
+                $filterSalle[] = (int)$salleID;
+            } elseif ('-' == $plusOuMoins) {
+                if (($key = array_search($salleID, $filterSalle)) !== false) {
+                    unset($filterSalle[$key]);
+                }
             }
         }
         
@@ -91,11 +111,11 @@ class CoursController extends CommonController
         }
         $searchModel->isPriorise = $onlyForWeb;
         Yii::$app->session['salles'] = $filterSalle;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search($params);
         
         foreach ($dataSalles as $s) {
             $btnSalle[] = [
-                'salleID' => $s->parametre_id,
+                'salleID' => (in_array($s->parametre_id, $searchModel->bySalle)) ? '-' . $s->parametre_id : '+' . $s->parametre_id,
                 'label' => $s->nom,
                 'class' => (in_array($s->parametre_id, $searchModel->bySalle)) ? ' btn-info' : '',
             ];
