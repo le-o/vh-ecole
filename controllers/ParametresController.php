@@ -37,7 +37,22 @@ class ParametresController extends Controller
     public function actionIndex()
     {
         $searchModel = new ParametresSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        // on sauve les filtres et la pagination
+        $params = Yii::$app->request->queryParams;
+        if (count($params) <= 1) {
+            if (isset(Yii::$app->session['ParametresSearch'])) {
+                $params = Yii::$app->session['ParametresSearch'];
+            } else {
+                Yii::$app->session['ParametresSearch'] = $params;
+            }
+        } else {
+            if (isset(Yii::$app->request->queryParams['ParametresSearch'])) {
+                Yii::$app->session['ParametresSearch'] = $params;
+            } else {
+                $params = Yii::$app->session['ParametresSearch'];
+            }
+        }
+        $dataProvider = $searchModel->search($params);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
