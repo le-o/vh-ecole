@@ -124,3 +124,7 @@ h3 {
   transform: translate(-50%, -50%);
   display: none;
 }
+
+span.select2-selection__choice__remove {
+    font-size: 14px !important;
+}
