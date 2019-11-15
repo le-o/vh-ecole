@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< Updated upstream
     <list default="true" id="7628f330-79a0-4131-ae28-8dfc102a3cf9" name="Default" comment="" />
     <ignored path="vertic-halle.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
+=======
+    <list default="true" id="7628f330-79a0-4131-ae28-8dfc102a3cf9" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/CoursController.php" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/CoursController.php" afterDir="false" />
+    </list>
+>>>>>>> Stashed changes
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -412,6 +420,10 @@
       <created>1452509449208</created>
       <option name="number" value="Default" />
       <updated>1452509449208</updated>
+<<<<<<< Updated upstream
+=======
+      <workItem from="1573625263615" duration="9973000" />
+>>>>>>> Stashed changes
     </task>
     <servers />
   </component>
