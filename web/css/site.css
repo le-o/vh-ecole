@@ -128,3 +128,7 @@ h3 {
 span.select2-selection__choice__remove {
     font-size: 14px !important;
 }
+
+div.datepicker {
+    z-index: 1050 !important;
+}
