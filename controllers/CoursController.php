@@ -97,7 +97,7 @@ class CoursController extends CommonController
             if ('+' == $plusOuMoins) {
                 $filterSalle[] = (int)$salleID;
             } elseif ('-' == $plusOuMoins) {
-                if (($key = array_search($salleID, $filterSalle)) !== false) {
+                if (null != $filterSalle && ($key = array_search($salleID, $filterSalle)) !== false) {
                     unset($filterSalle[$key]);
                 }
             }

@@ -261,7 +261,7 @@ class Parametres extends \yii\db\ActiveRecord
     {   
         $query = self::find()->where(['class_key' => $classKey])->orderBy('tri');
         
-        $withId = ($selectedParam !== null) ? 'parametre_id = '.$selectedParam : '';
+        $withId = (null !== $selectedParam && '' !== $selectedParam) ? 'parametre_id = '.$selectedParam : '';
         $query->andWhere(['OR', $withId, 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
         
         // retrouver le code langue depuis la langue de l'interface
