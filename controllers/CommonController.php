@@ -282,8 +282,14 @@ class CommonController extends Controller
             $modelClientsHasCours->fk_personne = $personneID;
             $modelClientsHasCours->fk_cours = $coursID;
             $modelClientsHasCours->fk_statut = Yii::$app->params['partInscrit'];
-            if (!$modelClientsHasCours->save()) {
-                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-cours.'));
+
+            $existe = ClientsHasCours::find()
+                ->where([ 'fk_personne' => $personneID, 'fk_cours' => $coursID])
+                ->exists();
+            if (!$existe) {
+                if (!$modelClientsHasCours->save()) {
+                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-cours.'));
+                }
             }
             foreach ($modelDate as $date) {
                 $modelClientsHasCoursDate = new ClientsHasCoursDate();
