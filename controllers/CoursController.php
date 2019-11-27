@@ -224,8 +224,19 @@ class CoursController extends CommonController
                         $model->image_web = null;
                     }
 
+                    // on gère le changement de prix indépendamment
+                    // on sauve le prix si différent, pour modifier les instance cours_date
+                    $newPrice = null;
+                    if ((float)$model->attributes['prix'] != (float)$model->oldAttributes['prix'] && '' !== Yii::$app->request->post()['editPrice']) {
+                        $newPrice = $model->attributes['prix'];
+                    }
+
                     if (!$model->save()) {
                         $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
+                    } else {
+                        if (null !== $newPrice) {
+                            CoursDate::updateAll(['prix' => $newPrice], 'fk_cours = ' . $model->cours_id);
+                        }
                     }
                 }
             } else {
@@ -358,6 +369,7 @@ class CoursController extends CommonController
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @deprecated Remplacée par actionView
      */
     public function actionUpdate($id)
     {

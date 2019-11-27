@@ -1,21 +1,35 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Alert;
 use yii\web\View;
 use kartik\file\FileInput;
+use kartik\dialog\Dialog;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Cours */
 /* @var $form yii\widgets\ActiveForm */
 
 $script = '
-    $("button.fileinput-remove-button").on("click", function() {
-            console.log("click")
-        });
-    ';
+    $("#cours-prix").change(function() {
+      $("#edit-price").val($(this).val());
+    });
+    
+    $("#submitButton").on("click", function() {
+        if ("" != $("#edit-price").val()) {
+            myDialogPrice.confirm("' . Yii::t('app', 'Modifier également le prix de chaque date de cours ?') . '", function (result) {
+                if (result) {
+                    console.log($("#edit-price").val());
+                } else {
+                    $("#edit-price").val("");
+                }
+                $("#editCours").submit();
+            });
+            event.preventDefault();
+        }
+    });
+';
 $this->registerJs($script, View::POS_END);
 ?>
 
@@ -30,7 +44,17 @@ $this->registerJs($script, View::POS_END);
 
 <div class="cours-form">
 
-    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
+    <?php $form = ActiveForm::begin(['options' => ['id' => 'editCours', 'enctype' => 'multipart/form-data']]) ?>
+    <?= Dialog::widget([
+        'libName' => 'myDialogPrice',
+        'options' => [
+            'type' => Dialog::TYPE_DEFAULT,
+            'title' => Yii::t('app', 'Le prix du cours a été modifié !'),
+            'btnOKClass' => 'btn-primary',
+            'btnOKLabel' => Yii::t('app', 'Oui'),
+            'btnCancelLabel' => Yii::t('app', 'Non'),
+        ]
+    ]) ?>
     <div class="row">
         <div class="col-sm-2">
             <?= $form->field($model, 'fk_niveau')->dropDownList($modelParams->optsNiveau($model->fk_niveau),['prompt'=>Yii::t('app', 'Choisir un niveau')]) ?>
@@ -83,6 +107,7 @@ $this->registerJs($script, View::POS_END);
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'prix')->textInput(['type' => 'number', 'min' => 0, 'max' => 5000]) ?>
+            <input type="hidden" id="edit-price" name="editPrice" value="" />
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'participant_min')->textInput(['type' => 'number', 'min' => 1, 'max' => 50]) ?>
@@ -133,7 +158,7 @@ $this->registerJs($script, View::POS_END);
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['id' => 'submitButton', 'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         <?php if (!$model->isNewRecord) { ?>
             <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_id], [
                 'class' => 'btn btn-danger',
