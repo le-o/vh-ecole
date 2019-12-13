@@ -220,7 +220,7 @@ class Cours extends \yii\db\ActiveRecord
         $jourNom = [];
         $jours = $this->hasMany(Parametres::className(), ['parametre_id' => 'fk_jours']);
         foreach ($jours->all() as $j) {
-            $jourNom[] = $j->nom;
+            $jourNom[] = Yii::t('app', $j->nom);
         }
         return implode(', ', $jourNom);
     }

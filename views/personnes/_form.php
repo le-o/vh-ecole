@@ -16,14 +16,17 @@ use yii\bootstrap\Alert;
 
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
-        <div class="col-sm-4">
-            <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatut($model->fk_statut),['prompt'=>'Choisir un statut']) ?>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatut($model->fk_statut),['prompt'=>Yii::t('app', 'Choisir un statut')]) ?>
         </div>
-        <div class="col-sm-4">
-            <?= $form->field($model, 'fk_type')->dropDownList($modelParams->optsType($model->fk_type),['prompt'=>'Choisir un type']) ?>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'fk_salle_admin')->dropDownList($modelParams->optsSalle($model->fk_salle_admin),['prompt'=>Yii::t('app', 'Choisir une salle')]) ?>
         </div>
-        <div class="col-sm-4">
-            <?= $form->field($model, 'fk_formation')->dropDownList($modelParams->optsNiveauFormation($model->fk_formation),['prompt'=>'Choisir un niveau']) ?>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'fk_type')->dropDownList($modelParams->optsType($model->fk_type),['prompt'=>Yii::t('app', 'Choisir un type')]) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'fk_formation')->dropDownList($modelParams->optsNiveauFormation($model->fk_formation),['prompt'=>Yii::t('app', 'Choisir un niveau')]) ?>
         </div>
     </div>
     <div class="row">

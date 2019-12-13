@@ -48,6 +48,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->fkStatut->nom,
             ],
             [
+                'attribute' => 'fk_salle_admin',
+                'value' => $model->fkSalleadmin->nom,
+            ],
+            [
                 'label' => Yii::t('app', 'Type'),
                 'value' => $model->fkType->nom,
             ],

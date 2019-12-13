@@ -265,7 +265,7 @@ class SiteController extends Controller
 //            . '<br /><a href="' . $link->ics() . '" target="_blank"><img src="' . \yii\helpers\Url::base(true) . '/images/cal-bw-01.png" style="width:20px;" /> Ajouter un événement iCal/Outlook</a>';
 //
 //        $message = Yii::$app->mailer->compose()
-//            ->setFrom(Yii::$app->params['adminEmail'])
+//            ->setFrom(Yii::$app->params['adminEmails'][Yii::$app->language])
 //            ->setTo(array('leo.decaillet@d-web.ch'))
 //            ->setSubject('Hello')
 //            ->setHtmlBody("<p>ici mon texte de test</p>" . $calLink);
@@ -273,6 +273,23 @@ class SiteController extends Controller
 //        $response = $message->send();
 
         return $this->render('about');
+    }
+
+    public function actionTranslation()
+    {
+        $params = Parametres::find()->where(['fk_langue' => 253])->all();
+        echo '<pre>return [';
+        foreach ($params as $p) {
+            echo '<br />';
+            if ($p->nom === Yii::t('app/code', $p->nom, [], 'de-CH')) {
+                echo "'" . $p->nom . "' => '',";
+            } else {
+                echo "'" . $p->nom . "' => ' " . Yii::t('app/code', $p->nom, [], 'de-CH') . "',";
+            }
+        }
+        echo '
+            ]</pre>DONE';
+        exit;
     }
     
     public function actionSetcalendarview($for) {

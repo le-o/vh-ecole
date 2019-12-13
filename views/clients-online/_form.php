@@ -12,7 +12,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 
 $this->registerJs('
     jQuery(document).ready(function() {
-        displayMessage(jQuery("#choix_cours"), '.$typeCours.');
+        displayMessage(jQuery("#choix_cours"), ' . implode(',', $selectedCours) . ');
     });
     function displayMessage(that, type) {
         var arEnfant = ['.implode(',', Yii::$app->params['nomsCoursEnfant']).'];
@@ -100,8 +100,8 @@ $this->registerJs('
                     'multiple' => false, 
                     'onchange'=>"displayMessage($(this))",
                     'disabled' => (count($dataCours) == 1) ? true : false,
+                    'value' => $selectedCours, // initial value
                 ],
-                'value' => $selectedCours, // initial value
                 'data' => $dataCours,
                 'pluginOptions'=>[
                     'initialize' => true,
@@ -210,18 +210,7 @@ $this->registerJs('
     <?php ActiveForm::end(); ?>
     
     <br /><br />
-    <h4>Conditions d'inscription et d'annulation</h4>
-    Les <strong>cours sur demande</strong> (cours privés, cours organisés pour des groupes, cours découverte et anniversaires) se font 
-    sur réservation 72 heures à l'avance.<br />
-    100% de la prestation est due en cas d'annulation à moins de 72h. Si le client reporte le cours, 40% du montant sera demandé en guise de frais de report.<br />
-    <br />
-    Les <strong>cours planifiés</strong> (cours collectifs programmés en avance sur une saison ainsi que les stages) se font sur réservation. 
-    100% du montant doit être versé avant le début du cours pour pouvoir y participer. En cas d'annulation à moins de 72h par 
-    le client, 100% de la prestation est due.<br />
-    <br />
-    En cas d'annulation par l'organisateur, le montant déjà payé sera intégralement remboursé.<br />
-    <br />
-    Nous conseillons à notre aimable clientèle de souscrire à une assurance annulation afin d'éviter tout désagrément.
+    <?= Yii::t('app', "Conditions inscription et annulation") ?>
 
 
 </div>

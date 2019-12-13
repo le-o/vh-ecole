@@ -106,7 +106,14 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             [
                 'attribute' => 'fk_statut',
                 'value' => 'fkStatut.nom',
-                'filter' => $typeStatut,
+                'filter' => $statutFilter,
+            ],
+            [
+                'attribute' => 'fk_salle_admin',
+                'value' => function ($model) {
+                    return ('' != $model->fk_salle_admin) ? $model->fkSalleadmin->nom : '';
+                },
+                'filter' => $salleFilter,
             ],
             [
                 'attribute' => 'fk_type',

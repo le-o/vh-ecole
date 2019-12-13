@@ -77,7 +77,7 @@ class CommonController extends Controller
             throw new Exception('Erreur typage email');
         }
         
-        $calNom = $model->fkCours->fkNom->nom.' - '.$model->fkCours->session.' - '.$model->fkCours->fkSaison->nom;
+        $calNom = $model->fkCours->fkNom->nom.' - '.Yii::t('app', $model->fkCours->session).' - '.Yii::t('app', $model->fkCours->fkSaison->nom);
         $calLink = '';
         
         // infos for addtocal link
@@ -105,7 +105,7 @@ class CommonController extends Controller
         }
         
         // on génère l'email à envoyer
-        return ['nom' => $model->fkCours->fkNom->nom.' - '.$cudObjet, 
+        return ['nom' => Yii::t('app', $model->fkCours->fkNom->nom).' - '.$cudObjet,
             'valeur' => $cudContent.'<br /><br />
                 '.$calNom.'<br />
                 '.$dateheure.'
@@ -196,7 +196,7 @@ class CommonController extends Controller
                 $myCoursDate = CoursDate::findOne($indexs[0]);
                 $myCours = Cours::findOne($myCoursDate->fk_cours);
             }
-            $saison = (isset($myCours->fkSaison)) ? $myCours->fkSaison->nom : '';
+            $saison = (isset($myCours->fkSaison)) ? Yii::t('app', $myCours->fkSaison->nom) : '';
             $dateCours = $myCours->nextCoursDate;
             $allDatesCours = $myCours->coursDates;
             $datesCours = [];
@@ -206,16 +206,16 @@ class CommonController extends Controller
             foreach ($allDatesCours as $date) {
                 if (isset($mail['personne_id']) && $date->getForPresence($mail['personne_id'])) {
                     $datesCoursInscrit[] = $date->date;
-                    $datesCoursInscritLieux[] = $date->date . ' - ' . $date->fkLieu->nom;
+                    $datesCoursInscritLieux[] = $date->date . ' - ' . Yii::t('app', $date->fkLieu->nom);
                 }
                 $datesCours[] = $date->date;
-                $datesCoursLieux[] = $date->date . ' - ' . $date->fkLieu->nom;
+                $datesCoursLieux[] = $date->date . ' - ' . Yii::t('app', $date->fkLieu->nom);
             }
             // on traite le statut du participant
             $statutInscription = 'n/a';
             if (isset($myPersonne)) {
                 $myClientsHasCours = ClientsHasCours::findOne(['fk_personne' => $myPersonne->personne_id, 'fk_cours' => $myCours->cours_id]);
-                $statutInscription = $myClientsHasCours->fkStatut->nom;
+                $statutInscription = Yii::t('app', $myClientsHasCours->fkStatut->nom);
             }
             if (isset($myCoursDate)) {
                 $heure_debut = $myCoursDate->heure_debut;
@@ -235,7 +235,7 @@ class CommonController extends Controller
                     '#toutes-les-dates#', '#toutes-les-dates-avec-lieux#', '#dates-inscrit#', '#dates-inscrit-avec-lieux#', 
                     '#statut-inscription#'], 
                 [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, $myCours->fkSalle->nom,
-                    $myCours->session, $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] ? $myCoursDate->prix : $myCours->prix), $date,
+                    Yii::t('app', $myCours->session), $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] ? $myCoursDate->prix : $myCours->prix), $date,
                     implode(', ', $datesCours), implode(', ', $datesCoursLieux), implode(', ', $datesCoursInscrit), implode(', ', $datesCoursInscritLieux), 
                     $statutInscription], 
                 $content
@@ -245,13 +245,13 @@ class CommonController extends Controller
         if (isset($emails) && !empty($emails)) {
             if ($public || count($originEmails) == 1) {
                 $message = Yii::$app->mailer->compose()
-                    ->setFrom(Yii::$app->params['adminEmail'])
+                    ->setFrom(Yii::$app->params['adminEmails'][Yii::$app->language])
                     ->setTo($emails)
                     ->setSubject($mail['nom'])
                     ->setHtmlBody($content);
             } else {
                 $message = Yii::$app->mailer->compose()
-                    ->setFrom(Yii::$app->params['adminEmail'])
+                    ->setFrom(Yii::$app->params['adminEmails'][Yii::$app->language])
                     ->setTo(Yii::$app->params['noreplyEmail'])
                     ->setBcc($emails)
                     ->setSubject($mail['nom'])
@@ -263,12 +263,13 @@ class CommonController extends Controller
             if (YII_ENV != 'dev') {
                 //  (this creates the full MIME message required for imap_append()
                 $msg = $message->toString();
+                $mailbox = ('de-CH' == Yii::$app->language) ? "{mail.infomaniak.ch:143/imap}Envoyes appli - de" : "{mail.infomaniak.ch:143/imap}Envoyes appli - fr";
 
                 //  After this you can call imap_append like this:
                 // connect to IMAP (port 143)
-                $stream = imap_open("{mail.infomaniak.ch:143/imap}", Yii::$app->params['adminEmail'], "V-HSaxon2012");
+                $stream = imap_open($mailbox, Yii::$app->params['adminEmails']['fr-CH'], "V-HSaxon2012");
                 // Saves message to Sent folder and marks it as read
-                imap_append($stream,"{mail.infomaniak.ch:143/imap}Envoyes appli",$msg."\r\n","\\Seen");
+                imap_append($stream,"",$msg."\r\n","\\Seen");
                 // Close connection to the server when you're done
                 imap_close($stream);
             }

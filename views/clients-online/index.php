@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
         'rowOptions' => function($model) {
             if ($model->is_actif == false) return ['class' => 'success'];
             return [];
@@ -28,8 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'fk_parent',
             [
-                'attribute' => 'fkParametre.nom',
-                'label' => Yii::t('app', 'Cours'),
+                'label' => Yii::t('app', 'Nom cours'),
+                'value' => function ($model) {
+                    return ($model->fkCours) ? $model->fkCours->fkNom->nom : $model->fkCoursNom->nom;
+                }
             ],
             'nom',
             'prenom',

@@ -37,26 +37,6 @@ class PersonnesController extends CommonController
             'ghost-access'=> [
                 'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
-//            'access' => [
-//                'class' => AccessControl::className(),
-//                'rules' => [
-//                    [
-//                        'allow' => true,
-//                        'actions' => ['index', 'view', 'setemail'],
-//                        'roles' => ['@'],
-//                        'matchCallback' => function ($rule, $action) {
-//                            return (Yii::$app->user->identity->id < 1100) ? true : false;
-//                        }
-//                    ],
-//                    [
-//                        'allow' => true,
-//                        'roles' => ['@'],
-//                        'matchCallback' => function ($rule, $action) {
-//                            return (Yii::$app->user->identity->id < 1000) ? true : false;
-//                        }
-//                    ],
-//                ],
-//            ],
         ];
     }
     
@@ -94,7 +74,8 @@ class PersonnesController extends CommonController
         }
         
         $parametre = new Parametres();
-        $typeStatut = $parametre->optsStatut();
+        $statutFilter = $parametre->optsStatut();
+        $salleFilter = $parametre->optsSalle();
         $typeFilter = $parametre->optsType();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
 
@@ -102,7 +83,8 @@ class PersonnesController extends CommonController
             'alerte' => $alerte,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'typeStatut' => $typeStatut,
+            'statutFilter' => $statutFilter,
+            'salleFilter' => $salleFilter,
             'typeFilter' => $typeFilter,
             'parametre' => $parametre,
             'emails' => $emails,

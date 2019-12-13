@@ -31,7 +31,7 @@ class ClientsHasCoursDate extends \yii\db\ActiveRecord
     {
         return [
             [['fk_personne', 'fk_cours_date', 'is_present'], 'required'],
-            [['fk_personne', 'fk_cours_date', 'is_present'], 'integer']
+            [['fk_personne', 'fk_cours_date'], 'integer']
         ];
     }
 

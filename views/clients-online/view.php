@@ -48,8 +48,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     'client_online_id',
                     'fk_parent',
                     [
-                        'attribute' => 'fkParametre.nom',
-                        'label' => Yii::t('app', 'Cours'),
+                        'label' => Yii::t('app', 'Nom cours'),
+                        'value' => function ($model) {
+                            return ($model->fkCours) ? $model->fkCours->fkNom->nom : $model->fkCoursNom->nom;
+                        }
                     ],
                     'nom',
                     'prenom',

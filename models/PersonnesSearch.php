@@ -21,7 +21,7 @@ class PersonnesSearch extends Personnes
     public function rules()
     {
         return [
-            [['personne_id', 'fk_statut', 'fk_type', 'fk_formation'], 'integer'],
+            [['personne_id', 'fk_statut', 'fk_type', 'fk_formation', 'fk_salle_admin'], 'integer'],
             [['noclient_cf', 'suivi_client', 'societe', 'nom', 'prenom', 'adresse1', 'adresse2', 'npa', 'localite', 'telephone', 'telephone2',
                 'email', 'email2', 'date_naissance', 'informations', 'carteclient_cf', 'categorie3_cf', 'soldefacture_cf', 'list_langues'], 'safe'],
         ];
@@ -67,6 +67,7 @@ class PersonnesSearch extends Personnes
             'fk_type' => $this->fk_type,
             'fk_formation' => $this->fk_formation,
             'date_naissance' => $this->date_naissance,
+            'fk_salle_admin' => $this->fk_salle_admin,
         ]);
 
         $query->andFilterWhere(['like', 'noclient_cf', $this->noclient_cf])

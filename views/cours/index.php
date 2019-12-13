@@ -47,6 +47,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => ['1'=>'Oui', '0'=>'Non'],
             ],
             [
+                'attribute' => 'fkSalle',
+                'value' => 'fkSalle.nom',
+                'label' => Yii::t('app', 'Salle'),
+            ],
+            [
                 'attribute' => 'fkNom',
                 'value' => 'fkNom.nom',
                 'label' => Yii::t('app', 'Nom'),

@@ -277,7 +277,7 @@ class Parametres extends \yii\db\ActiveRecord
         $codes = $query->all();
         $temp = array();
         foreach($codes as $code) {
-            $temp[$code['parametre_id']]= $code->nom;
+            $temp[$code['parametre_id']] = Yii::t('app', $code->nom);
         }
         return $temp;
     }

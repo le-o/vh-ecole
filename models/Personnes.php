@@ -32,6 +32,7 @@ use \DateTime;
  * @property string $categorie3_cf
  * @property string $soldefacture_cf
  * @property string $complement_langue
+ * @property integer $fk_salle_admin
  *
  * @property Parametres $fkStatut
  * @property Parametres $fkType
@@ -60,7 +61,7 @@ class Personnes extends \yii\db\ActiveRecord
     {
         return [
             [['fk_statut', 'fk_type', 'nom', 'prenom', 'telephone', 'email'], 'required'],
-            [['fk_statut', 'fk_type', 'fk_formation'], 'integer'],
+            [['fk_statut', 'fk_type', 'fk_formation', 'fk_salle_admin'], 'integer'],
             [['date_naissance'], 'safe'],
             [['informations'], 'string'],
             [['noclient_cf'], 'string', 'max' => 10],
@@ -102,6 +103,7 @@ class Personnes extends \yii\db\ActiveRecord
             'carteclient_cf' => Yii::t('app', 'Carte client CASHFLOW'),
             'categorie3_cf' => Yii::t('app', 'Catégorie CASHFLOW'),
             'soldefacture_cf' => Yii::t('app', 'Solde facture CASHFLOW'),
+            'fk_salle_admin' => Yii::t('app', 'Fk Salle Admin'),
         ];
     }
     
@@ -189,6 +191,14 @@ class Personnes extends \yii\db\ActiveRecord
     public function getFkFormation()
     {
         return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_formation']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkSalleadmin()
+    {
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_salle_admin']);
     }
 
     /**

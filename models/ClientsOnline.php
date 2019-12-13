@@ -9,6 +9,7 @@ use Yii;
  *
  * @property integer $client_online_id
  * @property integer $fk_parent
+ * @property integer $fk_cours_nom
  * @property integer $fk_cours
  * @property string $nom
  * @property string $prenom
@@ -40,8 +41,8 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_parent', 'fk_cours', 'is_actif'], 'integer'],
-            [['fk_cours', 'adresse', 'npa', 'localite', 'telephone', 'email', 'fk_cours'], 'required'],
+            [['fk_parent', 'fk_cours_nom', 'fk_cours', 'is_actif'], 'integer'],
+            [['fk_cours_nom', 'adresse', 'npa', 'localite', 'telephone', 'email'], 'required'],
             [['date_naissance', 'date_inscription'], 'safe'],
             [['informations'], 'string'],
             [['nom', 'prenom'], 'string', 'max' => 60],
@@ -60,6 +61,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
         return [
             'client_online_id' => Yii::t('app', 'Client Online ID'),
             'fk_parent' => Yii::t('app', 'Fk Parent'),
+            'fk_cours_nom' => Yii::t('app', 'Fk Cours Nom'),
             'fk_cours' => Yii::t('app', 'Fk Cours'),
             'nom' => Yii::t('app', 'Nom'),
             'prenom' => Yii::t('app', 'Prenom'),
@@ -111,8 +113,13 @@ class ClientsOnline extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFkParametre()
+    public function getFkCoursNom()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_cours']);
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_cours_nom']);
+    }
+
+    public function getFkCours()
+    {
+        return $this->hasOne(Cours::className(), ['cours_id' => 'fk_cours']);
     }
 }

@@ -8,7 +8,7 @@ use yii\bootstrap\Alert;
 ?>
 <div class="clients-online-create">
     
-    <h3>Attention : pour les inscriptions à - de 72h , merci de nous contacter par téléphone</h3>
+    <h3><?= Yii::t('app', 'Attention : pour les inscriptions à - de 72h , merci de nous contacter par téléphone') ?></h3>
     <br /><br />
     
     <?php if ($alerte != '') {
@@ -26,7 +26,6 @@ use yii\bootstrap\Alert;
         'dataCours' => $dataCours,
         'selectedCours' => $selectedCours,
         'params' => $params,
-        'typeCours' => $typeCours,
     ]) ?>
 
 </div>
