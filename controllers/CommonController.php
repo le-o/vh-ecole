@@ -293,12 +293,17 @@ class CommonController extends Controller
                 }
             }
             foreach ($modelDate as $date) {
-                $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
-                $modelClientsHasCoursDate->fk_personne = $personneID;
-                $modelClientsHasCoursDate->is_present = true;
-                if (!$modelClientsHasCoursDate->save(false)) {
-                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-date de cours.'));
+                $existe = ClientsHasCoursDate::find()
+                    ->where([ 'fk_personne' => $personneID, 'fk_cours_date' => $date->cours_date_id])
+                    ->exists();
+                if (!$existe) {
+                    $modelClientsHasCoursDate = new ClientsHasCoursDate();
+                    $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
+                    $modelClientsHasCoursDate->fk_personne = $personneID;
+                    $modelClientsHasCoursDate->is_present = true;
+                    if (!$modelClientsHasCoursDate->save(false)) {
+                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-date de cours.'));
+                    }
                 }
                 
                 // si cours ponctuel, on n'inscrit à une seul date
