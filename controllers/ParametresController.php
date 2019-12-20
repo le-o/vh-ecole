@@ -124,9 +124,8 @@ class ParametresController extends Controller
 
     public function actionGetemail() {
         $data = Yii::$app->request->post();
-        $myEmail = Parametres::findOne($data['id']);
-        $test[] = ['sujet' => $myEmail->nom, 'contenu' => $myEmail->valeur];
-        return json_encode($test);
+        $emailTemplate = Parametres::findOne($data['id']);
+        return json_encode([['sujet' => $emailTemplate->nom, 'contenu' => $emailTemplate->valeur]]);
     }
 
     /**
