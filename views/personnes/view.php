@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'fk_salle_admin',
-                'value' => $model->fkSalleadmin->nom,
+                'value' => (isset($model->fkSalleadmin)) ? $model->fkSalleadmin->nom : '',
             ],
             [
                 'label' => Yii::t('app', 'Type'),
