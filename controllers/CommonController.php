@@ -269,7 +269,7 @@ class CommonController extends Controller
                 // connect to IMAP (port 143)
                 $stream = imap_open($mailbox, Yii::$app->params['adminEmails']['fr-CH'], "V-HSaxon2012");
                 // Saves message to Sent folder and marks it as read
-                imap_append($stream,"",$msg."\r\n","\\Seen");
+                imap_append($stream, $mailbox,$msg."\r\n","\\Seen");
                 // Close connection to the server when you're done
                 imap_close($stream);
             }
