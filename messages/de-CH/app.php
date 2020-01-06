@@ -62,10 +62,10 @@ return [
     fällig. Innerhalb von 72 Stunden vor Kursbeginn sind 40% des Gesamtpreises des Kurses fällig. Ab dem Datum der 1. Kursstunde 
     sind 100% des Betrages fällig.<br />
     <br />
-    Verpasste Kurse werden von Vertic-Halle nicht von vornherein erstattet. Im Falle einer Stornierung durch Vertic-Halle 
-    wird der bereits bezahlte Betrag vollständig erstattet.<br />
-    Vertic-Halle behält sich das Recht vor, die Leistung je nach Teilnehmerzahl und Teilnehmerzahl zu ändern, sofern die 
-    Bedingungen dies zulassen und die Kursziele erreicht werden können.',
+    Verpasste Kurse werden von Vertic-Halle grundsätzlich nicht erstattet. Im Falle einer Stornierung durch Vertic-Halle 
+    wird der bereits bezahlte Betrag vollständig rückerstattet.<br />
+    Vertic-Halle behält sich das Recht vor, die Leistung je nach Niveau und Teilnehmerzahl zu ändern, sofern die Bedingungen 
+    dies zulassen und die Kursziele erreicht werden können.',
     'Contenu du message à envoyer' => 'Inhalt der zu sendenden Nachricht',
     'Cours' => 'Kurse',
     'Cours Date ID' => 'Kursdatum',
@@ -134,7 +134,7 @@ return [
     'Inscription impossible - aucune date dans le futur' => 'Keine Anmeldung möglich - kein zukünftiges Datum',
     'Inscription impossible - erreur inattendue, veuillez contactez le support.' => 'Keine Anmeldung möglich - unerwarteter Fehler, nehme bitte mit dem Support Kontakt auf',
     'Inscription online' => 'Online-Anmeldung',
-    'Inscrire d\'autres personnes sous mon nom:' => 'Anmeldung einer anderen Person unter meinem Namen',
+    'Inscrire d\'autres personnes sous mon nom:' => 'Anmeldung für mein Kind oder einer anderen Person unter meinem Namen',
     'Intéressé par le cours' => 'Am Kurs interessiert',
     'Invalide depuis le' => 'Ungültig seit dem',
     'Is Actif' => 'Aktiv',
@@ -180,7 +180,7 @@ return [
     'Niveau' => 'Ebene',
     'Niveau formation' => 'Ausbildungsstufe',
     'Nom' => 'Name',
-    'Nom (du représentant légal si mineur)' => 'Name (rechtmässiger Vertreter falls minderjährig)',
+    'Nom (du représentant légal si mineur)' => 'Name (Eltern oder rechtmässiger Vertreter falls minderjährig)',
     'Nom du cours' => 'Kursname',
     'Nom du moniteur' => 'Name des Leiters',
     'Nombre de client sans inscription' => 'Anzahl Kunden ohne Anmeldung',
