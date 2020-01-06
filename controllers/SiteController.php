@@ -194,10 +194,16 @@ class SiteController extends Controller
 
                 $client->connect('https://sync.infomaniak.com/calendars/' . Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['password']);
                 $arrayOfCalendars = $client->findCalendars();
-                $client->setCalendar($arrayOfCalendars[Yii::$app->params['syncCredentials']['calendarID']]);
-                
+
+                $mySalle = null;
                 foreach ($modelCoursDate as $coursDate) {
-                    $logTraitement[$coursDate->cours_date_id] = [
+                    if ($coursDate->fkCours->fk_salle !== $mySalle) {
+                        $mySalle = $coursDate->fkCours->fk_salle;
+                        $client->setCalendar($arrayOfCalendars[Yii::$app->params['syncCredentials']['calendarID'][$mySalle]]);
+                    }
+
+                    $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id] = [
+                        'calendarID' => $client->getUrl(),
                         'cours_date_id' => $coursDate->cours_date_id,
                         'fk_cours' => $coursDate->fk_cours,
                         'nom' => $coursDate->fkCours->fkNom->nom.' '.$coursDate->fkCours->session,
@@ -209,8 +215,8 @@ class SiteController extends Controller
                     $vevent = $coursDate->getVCalendarString();
                     if (CoursDate::CALENDAR_NEW == $coursDate->calendar_sync) {
                         // on ajoute un nouvel élément
-                        $newEvent = $client->create($vevent, true);
-                        $logTraitement[$coursDate->cours_date_id]['statut'] = 'ajout';
+                        $distantEvent = $client->create($vevent, true);
+                        $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id]['statut'] = 'ajout';
                     } else {
                         // on modifie un élément existant
                         $filter = new \CalDAVFilter("VEVENT");
@@ -218,20 +224,24 @@ class SiteController extends Controller
                         $events = $client->getCustomReport($filter->toXML());
                         // l'enregistrement n'est probablement jamais passé sur le serveur infomaniak
                         // on tente un nouvelle insertion !
-                        if (!isset($events[0])) {
-                            $newEvent = $client->create($vevent, true);
-                            $logTraitement[$coursDate->cours_date_id]['statut'] = 'ajout';
+                        if (empty($events)) {
+                            $distantEvent = $client->create($vevent, true);
+                            $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id]['statut'] = 'ajout';
                         } else {
-                            $client->change($events[0]->getHref(),$vevent, $events[0]->getEtag());
-                            $logTraitement[$coursDate->cours_date_id]['statut']  = 'modification';
+                            $distantEvent = $events[0];
+                            $client->change($distantEvent->getHref(), $vevent, $distantEvent->getEtag());
+                            $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id]['statut']  = 'modification';
                         }
                     }
-                    
-                    $coursDate->updateSync = false;
-                    $coursDate->calendar_sync = CoursDate::CALENDAR_SYNC;
-                    $coursDate->save();
+
+                    if (!empty($distantEvent) && null !== $distantEvent->getEtag()) {
+                        $coursDate->updateSync = false;
+                        $coursDate->calendar_sync = CoursDate::CALENDAR_SYNC;
+                        $coursDate->save();
+                    } else {
+                        $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id]['statut']  .= ' !! pas sync !!';
+                    }
                 }
-                
                 $transaction->commit();
                 Yii::$app->session->setFlash('syncOK');
             } catch (Exception $e) {
@@ -272,7 +282,89 @@ class SiteController extends Controller
 //
 //        $response = $message->send();
 
+//        $coursDateID = explode(',', '7447,7197,6613,7439,7582,7601,7619,7565,7628,7650,7509,7574,7602,7629,7568,7688,7630,7651,7519,7631,7632,7510,7645,7646,7652,7520,7647,7648,7653,7511,7512,7649,7521,7633,7522,7634,7513,7635,7523,7636,7637,7524,7638,7639,7518,7640,7641,7642,7525,7643,7644,7526,7527,7463,7468,7570,7542,7563,6411,7654,6412,7444,7569,7627,6413,6414,6415,6416,6417,6418,6419,6420,6421,6422,6423,6424,6425,6426,6427,7202,7219,7372,7236,7253,7270,7287,7603,7304,7321,7338,7389,7406,7203,7220,7373,7237,7254,7271,7288,7604,7305,7322,7339,7390,7404,7204,7221,7374,7238,7255,7272,7289,7605,7306,7323,7340,7599,7405,7205,7222,7375,7239,7256,7273,7290,7606,7307,7324,7341,7395,7407,7206,7223,7376,7240,7257,7274,7291,7607,7308,7325,7342,7396,7685,7207,7224,7377,7241,7258,7275,7292,7608,7309,7326,7343,7397,7686,7408,7209,7226,7379,7243,7260,7277,7294,7609,7311,7328,7345,7392,7210,7227,7380,7244,7261,7278,7295,7610,7312,7329,7346,7393,7211,7228,7381,7245,7262,7279,7296,7611,7313,7330,7347,7394,7216,7587,7378,7575,7242,7259,7293,7581,7612,7319,7576,7336,7417,7212,7229,7382,7246,7263,7280,7297,7613,7314,7331,7348,7401,7213,7230,7383,7247,7264,7281,7298,7614,7315,7332,7349,7402,7214,7231,7384,7248,7265,7282,7299,7615,7316,7333,7350,7413,7215,7232,7385,7249,7266,7283,7300,7616,7317,7334,7351,7414,7233,7592,7386,7250,7267,7284,7301,7617,7318,7335,7352,7415,7217,7234,7387,7251,7268,7285,7302,7618,7310,7588,7353,7409,7410,7411,7412');
+
+        /**
+        $logTraitement = [];
+        $model = new CoursDate();
+        $nombreATraiter = $model->getDateToSyncManuel(true);
+
+        if ($post = Yii::$app->request->post()) {
+            $modelCoursDate = $model->getDateToSyncManuel(false, $post['nbATraiter']);
+
+            try {
+                echo '<br /><br /><br />';
+                foreach ($modelCoursDate as $coursDate) {
+                    $client = new \SimpleCalDAVClient();
+
+                    $client->connect('https://sync.infomaniak.com/calendars/' . Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['user'], Yii::$app->params['syncCredentials']['password']);
+                    $arrayOfCalendars = $client->findCalendars();
+                    $client->setCalendar($arrayOfCalendars[Yii::$app->params['syncCredentials']['calendarID'][214]]);
+
+                    $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id] = [
+                        'calendarID' => $client->getUrl(),
+                        'cours_date_id' => $coursDate->cours_date_id,
+                        'fk_cours' => $coursDate->fk_cours,
+                        'nom' => $coursDate->fkCours->fkNom->nom.' '.$coursDate->fkCours->session,
+                        'date' => $coursDate->date,
+                        'heure_debut' => $coursDate->heure_debut,
+                        'heure_fin' => $coursDate->getHeureFin(),
+                    ];
+
+//                    $events = $client->GetEntryByUid("VH-cours-" . $coursDate->cours_date_id);
+
+//                    $events = $this->doDelete($coursDate->cours_date_id, $client);
+                    $filter = new \CalDAVFilter("VEVENT");
+                    // on supprimer les existants pour refaire la saisie juste !
+                    $filter->mustIncludeMatchSubstr("UID", "VH-cours-" . $coursDate->cours_date_id);
+                    $events = $client->getCustomReport($filter->toXML());
+                    if (!empty($events)) {
+//                        echo '<br />pas vide '.$events[0]['href'] . '-' . $events[0]['etag'];
+//                        $result = $client->delete($events[0]['href'], $events[0]['etag']);
+                        echo '<br />pas vide '.$events[0]->getHref() . '-' . $events[0]->getEtag();
+                        $result = $client->delete($events[0]->getHref(), $events[0]->getEtag());
+                        $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id]['statut'] = 'suppression - ' . $result;
+                    } else {
+                        $logTraitement[$coursDate->fkCours->fkSalle->nom][$coursDate->cours_date_id]['statut'] = 'non existant';
+                    }
+
+                }
+                Yii::$app->session->setFlash('syncOK');
+            } catch (Exception $e) {
+                echo $e->__toString();
+                $alerte = $e->getMessage();
+                echo "<pre>";
+                print_r($alerte);
+                echo "</pre>";
+                exit;
+            }
+        }
+        return $this->render('calendrierSync', [
+            'logTraitement' => $logTraitement,
+            'nombreATraiter' => $nombreATraiter,
+        ]);
+*/
         return $this->render('about');
+    }
+
+    private function doDelete($coursDateID, $client) {
+        $filter = new \CalDAVFilter("VEVENT");
+
+        $filter->mustIncludeMatchSubstr("UID", "VH-cours-" . $coursDateID);
+        $i = 0;
+        while ($i < 3) {
+            $i++;
+            $events = $client->getCustomReport($filter->toXML());
+            if (empty($events)) {
+                sleep($i);
+            } else {
+                break;
+            }
+        }
+        if (empty($events)) {
+            return null;
+        }
+        return $events;
     }
 
     public function actionTranslation()

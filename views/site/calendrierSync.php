@@ -59,8 +59,11 @@ $this->registerJs($script, View::POS_END);
         <div class="row">
             <div class="col-lg-12">
                 <i>Logs de traitement</i>
-                <?php foreach ($logTraitement as $log) { ?>
-                <div>[<?=$log['cours_date_id']?>-<?=$log['fk_cours']?>][<i><strong><?=$log['statut']?></strong></i>] cours <?=$log['nom']?> du <?=$log['date']?> de <?=$log['heure_debut']?> à <?=$log['heure_fin']?></div>
+                <?php foreach ($logTraitement as $salle => $logBySalle) { ?>
+                    <h3><?= $salle ?></h3>
+                    <?php foreach ($logBySalle as $log) { ?>
+                        <div>[<?=$log['cours_date_id']?>-<?=$log['fk_cours']?>][<i><strong><?=$log['statut']?></strong></i>] cours <?=$log['nom']?> du <?=$log['date']?> de <?=$log['heure_debut']?> à <?=$log['heure_fin']?></div>
+                    <?php } ?>
                 <?php } ?>
             </div>
         </div>
