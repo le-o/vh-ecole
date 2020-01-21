@@ -65,7 +65,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             <?php } ?>
 
             <?php $form = ActiveForm::begin(); ?>
-            <div class="col-sm-5">
+            <div class="col-sm-7">
                 <?php if (User::canRoute(['cours/gestioninscriptions'])) { ?>
                     <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->getNombreClientsInscrits() == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
                     <?php Modal::begin([

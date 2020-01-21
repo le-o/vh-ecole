@@ -105,7 +105,7 @@ $this->title = 'VH Gestion des cours';
         } */?>
 
         <?php if ($dataProviderNF->totalCount > 0 && User::canRoute(['/cours/update'])) { ?>
-            <h2><?= Yii::t('app', 'Cours actifs sans date future') ?></h2>
+            <h2><br /><?= Yii::t('app', 'Cours actifs sans date future') ?></h2>
 
             <?= GridView::widget([
                 'dataProvider' => $dataProviderNF,

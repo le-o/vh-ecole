@@ -924,11 +924,12 @@ class CoursController extends CommonController
                     $dates[] = date('r', strtotime($d->date.' '.$d->heure_debut));
                     $datesLieux[] = ['date' => date('r', strtotime($d->date.' '.$d->heure_debut)), 'lieu' => $d->fkLieu->nom];
                 }
+                $language = (isset(Yii::$app->params['interface_language_label'][$c->fk_langue])) ? Yii::$app->params['interface_language_label'][$c->fk_langue] : 'fr-CH';
                 $data[] = [
                     'id' => $c->cours_id,
                     'nom' => $c->fkNom->nom,
                     'nom_id' => $c->fk_nom,
-                    'niveau' => $c->fkNiveau->nom,
+                    'niveau' => Yii::t('app', $c->fkNiveau->nom, [], $language),
                     'semestre' => ($c->fk_semestre != '') ? $c->fkSemestre->nom : '',
                     'saison' => ($c->fk_saison != '') ? $c->fkSaison->nom : '',
                     'session' => $c->session,
@@ -940,7 +941,7 @@ class CoursController extends CommonController
                     'prix' => $c->prix,
                     'participant_max' => $c->participant_max,
                     'nombre_inscrit' => $c->getNombreClientsInscritsForExport(),
-                    'tranche_age' => $c->fkAge->nom,
+                    'tranche_age' => Yii::t('app', $c->fkAge->nom, [], $language),
                     'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
                     'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
                     'infos_tarifs' => $c->offre_speciale,
