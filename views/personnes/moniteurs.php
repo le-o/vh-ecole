@@ -1,5 +1,6 @@
 <?php
 
+use webvimark\modules\UserManagement\models\User;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\widgets\ActiveForm;
@@ -15,7 +16,7 @@ use kartik\export\ExportMenu;
 
 $this->registerCss('.table-responsive {overflow-x: visible;}');
 
-$this->title = Yii::t('app', 'Moniteurs');
+$this->title = ($isMoniteur) ? Yii::t('app', 'Mes cours comme moniteur') : Yii::t('app', 'Moniteurs');
 $this->params['breadcrumbs'][] = Yii::t('app', 'Personnes');
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -50,6 +51,11 @@ $gridColumns = [
 
     ['class' => 'yii\grid\ActionColumn',
         'template'=>'{view} {update} {listeHeures}',
+        'visibleButtons'=>[
+            'view' => User::canRoute(['/personnes/view']),
+            'update' => User::canRoute(['/personnes/update']),
+            'listeHeures' => User::canRoute(['/personnes/viewmoniteur']),
+        ],
         'buttons'=>[
             'listeHeures' => function ($url, $model, $key) use ($fromData) {
                 return Html::a('<span class="glyphicon glyphicon-calendar"></span>', Url::to(['viewmoniteur', 'id' => $key, 'fromData' => $fromData]), [
@@ -72,9 +78,10 @@ $gridColumns = [
         'dataLangues' => $dataLangues,
         'searchFrom' => $searchFrom,
         'searchTo' => $searchTo,
+        'isMoniteur' => $isMoniteur,
     ]); ?>
     
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (User::hasRole(['admin', 'gestion'])) { ?>
         <div style="margin-bottom: 10px;">
             <?php
             // Renders a export dropdown menu

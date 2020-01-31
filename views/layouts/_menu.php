@@ -58,6 +58,7 @@ use webvimark\modules\UserManagement\models\User;
                 [
                     'label' => '<span class="glyphicon glyphicon-user"></span> '.Yii::$app->user->username,
                         'items' => [
+                            ['label' => Yii::t('app', 'Mes cours'), 'url' => ['/personnes/mycours'], 'visible' => User::canRoute(['/personnes/mycours'])],
                             ['label' => Yii::t('app', 'Mon compte'), 'url' => ['/user-management/user/view', 'id' => User::getCurrentUser()->id], 'visible' => User::canRoute(['/user-management/user/view'])],
                             ['label' => Yii::t('app', 'Changer mot de passe'), 'url' => ['/user-management/auth/change-own-password'], 'visible' => User::canRoute(['/user-management/auth/change-own-password'])],
                             ['label' => Yii::t('app', 'Se déconnecter'), 'url' => ['/site/logout'], 'linkOptions' => ['data-method' => 'post']]
