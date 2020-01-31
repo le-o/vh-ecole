@@ -687,6 +687,8 @@ class CoursController extends CommonController
         }
         
         // préparation des data
+        $arrayMoniteurs = [];
+        $dejaMoniteurs = [];
         foreach ($model->coursDates as $coursDate) {
             $arrayData[$coursDate->cours_date_id]['model'] = $coursDate;
             foreach ($coursDate->coursHasMoniteurs as $moniteur) {

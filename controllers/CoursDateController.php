@@ -86,7 +86,8 @@ class CoursDateController extends CommonController
                 $clone = clone($model);
                 $model->load(Yii::$app->request->post());
                 $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
-                
+
+                $moniteursOld = [];
                 foreach ($clone->coursHasMoniteurs as $myMoniteur) {
                     $moniteursOld[] = $myMoniteur->fk_moniteur;
                 }
