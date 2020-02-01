@@ -137,7 +137,11 @@ class PersonnesController extends CommonController
                     $dataMoniteurs[$moniteur->personne_id]['societe'] = $moniteur->societe;
                     $dataMoniteurs[$moniteur->personne_id]['nom'] = $moniteur->nom;
                     $dataMoniteurs[$moniteur->personne_id]['prenom'] = $moniteur->prenom;
+                    $dataMoniteurs[$moniteur->personne_id]['adresse1'] = $moniteur->adresse1;
+                    $dataMoniteurs[$moniteur->personne_id]['adresse2'] = $moniteur->adresse2;
+                    $dataMoniteurs[$moniteur->personne_id]['npa'] = $moniteur->npa;
                     $dataMoniteurs[$moniteur->personne_id]['localite'] = $moniteur->localite;
+                    $dataMoniteurs[$moniteur->personne_id]['date_naissance'] = $moniteur->date_naissance;
                     $dataMoniteurs[$moniteur->personne_id]['fk_langues'] = $moniteur->fkLanguesNoms;
                     $dataMoniteurs[$moniteur->personne_id]['email'] = $moniteur->email;
                     $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;

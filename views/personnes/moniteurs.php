@@ -3,11 +3,7 @@
 use webvimark\modules\UserManagement\models\User;
 use yii\helpers\Html;
 use kartik\grid\GridView;
-use yii\widgets\ActiveForm;
-use yii\bootstrap\Modal;
-use yii\bootstrap\Alert;
 use yii\helpers\Url;
-use yii\web\View;
 use kartik\export\ExportMenu;
 
 /* @var $this yii\web\View */
@@ -21,7 +17,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Personnes');
 $this->params['breadcrumbs'][] = $this->title;
 
 // On créé les colonnes ici, comme ca réutilisable dans l'export et la gridview
-$gridColumns = [
+$gridColumnsBegin = [
     ['class' => 'kartik\grid\SerialColumn'],
     
     'statut',
@@ -33,6 +29,8 @@ $gridColumns = [
     'nom',
     'prenom',
     'localite',
+];
+$gridColumnsEnd = [
     [
         'attribute' => 'fk_langues',
         'label' => Yii::t('app', 'Langues parlées'),
@@ -65,6 +63,8 @@ $gridColumns = [
         ],
     ],
 ];
+$gridColumns = array_merge ($gridColumnsBegin, $gridColumnsEnd);
+$gridColumnsExport = array_merge($gridColumnsBegin, ['adresse1', 'adresse2', 'npa', 'date_naissance'], $gridColumnsEnd);
 ?>
 
 <div class="personnes-moniteurs">
@@ -87,7 +87,7 @@ $gridColumns = [
             // Renders a export dropdown menu
             echo ExportMenu::widget([
                 'dataProvider' => $moniteursProvider,
-                'columns' => $gridColumns,
+                'columns' => $gridColumnsExport,
                 'target' => ExportMenu::TARGET_SELF,
                 'showConfirmAlert' => false,
                 'showColumnSelector' => true,
