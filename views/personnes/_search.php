@@ -10,12 +10,13 @@ use kartik\select2\Select2;
 /* @var $form yii\widgets\ActiveForm */
 
 if (!isset($isMoniteur)) $isMoniteur = false;
+$action = (true == $isMoniteur) ? ['mycours'] : ['moniteurs'];
 ?>
 
 <div class="personnes-search">
 
     <?php $form = ActiveForm::begin([
-        'action' => ['moniteurs'],
+        'action' => $action,
         'method' => 'get',
     ]); ?>
     
@@ -65,7 +66,8 @@ if (!isset($isMoniteur)) $isMoniteur = false;
         <div class="col-sm-3">
             <div class="form-group">
                 <br />
-                <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+                <?= Html::hiddenInput('isMoniteur', $isMoniteur) ?>
+                <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary', 'isMoniteur' => $isMoniteur]) ?>
             </div>
         </div>
 
