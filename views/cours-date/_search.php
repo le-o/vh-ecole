@@ -42,7 +42,10 @@ use webvimark\modules\UserManagement\models\User;
             ]); ?>
         </div>
         <?php } ?>
-        <div class="col-sm-4">
+        <div class="col-sm-2">
+            <?= $form->field($model, 'withoutMoniteur')->checkbox(['label' => Yii::t('app', 'Sans moniteur')]) ?>
+        </div>
+        <div class="col-sm-3">
             <div class="form-group">
                 <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
                 <?= Html::a(Yii::t('app', 'Reset'), ['cours-date/liste'], ['class'=>'btn btn-default']) ?>

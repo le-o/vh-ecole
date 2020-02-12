@@ -390,4 +390,5 @@ return [
     'Kletterhalle Baltschieder' => 'Kletterhalle Baltschieder',
     'cashflow Baltschieder' => 'Cashflow Baltschieder',
     'inscrit(e) à l\'année' => 'eingeschrieben fürs Jahr',
+    'Sans moniteur' => 'Sans moniteur',
 ];

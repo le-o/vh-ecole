@@ -237,6 +237,7 @@ return [
     'Saison' => 'Saison',
     'Salle' => '',
     'Salle concernée' => '',
+    'Sans moniteur' => '',
     'Sauvegardes' => 'Sauvegardes',
     'Se connecter' => '',
     'Se déconnecter' => '',

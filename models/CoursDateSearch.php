@@ -19,6 +19,7 @@ class CoursDateSearch extends CoursDate
     public $depuis;
     public $dateA;
     public $homepage = false;
+    public $withoutMoniteur = true;
     
     public $fkNom;
 	
@@ -29,6 +30,7 @@ class CoursDateSearch extends CoursDate
     {
         return [
             [['cours_date_id', 'fk_cours', 'fk_lieu'], 'integer'],
+            [['withoutMoniteur'], 'boolean'],
             [['date', 'heure_debut', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA', 'fkNom'], 'safe'],
         ];
     }
@@ -52,7 +54,7 @@ class CoursDateSearch extends CoursDate
     public function search($params)
     {
         $query = CoursDate::find();
-        $query->joinWith(['fkCours.fkNom']);
+        $query->joinWith(['fkCours.fkNom', 'coursHasMoniteurs']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -111,6 +113,10 @@ class CoursDateSearch extends CoursDate
                 $query->distinct = true;
                 $query->select = ['fk_cours'];
             }
+        }
+
+        if (true == $this->withoutMoniteur) {
+            $query->andFilterWhere(['IN', 'cours_has_moniteurs.fk_moniteur', implode(',', Yii::$app->params['sansEncadrant'])]);
         }
 
         return $dataProvider;
