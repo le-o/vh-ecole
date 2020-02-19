@@ -306,7 +306,7 @@ return [
     'prénom du client' => '',
     'prénom et nom de chaque participant' => '',
     'salle concernée par le cours' => '',
-    'statut' => '@@statut@@',
+    'statut' => '',
     'statut de l\'inscription du client' => '',
     'toutes les dates du cours' => '',
     'toutes les dates du cours avec lieux' => '',
@@ -403,4 +403,8 @@ return [
     'Kletterhalle Baltschieder' => '',
     'cashflow Baltschieder' => '',
     'inscrit(e) à l\'année' => '',
+    'Actif' => '',
+    'Inactif' => '',
+    'Annulé par VH' => '',
+    'Annulé par client' => '',
 ];

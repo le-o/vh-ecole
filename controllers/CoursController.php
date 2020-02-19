@@ -48,7 +48,7 @@ class CoursController extends CommonController
                 'duration' => 60,
                 'dependency' => [
                     'class' => 'yii\caching\DbDependency',
-                    'sql' => 'SELECT * FROM cours WHERE is_actif = 1 AND is_publie = 1',
+                    'sql' => 'SELECT * FROM cours WHERE fk_statut = ' . Yii::$app->params['coursActif'] . ' AND is_publie = 1',
                 ],
             ],
         ];
@@ -124,11 +124,13 @@ class CoursController extends CommonController
         
         $parametre = new Parametres();
         $saisonFilter = $parametre->optsSaison();
+        $statutFilter = $parametre->optsStatutCours();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'saisonFilter' => $saisonFilter,
+            'statutFilter' => $statutFilter,
             'btnSalle' => $btnSalle,
             'btnClassPriorise' => $btnClassPriorise,
         ]);
@@ -900,7 +902,7 @@ class CoursController extends CommonController
      */
     public function actionGetcoursjson() {
         $searchModel = new CoursSearch();
-        $searchModel->is_actif = 1;
+        $searchModel->fk_statut = Yii::$app->params['coursActif'];
         $searchModel->is_publie = 1;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, 0);
         

@@ -26,7 +26,7 @@ use Yii;
  * @property string $offre_speciale
  * @property integer $is_materiel_compris
  * @property integer $is_entree_compris
- * @property integer $is_actif
+ * @property integer $fk_statut
  * @property integer $is_publie
  * @property array $fk_categories 
  * @property string $image_web 
@@ -43,6 +43,7 @@ use Yii;
  * @property CoursDate[] $coursDates
  * @property Parametres $fkLangue
  * @property Parametres $fkSalle
+ * @property Parametres $fkStatut
  */
 class Cours extends \yii\db\ActiveRecord
 {
@@ -64,8 +65,8 @@ class Cours extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'session', 'prix', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie', 'fk_langue', 'fk_salle'], 'required'],
-            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'fk_saison', 'fk_semestre', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'is_actif', 'is_publie', 'fk_langue', 'fk_salle', 'tri_internet'], 'integer'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'description', 'duree', 'session', 'prix', 'is_materiel_compris', 'is_entree_compris', 'fk_statut', 'is_publie', 'fk_langue', 'fk_salle'], 'required'],
+            [['fk_niveau', 'fk_type', 'fk_nom', 'fk_age', 'fk_saison', 'fk_semestre', 'participant_min', 'participant_max', 'is_materiel_compris', 'is_entree_compris', 'fk_statut', 'is_publie', 'fk_langue', 'fk_salle', 'tri_internet'], 'integer'],
             [['duree', 'prix'], 'double'],
             [['extrait', 'description', 'session', 'offre_speciale'], 'string'],
             [['annee', 'image'], 'safe'],
@@ -98,7 +99,7 @@ class Cours extends \yii\db\ActiveRecord
             'offre_speciale' => Yii::t('app', 'Offre Spéciale'),
             'is_materiel_compris' => Yii::t('app', 'Is Materiel Compris'),
             'is_entree_compris' => Yii::t('app', 'Is Entree Compris'),
-            'is_actif' => Yii::t('app', 'Is Actif'),
+            'fk_statut' => Yii::t('app', 'Statut'),
             'is_publie' => Yii::t('app', 'Is Publié'),
             'fk_langue' => Yii::t('app', 'Langue'),
             'fk_salle' => Yii::t('app', 'Salle'),
@@ -186,6 +187,14 @@ class Cours extends \yii\db\ActiveRecord
     public function getFkSemestre()
     {
         return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_semestre']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkStatut()
+    {
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_statut']);
     }
 
     /**

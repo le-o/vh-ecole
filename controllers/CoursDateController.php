@@ -118,8 +118,8 @@ class CoursDateController extends CommonController
                     
                     $myCours = Cours::findOne($model->fk_cours);
                     // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
-                    if ($myCours->is_actif == false && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
-                        $myCours->is_actif = true;
+                    if ($myCours->fk_statut == Yii::$app->params['coursInactif'] && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
+                        $myCours->fk_statut = Yii::$app->params['coursActif'];
                         $myCours->save();
                     }
 
@@ -366,8 +366,8 @@ class CoursDateController extends CommonController
                 }
                 
                 // on réactive le cours si il ne l'est pas déjà et si on saisi une date dans le futur
-                if ($myCours->is_actif == false && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
-                    $myCours->is_actif = true;
+                if ($myCours->fk_statut == Yii::$app->params['coursInactif'] && date('Y-m-d', strtotime($model->date)) >= date('Y-m-d')) {
+                    $myCours->fk_statut = Yii::$app->params['coursActif'];
                     $myCours->save();
                 }
 		        
@@ -554,7 +554,7 @@ class CoursDateController extends CommonController
             ->joinWith(['fkCours'])
             ->where(['>=', 'date', $start])
             ->andWhere(['<=', 'date', $end])
-            ->andWhere(['cours.fk_salle' => $for])
+            ->andWhere(['cours.fk_salle' => $for, 'cours.fk_statut' => Yii::$app->params['coursActif']])
             ->all();
         
         Yii::$app->session->set('home-cal-debut-' . $for, $start);

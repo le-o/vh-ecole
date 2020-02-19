@@ -402,7 +402,7 @@ class PersonnesController extends CommonController
 		    ],
 		]);
         
-        $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['is_actif' => [1]])->all();
+        $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['fk_statut' => [Yii::$app->params['coursActif']]])->all();
         $dataCours = [];
         foreach ($coursNot as $c) {
             if (in_array($c->fk_type, Yii::$app->params['coursPlanifieS'])) {

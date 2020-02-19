@@ -175,7 +175,7 @@ class ClientsOnlineController extends CommonController
             $model->fk_cours = $cours_id;
             $selectedCours = [$cours_id];
         } else {
-            $query = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('parametres.tri')->where(['is_actif' => 1, 'is_publie' => true]);
+            $query = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('parametres.tri')->where(['fk_cours' => Yii::$app->params['coursActif'], 'is_publie' => true]);
             $query->andWhere(['OR', 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
             $modelCours = $query->all();
             foreach ($modelCours as $cours) {

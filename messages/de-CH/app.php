@@ -391,4 +391,8 @@ return [
     'cashflow Baltschieder' => 'Cashflow Baltschieder',
     'inscrit(e) à l\'année' => 'eingeschrieben fürs Jahr',
     'Sans moniteur' => 'Sans moniteur',
+    'Actif' => '',
+    'Inactif' => '',
+    'Annulé par VH' => '',
+    'Annulé par client' => '',
 ];

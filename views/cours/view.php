@@ -43,8 +43,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'cours_id',
             [
-                'label' => Yii::t('app', 'Is Actif'),
-                'value' => ($model->is_actif) ? 'Oui' : 'Non',
+                'label' => Yii::t('app', 'Statut'),
+                'attribute' => 'fkStatut.nom',
             ],
             [
                 'label' => Yii::t('app', 'Fk Salle'),

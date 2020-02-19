@@ -33,18 +33,18 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'rowOptions' => function($model) {
             if (in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) && $model->getNombreClientsInscrits() >= $model->participant_max) return ['class' => 'warning'];
-            if ($model->is_actif == false) return ['class' => 'danger'];
+            if ($model->fk_statut == Yii::$app->params['coursInactif']) return ['class' => 'danger'];
             return [];
         },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            
+
             [
-                'attribute' => 'is_actif',
-                'value' => function ($data) {
-                    return ($data->is_actif) ? 'Oui' : 'Non';
-                },
-                'filter' => ['1'=>'Oui', '0'=>'Non'],
+                'attribute' => 'fkStatut',
+                'value' => 'fkStatut.nom',
+                'label' => Yii::t('app', 'Statut'),
+                'filter' => $statutFilter,
+                'headerOptions' => ['style' => 'width:125px;'],
             ],
             [
                 'attribute' => 'fkSalle',

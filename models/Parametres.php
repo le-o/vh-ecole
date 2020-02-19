@@ -246,12 +246,21 @@ class Parametres extends \yii\db\ActiveRecord
     {
         return $this->optsDropDown(16, $selectedParam);
     }
+
     /**
      * @return array options lieu for drop-down
      */
     public function optsLieu($selectedParam = null)
     {
         return $this->optsDropDown(17, $selectedParam);
+    }
+
+    /**
+     * @return array options lieu for drop-down
+     */
+    public function optsStatutCours($selectedParam = null)
+    {
+        return $this->optsDropDown(18, $selectedParam);
     }
 
     /**
@@ -295,6 +304,7 @@ class Parametres extends \yii\db\ActiveRecord
             '5' => 'Paramètres généraux',
             '6' => 'Type de cours',
             '7' => 'Nom de cours',
+            '18' => 'Statut de cours',
             '8' => 'Niveau de formation',
             '9' => 'Statut de participation',
             '10' => 'Tranche d\'âge',

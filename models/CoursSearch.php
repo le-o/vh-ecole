@@ -17,6 +17,7 @@ class CoursSearch extends Cours
     public $fkNom;
     public $fkSaison;
     public $fkSemestre;
+    public $fkStatut;
     public $fkJours;
     public $isPriorise;
     
@@ -28,9 +29,9 @@ class CoursSearch extends Cours
     public function rules()
     {
         return [
-            [['cours_id', 'participant_min', 'participant_max', 'is_actif'], 'integer'],
+            [['cours_id', 'participant_min', 'participant_max'], 'integer'],
             [['duree', 'prix'], 'double'],
-            [['description', 'annee', 'session', 'fkNiveau', 'fkType', 'fkNom', 'fkSaison'], 'safe'],
+            [['description', 'annee', 'session', 'fkNiveau', 'fkType', 'fkNom', 'fkSaison', 'fkStatut'], 'safe'],
         ];
     }
 
@@ -76,7 +77,7 @@ class CoursSearch extends Cours
             'prix' => $this->prix,
             'participant_min' => $this->participant_min,
             'participant_max' => $this->participant_max,
-            'is_actif' => $this->is_actif,
+            'fk_statut' => $this->fkStatut,
             'is_publie' => $this->is_publie,
             'fk_saison' => $this->fkSaison,
         ])
@@ -135,6 +136,13 @@ class CoursSearch extends Cours
             'asc' => ['saison.nom' => SORT_ASC],
             'desc' => ['saison.nom' => SORT_DESC],
         ];
+        $query->joinWith(['fkStatut' => function ($nom) {
+            $nom->alias('statut');
+        }]);
+        $dataProvider->sort->attributes['fkStatut'] = [
+            'asc' => ['statut.nom' => SORT_ASC],
+            'desc' => ['statut.nom' => SORT_DESC],
+        ];
         $query->joinWith(['fkSemestre' => function ($nom) {
             $nom->alias('semestre');
 //            $nom->where('semestre.nom LIKE "%'.$this->fkSemestre.'%"');
@@ -143,7 +151,7 @@ class CoursSearch extends Cours
             'asc' => ['semestre.nom' => SORT_ASC],
             'desc' => ['semestre.nom' => SORT_DESC],
         ];
-        $dataProvider->sort->defaultOrder = ['is_actif'=>SORT_DESC, 'fkNom'=>SORT_ASC];
+        $dataProvider->sort->defaultOrder = ['fk_statut'=>SORT_ASC, 'fkNom'=>SORT_ASC];
 
         return $dataProvider;
     }

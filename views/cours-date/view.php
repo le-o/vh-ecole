@@ -47,8 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'date',
             'fkCours.fkNom.nom',
             [
-                'label' => Yii::t('app', 'Is Actif'),
-                'value' => ($model->fkCours->is_actif) ? 'Oui' : 'Non',
+                'label' => Yii::t('app', 'Statut'),
+                'attribute' => 'fkCours.fkStatut.nom',
                 'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
             ],
             [

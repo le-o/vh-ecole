@@ -68,8 +68,7 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'is_entree_compris')->checkbox() ?>
         </div>
         <div class="col-sm-2">
-            <label></label>
-            <?= $form->field($model, 'is_actif')->checkbox() ?>
+            <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatutCours($model->fk_statut),['prompt'=>Yii::t('app', 'Choisir un statut')]) ?>
         </div>
         <div class="col-sm-2">
             <label></label>
