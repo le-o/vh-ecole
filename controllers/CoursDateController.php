@@ -350,18 +350,9 @@ class CoursDateController extends CommonController
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
                 // seulement pour les cours planifiés (planifié et régulié)
                 if (in_array($myCours->fk_type, Yii::$app->params['coursPlanifieS'])) {
-                    $coursDate = CoursDate::find()
-                        ->where(['=', 'fk_cours', $model->fk_cours])
-                        ->andWhere(['!=', 'cours_date_id', $model->cours_date_id])
-                        ->orderBy('cours_date_id DESC')
-                        ->one();
-                    if (!empty($coursDate)) {
-                        $participants = ClientsHasCoursDate::find()
-                            ->where(['=', 'fk_cours_date', $coursDate->cours_date_id])
-                            ->all();
-                        foreach ($participants as $part) {
-                            $alerte = $this->addClientToCours([$coursDate], $part->fk_personne, $cours_id);
-                        }
+                    $participants = ClientsHasCours::find()->where(['fk_cours' => $model->fk_cours])->all();
+                    foreach ($participants as $part) {
+                        $alerte = $this->addClientToCours([$model], $part->fk_personne, $cours_id);
                     }
                 }
                 
