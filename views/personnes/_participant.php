@@ -41,7 +41,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
 <div class="cours-participant-form">
 
-    <?php if (User::canRoute(['cours/gestionpresences']) || User::canRoute(['/cours/presence'])) { ?>
+    <?php if ((User::canRoute(['cours/gestionpresences']) || User::canRoute(['/cours/presence'])) && true == $hasPlanification) { ?>
         <div class="row">
             <?php if ($isInscriptionOk && User::canRoute(['cours/gestioninscriptions'])) { ?>
 

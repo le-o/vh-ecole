@@ -100,6 +100,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'parametre' => $parametre,
         'emails' => $emails,
         'forPresenceOnly' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? false : true,
+        'hasPlanification' => true,
     ]) ?>
 
 </div>

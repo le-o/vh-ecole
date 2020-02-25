@@ -90,6 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'parametre' => $parametre,
         'emails' => $emails,
         'forPresenceOnly' => false,
+        'hasPlanification' => (0 == $coursDateProvider->totalCount) ? false : true,
     ]) ?>
     
     <?php
