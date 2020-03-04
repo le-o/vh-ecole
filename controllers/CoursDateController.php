@@ -350,7 +350,7 @@ class CoursDateController extends CommonController
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
                 // seulement pour les cours planifiés (planifié et régulié)
                 if (in_array($myCours->fk_type, Yii::$app->params['coursPlanifieS'])) {
-                    $participants = ClientsHasCours::find()->where(['fk_cours' => $model->fk_cours])->all();
+                    $participants = ClientsHasCours::find()->where(['fk_cours' => $model->fk_cours, 'fk_statut' => Yii::$app->params['partInscrit']])->all();
                     foreach ($participants as $part) {
                         $alerte = $this->addClientToCours([$model], $part->fk_personne, $cours_id);
                     }
@@ -412,7 +412,14 @@ class CoursDateController extends CommonController
             $post = Yii::$app->request->post();
             $date_range = $post['date_range_1'];
             $date_exclude = $post['date_exclude_1'];
-            
+
+            // on inscrit les participants déjà existant pour les autres planifications de ce cours
+            // seulement pour les cours planifiés (planifié et régulié)
+            $myCours = Cours::findOne(['cours_id' => $cours_id]);
+            $participants = [];
+            if (in_array($myCours->fk_type, Yii::$app->params['coursPlanifieS'])) {
+                $participants = ClientsHasCours::find()->where(['fk_cours' => $cours_id, 'fk_statut' => Yii::$app->params['partInscrit']])->all();
+            }
             $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
             $dateRange = explode(Yii::t('app', ' au '), $post['date_range_1']);
             $date_debut = date('Y-m-d', strtotime($dateRange[0]));
@@ -432,12 +439,21 @@ class CoursDateController extends CommonController
                             throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours. '.$date_debut));
                         }
 
+                        foreach ($participants as $p) {
+                            $addParticipant = new ClientsHasCoursDate();
+                            $addParticipant->fk_cours_date = $modelDate->cours_date_id;
+                            $addParticipant->fk_personne = $p->fk_personne;
+                            if (!$addParticipant->save(false)) {
+                                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des participant(s).'));
+                            }
+                        }
+
                         foreach ($moniteurs as $moniteur_id) {
                             $addMoniteur = new CoursHasMoniteurs();
                             $addMoniteur->fk_cours_date = $modelDate->cours_date_id;
                             $addMoniteur->fk_moniteur = $moniteur_id;
                             $addMoniteur->is_responsable = 0;
-                            if (! ($flag = $addMoniteur->save(false))) {
+                            if (!$addMoniteur->save(false)) {
                                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                             }
                         }
