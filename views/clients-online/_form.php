@@ -120,7 +120,7 @@ $this->registerJs('
                 'offre_annuelle' => Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)')
             ], ['id' => 'choix_enfant', 'style' => 'display:none;']) ?>
             <div id="pmt_tranche" style="display:none;">
-                <?= yii\bootstrap\BaseHtml::checkbox('pmt_tranche', false, ['label' => Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (Frais administratifs: CHF 10 inscription pour un semestre, CHF 25 inscription pour la saison complète)')]) ?>
+                <?= yii\bootstrap\BaseHtml::checkbox('pmt_tranche', false, ['label' => Yii::t('app', 'Je choisis d\'étaler le paiement du solde en plusieurs tranches (CHF 10 par tranche)')]) ?>
             </div>
         </div>
     </div>
@@ -133,7 +133,7 @@ $this->registerJs('
     </div>
     
     <div class="panel panel-default">
-        <div class="panel-heading"><h4><i class="glyphicon glyphicon-plus"></i> <?= Yii::t('app', 'Inscrire d\'autres personnes sous mon nom:') ?></h4></div>
+        <div class="panel-heading"><h4><i class="glyphicon glyphicon-plus"></i> <?= Yii::t('app', 'Inscrire un/des enfant/s sous mon nom:') ?></h4></div>
         <div class="panel-body">
              <?php DynamicFormWidget::begin([
                 'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]

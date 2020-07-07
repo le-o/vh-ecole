@@ -2,7 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\CoursDate;
 use app\models\Personnes;
+use app\models\PersonnesHasInterlocuteurs;
 use Yii;
 use app\models\ClientsOnline;
 use app\models\ClientsOnlineSearch;
@@ -78,9 +80,9 @@ class ClientsOnlineController extends CommonController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($cours_id = null, $lang_interface = 'fr-CH')
+    public function actionCreate($cours_id = null, $lang_interface = 'fr-CH', $goodlooking = false)
     {
-        $this->layout = "main_1";
+        $this->layout = (false == $goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
         $model = new ClientsOnline();
@@ -112,7 +114,8 @@ class ClientsOnlineController extends CommonController
                 $model->informations .= '
                     + '.Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches');
             }
-            
+
+            $clientAuto = false;
             if (isset($modelCours)) {
                 $model->fk_cours = $cours_id;
                 $model->informations .= '
@@ -121,6 +124,9 @@ class ClientsOnlineController extends CommonController
                 $model->informations .= (isset($modelCours->fkSemestre)) ? ' - ' . $modelCours->fkSemestre->nom : ' - ';
                 $model->informations .= $modelCours->fkSaison->nom.' '.$modelCours->session;
                 $model->informations .= '<br />'.Yii::t('app', 'Salle concernée') . ': ' . $modelCours->fkSalle->nom;
+                if (Yii::$app->params['coursRegulie'] == $modelCours->fk_type) {
+                    $clientAuto = true;
+                }
             } else {
                 $model->fk_cours = null;
             }
@@ -129,6 +135,11 @@ class ClientsOnlineController extends CommonController
             Model::loadMultiple($modelsClient, $post);
             
             if ($model->validate()) {
+                $clientDirect = [];
+                if (true == $clientAuto) {
+                    $clientDirect[] = $this->setPersonneAttribute($model);
+                    $model->is_actif = 0;
+                }
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
                     if (!$model->save()) {
@@ -148,16 +159,74 @@ class ClientsOnlineController extends CommonController
                             $client->email = $model->email;
                             $client->is_actif = 1;
 
+                            if (true == $clientAuto) {
+                                $clientDirect[] = $this->setPersonneAttribute($client);
+                                $client->is_actif = 0;
+                            }
+
                             if (!$client->save()) {
                                 throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du client lié.'));
                             }
                         }
                     }
+                    if (true == $clientAuto) {
+                        $inscritCours = (1 < count($clientDirect)) ? false : true;
+                        $parentID = null;
+                        $modelDate = CoursDate::find()
+                            ->where(['=', 'fk_cours', $modelCours->cours_id])
+                            ->andWhere(['>=', 'date', date('Y-m-d')])
+                            ->all();
 
+                        foreach ($clientDirect as $cd) {
+                            // si la personne existe déjà, on ne fait pas de doublon
+                            $isPersonne = Personnes::find()->where(['nom' => $cd->nom, 'prenom' => $cd->prenom])->one();
+                            if (null == $isPersonne) {
+                                $cd->save();
+                                $existeID = $cd->personne_id;
+                            } else {
+                                $existeID = $isPersonne->personne_id;
+                            }
+
+                            // si on a un interlocuteur, on ne sauve pas l'inscription au cours, mais juste la personne
+                            if (false == $inscritCours) {
+                                $inscritCours = true;
+                                $parentID = $existeID;
+                                continue;
+                            }
+                            // si on a un interlocuteur, on sauve le lien entre les personnes
+                            if (!is_null($parentID)) {
+                                $hasInterloc = PersonnesHasInterlocuteurs::find()->where(['fk_personne' => $existeID, 'fk_interlocuteur' => $parentID])->one();
+                                if (null == $hasInterloc) {
+                                    $i = new PersonnesHasInterlocuteurs;
+                                    $i->fk_personne = $existeID;
+                                    $i->fk_interlocuteur = $parentID;
+                                    $i->save();
+                                }
+                            }
+                            // on sauve l'inscription au cours
+                            if (!empty($modelDate)) {
+                                $this->addClientToCours($modelDate, $existeID, $modelCours->cours_id);
+                                $sendEmailTo[] = $existeID;
+                            }
+                        }
+                    }
                     $transaction->commit();
 
-                    $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInscriptionOnline'][Yii::$app->language]);
-                    $this->actionEmail($contenu, [$model->email], true);
+                    // on traite le mail après le commit, comme cela si l'envoi de l'email plante, on a quand même
+                    // enregistré les données dans la base
+                    if (true == $clientAuto) {
+                        $emailBrut = \app\models\Parametres::findOne(Yii::$app->params['texteEmailConfirmationOnline'][Yii::$app->language]);
+                        $contenu['nom'] = $emailBrut->nom;
+                        $contenu['valeur'] = $emailBrut->valeur;
+                        $contenu['keyForMail'] = $modelCours->cours_id;
+                        foreach ($sendEmailTo as $personneID) {
+                            $contenu['personne_id'] = $personneID;
+                            $this->actionEmail($contenu, [$model->email], true);
+                        }
+                    } else {
+                        $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInscriptionOnline'][Yii::$app->language]);
+                        $this->actionEmail($contenu, [$model->email], true);
+                    }
 
                     return $this->render('confirmation');
                 } catch (\Exception $e) {
@@ -170,12 +239,12 @@ class ClientsOnlineController extends CommonController
         }
         
         if (isset($modelCours)) {
-            $dataCours[$modelCours->cours_id] = $modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom;
+            $dataCours[$modelCours->cours_id] = $modelCours->fkNom->nom . ' ' . $modelCours->fkNiveau->nom . ' ' . $modelCours->session . ' ' . $modelCours->fkSalle->nom;
             $dataCours[$modelCours->cours_id] .= (isset($modelCours->fkSemestre)) ? ' - '.$modelCours->fkSemestre->nom : '';
             $model->fk_cours = $cours_id;
             $selectedCours = [$cours_id];
         } else {
-            $query = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('parametres.tri')->where(['fk_cours' => Yii::$app->params['coursActif'], 'is_publie' => true]);
+            $query = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('parametres.tri')->where(['fk_statut' => Yii::$app->params['coursActif'], 'is_publie' => true]);
             $query->andWhere(['OR', 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
             $modelCours = $query->all();
             foreach ($modelCours as $cours) {
@@ -245,23 +314,9 @@ class ClientsOnlineController extends CommonController
     public function actionPushclient($id)
     {
         $model = $this->findModel($id);
-        
-        $p = new Personnes;
-        $p->fk_statut = Yii::$app->params['persStatutStandby'];
-        $p->fk_type = Yii::$app->params['typeADefinir'];
-        $p->nom = $model->nom;
-        $p->prenom = ($model->prenom != '') ? $model->prenom : 'non renseigné';
-        $p->adresse1 = $model->adresse;
-        $p->npa = $model->npa;
-        $p->localite = $model->localite;
-        $p->telephone = $model->telephone;
-        $p->email = $model->email;
-        $p->date_naissance = $model->date_naissance;
-        $p->informations = Yii::t('app', 'Intéressé par le cours').' '.$model->fkCoursNom->nom;
-        $p->informations .= "\r\n".Yii::t('app', 'Date d\'inscription').': '.$model->date_inscription;
-        if ($model->informations != '') $p->informations .= "\r\n\r\n".$model->informations;
-        $p->fk_salle_admin = ($model->fkCours) ? $model->fkCours->fk_salle : Yii::$app->params['salleAdmin'][$model->fkCoursNom->fk_langue];
-        
+
+        $p = $this->setPersonneAttribute($model);
+
         $clients = ClientsOnline::findAll(['fk_parent' => $model->client_online_id]);
         
         $transaction = \Yii::$app->db->beginTransaction();
@@ -385,5 +440,29 @@ class ClientsOnlineController extends CommonController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param ClientsOnline $model
+     * @return Personnes
+     */
+    private function setPersonneAttribute(ClientsOnline $model)
+    {
+        $p = new Personnes;
+        $p->fk_statut = Yii::$app->params['persStatutStandby'];
+        $p->fk_type = Yii::$app->params['typeADefinir'];
+        $p->nom = $model->nom;
+        $p->prenom = ($model->prenom != '') ? $model->prenom : 'non renseigné';
+        $p->adresse1 = $model->adresse;
+        $p->npa = $model->npa;
+        $p->localite = $model->localite;
+        $p->telephone = $model->telephone;
+        $p->email = $model->email;
+        $p->date_naissance = $model->date_naissance;
+        $p->informations = Yii::t('app', 'Intéressé par le cours') . ' ' . $model->fkCoursNom->nom;
+        $p->informations .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $model->date_inscription;
+        if ($model->informations != '') $p->informations .= "\r\n\r\n" . $model->informations;
+        $p->fk_salle_admin = ($model->fkCours) ? $model->fkCours->fk_salle : Yii::$app->params['salleAdmin'][$model->fkCoursNom->fk_langue];
+        return $p;
     }
 }

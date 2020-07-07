@@ -57,14 +57,20 @@ return [
     'Conditions inscription et annulation' => '<h4>Conditions d\'inscription et d\'annulation</h4>
     L\'inscription aux cours d\'escalade planifiés se fait sur réservation. Jusqu\'à 7 jours avant le début du cours, aucun 
     montant n\'est dû. Dans les 7 jours avant le début du cours, 50% du montant total du cours est dû (25% en cas d\'inscription 
-    à une offre annuelle). A partir de la date du 1er cours, 100% du montant est dû.<br />
+    à une offre annuelle). À partir de la date du 1er cours, 100% du montant est dû. Le versement peut être effectué par 
+    virement bancaire ou directement sur place avant le cours.<br />
     <br />
     L\'inscription aux cours d\'escalade sur demande se fait sur réservation. Jusqu\'à 72h avant le début du cours, aucun 
-    montant n\'est dû. Dans les 72h avant le début du cours, 40% du montant total du cours est dû. A partir de la date du 1er 
-    cours, 100% du montant est dû.<br />
+    montant n\'est dû. Dans les 72h avant le début du cours, 40% du montant total du cours est dû. À partir de la date du 
+    1er cours, 100% du montant est dû.<br />
     <br />
-    Vertic-Halle n\'effectue a priori aucun remboursement pour des cours manqués. En cas d\'annulation par Vertic-Halle, le 
-    montant déjà versé sera intégralement remboursé.<br />
+    Vertic-Halle n\'effectue aucun remboursement des montants dus selon les conditions susmentionnées ni de remboursement 
+    partiel pour des cours manqués (hormis la part relative aux entrées et au matériel, si applicable). En cas d\'annulation 
+    par Vertic-Halle, le montant déjà versé sera remboursé proportionnellement aux cours annulés.<br />
+    <br />
+    Conditions de remboursement spécifiques en raison de la pandémie COVID pour les cours réguliers : [prix du cours - 
+    frais administratif de 120.-] x [nbre de cours perdus/nbre de cours totaux].<br />
+    <br />
     Vertic-Halle se réserve le droit de modifier la prestation en fonction du niveau et du nombre de participants, si les 
     conditions le permettent et que les objectifs du cours peuvent être atteints.',
     'Contenu du message à envoyer' => 'Contenu du message à envoyer',
@@ -134,12 +140,12 @@ return [
     'Info Special' => 'Info spécial',
     'Informations' => 'Informations',
     'Infos diverses' => 'Infos diverses',
-    'Infos, détails et besoins particuliers' => '',
+    'Infos, détails et besoins particuliers' => 'Remarque(s) particulière(s)',
     'Infos, détails et besoins particuliers (date et horaire, nom de la session, offres, 2 cours à l\'essai, etc.)' => '@@Infos, détails et besoins particuliers (date et horaire, nom de la session, offres, 2 cours à l\'essai, etc.)@@',
     'Inscription impossible - aucune date dans le futur' => 'Inscription impossible - aucune date dans le futur',
     'Inscription impossible - erreur inattendue, veuillez contactez le support.' => 'Inscription impossible - erreur inattendue, veuillez contactez le support.',
     'Inscription online' => 'Inscription en ligne',
-    'Inscrire d\'autres personnes sous mon nom:' => 'Inscrire d\'autres personnes sous mon nom:',
+    'Inscrire un/des enfant/s sous mon nom:' => 'Inscrire un/des enfant/s sous mon nom:',
     'Intéressé par le cours' => 'Intéressé par le cours',
     'Invalide depuis le' => '',
     'Is Actif' => 'Est actif',
@@ -147,11 +153,12 @@ return [
     'Is Materiel Compris' => 'Matériel compris',
     'Is Publié' => 'Publié sur le site internet',
     'Is Responsable' => 'Est responsable',
-    'Je souhaite inscrire mon enfant pour 2 cours à l’essai (je déciderai au terme des 2 cours si j’inscris mon enfant pour un semestre ou à l’année)' => '',
+    'Je souhaite inscrire mon enfant pour 2 cours à l\'essai (je déciderai au terme des 2 cours si j\'inscris mon enfant pour un semestre ou à l\'année)' => '',
     'Je souhaite inscrire mon enfant pour un semestre uniquement' => '',
-    'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)' => 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert - uniquement pour les cours réguliers)',
+    'Je souhaite profiter de l\'offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)' => 'Je souhaite profiter de l\'offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert - uniquement pour les cours réguliers)',
     'Je souhaite étaler le paiement du cours en plusieurs tranches' => '',
     'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)' => '@@Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)@@',
+    'Je choisis d\'étaler le paiement du solde en plusieurs tranches (CHF 10 par tranche)' => 'Je choisis d\'étaler le paiement du solde en plusieurs tranches (CHF 10 par tranche)',
     'Je souhaite étaler le paiement du cours en plusieurs tranches (Frais administratifs: CHF 10 inscription pour un semestre, CHF 25 inscription pour la saison complète)' => '',
     'Jour semaine' => 'Jour de la semaine',
     'Jours' => '',

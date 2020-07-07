@@ -196,6 +196,7 @@ class CommonController extends Controller
                 $myCoursDate = CoursDate::findOne($indexs[0]);
                 $myCours = Cours::findOne($myCoursDate->fk_cours);
             }
+
             $saison = (isset($myCours->fkSaison)) ? Yii::t('app', $myCours->fkSaison->nom) : '';
             $dateCours = $myCours->nextCoursDate;
             $allDatesCours = $myCours->coursDates;
@@ -228,16 +229,18 @@ class CommonController extends Controller
                 $date = isset($dateCours->date) ? $dateCours->date : '<b>jj.mm.aaaa</b>';
                 $jour_cours = $myCours->FkJoursNoms;
             }
+
+            $montantAcompte30 = round($myCours->prix * 0.3);
             
             $content = str_replace(
                 ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', '#salle-cours#',
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
                     '#toutes-les-dates#', '#toutes-les-dates-avec-lieux#', '#dates-inscrit#', '#dates-inscrit-avec-lieux#', 
-                    '#statut-inscription#'], 
+                    '#statut-inscription#', '#cours-acompte-30#'],
                 [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, $myCours->fkSalle->nom,
                     Yii::t('app', $myCours->session), $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] ? $myCoursDate->prix : $myCours->prix), $date,
                     implode(', ', $datesCours), implode(', ', $datesCoursLieux), implode(', ', $datesCoursInscrit), implode(', ', $datesCoursInscritLieux), 
-                    $statutInscription], 
+                    $statutInscription, $montantAcompte30],
                 $content
             );
         }
