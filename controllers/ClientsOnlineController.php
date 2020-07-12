@@ -137,8 +137,6 @@ class ClientsOnlineController extends CommonController
             if ($model->validate()) {
                 $clientDirect = [];
 
-                $nbInscrits = $modelCours->getNombreClientsInscrits();
-
                 $modelDate = CoursDate::find()
                     ->where(['=', 'fk_cours', $modelCours->cours_id])
                     ->andWhere(['>=', 'date', date('Y-m-d')])
