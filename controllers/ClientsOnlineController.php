@@ -136,6 +136,18 @@ class ClientsOnlineController extends CommonController
             
             if ($model->validate()) {
                 $clientDirect = [];
+
+                $nbInscrits = $modelCours->getNombreClientsInscrits();
+
+                $modelDate = CoursDate::find()
+                    ->where(['=', 'fk_cours', $modelCours->cours_id])
+                    ->andWhere(['>=', 'date', date('Y-m-d')])
+                    ->all();
+                // si pas de cours pour l'inscription, on reste en inscription standard
+                // si max du nombre de participants atteint, on reste en inscription standard
+                if (0 == count($modelDate) || $modelCours->getNombreClientsInscrits() >= $modelCours->participant_max) {
+                    $clientAuto = false;
+                }
                 if (true == $clientAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
                     $model->is_actif = 0;
@@ -172,10 +184,6 @@ class ClientsOnlineController extends CommonController
                     if (true == $clientAuto) {
                         $inscritCours = (1 < count($clientDirect)) ? false : true;
                         $parentID = null;
-                        $modelDate = CoursDate::find()
-                            ->where(['=', 'fk_cours', $modelCours->cours_id])
-                            ->andWhere(['>=', 'date', date('Y-m-d')])
-                            ->all();
 
                         foreach ($clientDirect as $cd) {
                             // si la personne existe déjà, on ne fait pas de doublon

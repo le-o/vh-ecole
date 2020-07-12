@@ -277,7 +277,7 @@ class Cours extends \yii\db\ActiveRecord
     /**
      * @return int Number of clients
      */
-    public function getNombreClientsInscrits($listeCoursDate = [])
+    public function getNombreClientsInscrits()
     {
         return ClientsHasCours::find()->where(['fk_cours' => $this->cours_id])->andWhere(['fk_statut' => Yii::$app->params['partInscrit']])->count();
     }
