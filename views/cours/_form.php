@@ -75,7 +75,7 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'is_publie')->checkbox() ?>
         </div>
         <div class="col-sm-2">
-            <?= $form->field($model, 'tri_internet')->textInput(['type' => 'number', 'min' => 1]) ?>
+            <?= $form->field($model, 'tri_internet')->textInput(['type' => 'number', 'min' => 0]) ?>
         </div>
     </div>
     
