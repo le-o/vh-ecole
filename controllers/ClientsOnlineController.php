@@ -191,6 +191,20 @@ class ClientsOnlineController extends CommonController
                                 $existeID = $cd->personne_id;
                             } else {
                                 $existeID = $isPersonne->personne_id;
+                                // on modifie le statut pour permettre le suivi
+                                $isPersonne->fk_statut = Yii::$app->params['persStatutStandby'];
+                                if (!in_array($isPersonne->getOldAttribute('fk_statut'), [
+                                    Yii::$app->params['persStatutInscrit'],
+                                    Yii::$app->params['persStatutStandby'],
+                                ])) {
+                                    $oldStatut = Parametres::findOne($isPersonne->getOldAttribute('fk_statut'));
+                                    $isPersonne->suivi_client .= "\n" . Yii::t('app', 'Attention, statut du client avant fusion du {date} : {oldStatut}.',
+                                    [
+                                        'date' => date('d.m.Y'),
+                                        'oldStatut' => $oldStatut->nom,
+                                    ]);
+                                }
+                                $isPersonne->save();
                             }
 
                             // si on a un interlocuteur, on ne sauve pas l'inscription au cours, mais juste la personne
