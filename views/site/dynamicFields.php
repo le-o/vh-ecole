@@ -34,6 +34,8 @@ $this->registerJs('
                             <li>#dates-inscrit# : <i><?= Yii::t('app', 'date à laquelle le client est inscrit') ?></i></li>
                             <li>#dates-inscrit-avec-lieux# : <i><?= Yii::t('app', 'date à laquelle le client est inscrit avec lieux') ?></i></li>
                             <li>#statut-inscription# : <i><?= Yii::t('app', 'statut de l\'inscription du client') ?></i></li>
+                            <li>#prenom-utilisateur# : <i><?= Yii::t('app', 'prénom de l\'utilisateur') ?></i></li>
+                            <li>#nom-utilisateur# : <i><?= Yii::t('app', 'nom de l\'utilisateur') ?></i></li>
                         </ul>">
                             <?= Yii::t('app', 'Champs dynamiques disponibles') ?>
                     </button>

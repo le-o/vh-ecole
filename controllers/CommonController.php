@@ -164,6 +164,14 @@ class CommonController extends Controller
         }
             
         $content = $beginMail . $mail['valeur'];
+
+        $userInfo = Yii::$app->user->identity->fkpersonne;
+        $userPrenom = (!empty($userInfo)) ? $userInfo->prenom : '';
+        $userNom = (!empty($userInfo)) ? $userInfo->nom : Yii::$app->user->username;
+        $content = str_replace(
+            ['#prenom-utilisateur#', '#nom-utilisateur#'],
+            [$userPrenom, $userNom],
+            $content);
         
         if (isset($mail['personne_id']) && !empty($mail['personne_id'])) {
             $myPersonne = Personnes::findOne($mail['personne_id']);
