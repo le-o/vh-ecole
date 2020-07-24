@@ -105,6 +105,7 @@ class SiteController extends Controller
         // liste de tous les cours sans date dans le futur
         $searchNoFutur = new CoursDateSearch();
         $searchNoFutur->dateA = date('d.m.Y');
+        $searchNoFutur->withoutMoniteur = false;
         $searchNoFutur->homepage = true;
         $dataProviderNF = $searchNoFutur->search([]);
         
