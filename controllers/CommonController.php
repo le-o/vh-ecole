@@ -246,7 +246,7 @@ class CommonController extends Controller
                     '#toutes-les-dates#', '#toutes-les-dates-avec-lieux#', '#dates-inscrit#', '#dates-inscrit-avec-lieux#', 
                     '#statut-inscription#', '#cours-acompte-30#'],
                 [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, $myCours->fkSalle->nom,
-                    Yii::t('app', $myCours->session), $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] ? $myCoursDate->prix : $myCours->prix), $date,
+                    Yii::t('app', $myCours->session), $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] && isset($myCoursDate) ? $myCoursDate->prix : $myCours->prix), $date,
                     implode(', ', $datesCours), implode(', ', $datesCoursLieux), implode(', ', $datesCoursInscrit), implode(', ', $datesCoursInscritLieux), 
                     $statutInscription, $montantAcompte30],
                 $content
