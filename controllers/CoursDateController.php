@@ -561,7 +561,8 @@ class CoursDateController extends CommonController
             ->joinWith(['fkCours'])
             ->where(['>=', 'date', $start])
             ->andWhere(['<=', 'date', $end])
-            ->andWhere(['cours.fk_salle' => $for, 'cours.fk_statut' => Yii::$app->params['coursActif']])
+            ->andWhere(['cours.fk_salle' => $for])
+            ->andWhere(['IN', 'cours.fk_statut', [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
             ->all();
         
         Yii::$app->session->set('home-cal-debut-' . $for, $start);
