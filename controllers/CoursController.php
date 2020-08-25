@@ -631,7 +631,8 @@ class CoursController extends CommonController
                 $newMoniteur = new CoursHasMoniteurs();
                 $newMoniteur->fk_moniteur = $post['new_moniteur'];
             } else {
-                
+
+                $arrayBefore = [];
                 // préparation du tableau de comparaison
                 foreach ($model->coursDates as $coursDate) {
                     $dateCours = date('Ymd', strtotime($coursDate->date));

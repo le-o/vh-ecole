@@ -274,7 +274,7 @@ class CommonController extends Controller
             if (YII_ENV != 'dev') {
                 //  (this creates the full MIME message required for imap_append()
                 $msg = $message->toString();
-                $mailbox = ('de-CH' == Yii::$app->language) ? "{mail.infomaniak.ch:143/imap}Envoyes appli - de" : "{mail.infomaniak.ch:143/imap}Envoyes appli - fr";
+                $mailbox = ('de-CH' == Yii::$app->language) ? "{mail.infomaniak.ch:143/imap}Sent App DE" : "{mail.infomaniak.ch:143/imap}Sent App FR";
 
                 //  After this you can call imap_append like this:
                 // connect to IMAP (port 143)
