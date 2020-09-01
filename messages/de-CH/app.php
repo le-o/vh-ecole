@@ -289,6 +289,8 @@ return [
     'nom du cours' => 'Kursname',
     'non' => 'Nein',
     'oui' => 'Ja',
+    'Non' => 'Nein',
+    'Oui' => 'Ja',
     'present?' => 'Anwesend?',
     'prix du cours' => 'Kurspreis',
     'prénom du client' => 'Vorname des Kunden',

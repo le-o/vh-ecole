@@ -911,13 +911,15 @@ class CoursController extends CommonController
             $data = ["Aucune donnée trouvée"];
         } else {
             foreach ($dataProvider->getModels() as $c) {
+                // quelle langue ?
+                $language = (isset(Yii::$app->params['interface_language_label'][$c->fk_langue])) ? Yii::$app->params['interface_language_label'][$c->fk_langue] : 'fr-CH';
                 $jours = [];
                 foreach ($c->fkJours as $j) {
-                    $jours[] = $j->nom;
+                    $jours[] = Yii::t('app', $j->nom, [], $language);
                 }
                 $categories = [];
                 foreach ($c->fkCategories as $cat) {
-                    $categories[] = $cat->nom;
+                    $categories[] = Yii::t('app', $cat->nom, [], $language);
                 }
                 $dates = [];
                 $datesLieux = [];
@@ -929,7 +931,6 @@ class CoursController extends CommonController
                     $dates[] = date('r', strtotime($d->date.' '.$d->heure_debut));
                     $datesLieux[] = ['date' => date('r', strtotime($d->date.' '.$d->heure_debut)), 'lieu' => $d->fkLieu->nom];
                 }
-                $language = (isset(Yii::$app->params['interface_language_label'][$c->fk_langue])) ? Yii::$app->params['interface_language_label'][$c->fk_langue] : 'fr-CH';
                 $data[] = [
                     'id' => $c->cours_id,
                     'nom' => $c->fkNom->nom,
@@ -947,8 +948,8 @@ class CoursController extends CommonController
                     'participant_max' => $c->participant_max,
                     'nombre_inscrit' => $c->getNombreClientsInscritsForExport(),
                     'tranche_age' => Yii::t('app', $c->fkAge->nom, [], $language),
-                    'materiel_compris' => ($c->is_materiel_compris == true) ? 'Oui' : 'Non',
-                    'entree_compris' => ($c->is_entree_compris == true) ? 'Oui' : 'Non',
+                    'materiel_compris' => ($c->is_materiel_compris == true) ? Yii::t('app', 'Oui', [], $language) : Yii::t('app', 'Non', [], $language),
+                    'entree_compris' => ($c->is_entree_compris == true) ? Yii::t('app', 'Oui', [], $language) : Yii::t('app', 'Non', [], $language),
                     'infos_tarifs' => $c->offre_speciale,
                     'premier_jour_session' => $premierJourSession,
                     'toutes_les_dates' => $dates,
