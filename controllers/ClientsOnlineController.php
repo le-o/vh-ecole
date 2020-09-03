@@ -234,7 +234,7 @@ class ClientsOnlineController extends CommonController
 
                     // on traite le mail après le commit, comme cela si l'envoi de l'email plante, on a quand même
                     // enregistré les données dans la base
-                    if (true == $clientAuto) {
+                    if (true == $clientAuto && true == Yii::$app->params['emailConfirmationInscription']) {
                         $emailBrut = \app\models\Parametres::findOne(Yii::$app->params['texteEmailConfirmationOnline'][Yii::$app->language]);
                         $contenu['nom'] = $emailBrut->nom;
                         $contenu['valeur'] = $emailBrut->valeur;
