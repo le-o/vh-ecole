@@ -26,3 +26,5 @@ phpunit.phar
 # vendor folder
 vendor
 web/assets
+/vendor/
+/components/
