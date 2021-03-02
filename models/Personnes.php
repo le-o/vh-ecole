@@ -4,6 +4,8 @@ namespace app\models;
 
 use Yii;
 use \DateTime;
+use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "personnes".
@@ -125,7 +127,7 @@ class Personnes extends \yii\db\ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             $this->fk_langues = json_encode($this->fk_langues);
-            $this->date_naissance = ($this->date_naissance == '') ? 'null' : date('Y-m-d', strtotime($this->date_naissance));
+            $this->date_naissance = ($this->date_naissance == '') ? null : date('Y-m-d', strtotime($this->date_naissance));
             return true;
         } else {
             return false;
@@ -318,5 +320,19 @@ class Personnes extends \yii\db\ActiveRecord
             $dataClients[$c->fkType->nom][$c->personne_id] = ($c->societe != '') ? $c->societe.' '.$c->NomPrenom : $c->NomPrenom;
         }
         return $dataClients;
+    }
+
+    /**
+     *
+     * @param array $excludePart
+     * @return array
+     */
+    public static function getMoniteurs($personne_id)
+    {
+        $moniteurs = self::find()
+            ->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])
+            ->orderBy('nom, prenom')
+            ->all();
+        return ArrayHelper::map($moniteurs, 'personne_id', 'NomPrenom');
     }
 }
