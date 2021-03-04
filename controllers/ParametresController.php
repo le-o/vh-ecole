@@ -122,6 +122,9 @@ class ParametresController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * @return false|string
+     */
     public function actionGetemail() {
         $data = Yii::$app->request->post();
         $emailTemplate = Parametres::findOne($data['id']);
