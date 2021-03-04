@@ -324,10 +324,9 @@ class Personnes extends \yii\db\ActiveRecord
 
     /**
      *
-     * @param array $excludePart
      * @return array
      */
-    public static function getMoniteurs($personne_id)
+    public static function getMoniteurs()
     {
         $moniteurs = self::find()
             ->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])
