@@ -142,6 +142,29 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionAnniversaire()
+    {
+        // liste des anniversaire sans moniteur
+        $searchNoMoniteur = new CoursDateSearch();
+        $searchNoMoniteur->fkTypeCours = Yii::$app->params['coursUnique'];
+        $searchNoMoniteur->depuis = date('d.m.Y');
+        $searchNoMoniteur->withoutMoniteur = true;
+        $searchNoMoniteur->anniversairepage = true;
+        $dataProviderNM = $searchNoMoniteur->search([]);
+
+        // set la valeur de la date début du calendrier
+        $dataSalles = Parametres::findAll(['class_key' => 16]);
+        foreach ($dataSalles as $salle) {
+            if (Yii::$app->session->get('anni-cal-debut-' . $salle->parametre_id) === null) Yii::$app->session->set('anni-cal-debut-' . $salle->parametre_id, date('Y-m-d'));
+            if (Yii::$app->session->get('anni-cal-view-' . $salle->parametre_id) === null) Yii::$app->session->set('anni-cal-view-' . $salle->parametre_id, 'agendaWeek');
+        }
+
+        return $this->render('anniversaire', [
+            'dataProviderNM' => $dataProviderNM,
+            'dataSalles' => $dataSalles,
+        ]);
+    }
+
     public function actionLogin()
     {
         if (!\Yii::$app->user->isGuest) {
@@ -385,11 +408,11 @@ class SiteController extends Controller
         exit;
     }
     
-    public function actionSetcalendarview($for) {
+    public function actionSetcalendarview($for, $name) {
         if (Yii::$app->request->isAjax) {
             $data = Yii::$app->request->post();
-            Yii::$app->session->set('home-cal-view-' . $for, $data['view']);
-            Yii::$app->session->set('home-cal-debut-' . $for, $data['start']);
+            Yii::$app->session->set($name . '-cal-view-' . $for, $data['view']);
+            Yii::$app->session->set($name . '-cal-debut-' . $for, $data['start']);
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }

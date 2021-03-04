@@ -76,8 +76,9 @@ class CommonController extends Controller
         } else {
             throw new Exception('Erreur typage email');
         }
-        
-        $calNom = $model->fkCours->fkNom->nom.' - '.Yii::t('app', $model->fkCours->session).' - '.Yii::t('app', $model->fkCours->fkSaison->nom);
+
+        $saison = (isset($model->fkCours->fkSaison->nom)) ? ' - ' . Yii::t('app', $model->fkCours->fkSaison->nom) : '';
+        $calNom = $model->fkCours->fkNom->nom . ' - ' . Yii::t('app', $model->fkCours->session) . $saison;
         $calLink = '';
         
         // infos for addtocal link
@@ -165,13 +166,15 @@ class CommonController extends Controller
             
         $content = $beginMail . $mail['valeur'];
 
-        $userInfo = Yii::$app->user->identity->fkpersonne;
-        $userPrenom = (!empty($userInfo)) ? $userInfo->prenom : '';
-        $userNom = (!empty($userInfo)) ? $userInfo->nom : Yii::$app->user->username;
-        $content = str_replace(
-            ['#prenom-utilisateur#', '#nom-utilisateur#'],
-            [$userPrenom, $userNom],
-            $content);
+        if (!Yii::$app->user->isGuest && strpos($content, '#prenom-utilisateur#')) {
+            $userInfo = (isset(Yii::$app->user->identity->fkpersonne)) ? Yii::$app->user->identity->fkpersonne : '';
+            $userPrenom = (!empty($userInfo)) ? $userInfo->prenom : '';
+            $userNom = (!empty($userInfo)) ? $userInfo->nom : Yii::$app->user->username;
+            $content = str_replace(
+                ['#prenom-utilisateur#', '#nom-utilisateur#'],
+                [$userPrenom, $userNom],
+                $content);
+        }
         
         if (isset($mail['personne_id']) && !empty($mail['personne_id'])) {
             $myPersonne = Personnes::findOne($mail['personne_id']);
@@ -198,11 +201,16 @@ class CommonController extends Controller
         
         if (isset($mail['keyForMail']) && !empty($mail['keyForMail'])) {
             $indexs = explode('|', $mail['keyForMail']);
-            $myCours = Cours::findOne($indexs[0]);
-            // on a un cours vide, on va essayer de le trouver via les dates
-            if (empty($myCours)) {
-                $myCoursDate = CoursDate::findOne($indexs[0]);
-                $myCours = Cours::findOne($myCoursDate->fk_cours);
+            if ('d' == $indexs[0]) {
+                $myCoursDate = CoursDate::findOne($indexs[1]);
+                $myCours = $myCoursDate->fkCours;
+            } else {
+                $myCours = Cours::findOne($indexs[0]);
+                // on a un cours vide, on va essayer de le trouver via les dates
+                if (empty($myCours)) {
+                    $myCoursDate = CoursDate::findOne($indexs[0]);
+                    $myCours = Cours::findOne($myCoursDate->fk_cours);
+                }
             }
 
             $saison = (isset($myCours->fkSaison)) ? Yii::t('app', $myCours->fkSaison->nom) : '';
@@ -244,11 +252,11 @@ class CommonController extends Controller
                 ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', '#salle-cours#',
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
                     '#toutes-les-dates#', '#toutes-les-dates-avec-lieux#', '#dates-inscrit#', '#dates-inscrit-avec-lieux#', 
-                    '#statut-inscription#', '#cours-acompte-30#'],
+                    '#statut-inscription#', '#cours-acompte-30#', '#infostarifs#', '#description-cours#', '#extrait-cours#'],
                 [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, $myCours->fkSalle->nom,
                     Yii::t('app', $myCours->session), $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] && isset($myCoursDate) ? $myCoursDate->prix : $myCours->prix), $date,
                     implode(', ', $datesCours), implode(', ', $datesCoursLieux), implode(', ', $datesCoursInscrit), implode(', ', $datesCoursInscritLieux), 
-                    $statutInscription, $montantAcompte30],
+                    $statutInscription, $montantAcompte30, $myCours->offre_speciale, $myCours->description, $myCours->extrait],
                 $content
             );
         }
@@ -316,6 +324,9 @@ class CommonController extends Controller
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-date de cours.'));
                     }
                 }
+
+                // on sauve la remarque modifiée !
+                $date->save();
                 
                 // si cours ponctuel, on n'inscrit à une seul date
                 if ($date->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {

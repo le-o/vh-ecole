@@ -14,6 +14,7 @@ use app\models\Parametres;
 use yii\web\NotFoundHttpException;
 use yii\web\Exception;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * ClientsOnlineController implements the CRUD actions for ClientsOnline model.
@@ -21,7 +22,7 @@ use yii\filters\VerbFilter;
 class ClientsOnlineController extends CommonController
 {
     
-    public $freeAccessActions = ['create'];
+    public $freeAccessActions = ['create', 'createanniversaire', 'depnbparticipants'];
     
     /**
      * @inheritdoc
@@ -90,7 +91,6 @@ class ClientsOnlineController extends CommonController
         if ($cours_id !== null && $cours_id !== '') {
             $modelCours = Cours::findOne($cours_id);
         }
-        $alerte = '';
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -250,11 +250,11 @@ class ClientsOnlineController extends CommonController
 
                     return $this->render('confirmation');
                 } catch (\Exception $e) {
-                    $alerte = $e->getMessage();
+                    Yii::$app->session->setFlash('alerte', ['type'=>'danger', 'info'=>$e->getMessage()], false);
                     $transaction->rollBack();
                 }
             } else {
-                $alerte = Yii::t('app', 'Une erreur est survenue lors de l\'enregistrement.');
+                Yii::$app->session->setFlash('alerte', ['type'=>'danger', 'info'=>Yii::t('app', 'Une erreur est survenue lors de l\'enregistrement.')], false);
             }
         }
         
@@ -279,7 +279,137 @@ class ClientsOnlineController extends CommonController
             'dataCours' => $dataCours,
             'selectedCours' => $selectedCours,
             'params' => new Parametres,
-            'alerte' => $alerte,
+            'displayForm' => '_form',
+        ]);
+    }
+
+    /**
+     * Creates a new ClientsOnline model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateanniversaire($ident = null, $lang_interface = 'fr-CH')
+    {
+        $this->layout = "main_1";
+        Yii::$app->language = $lang_interface;
+
+        $model = new ClientsOnline();
+        $model->setScenario('anniversaire');
+        $modelsClient = [new ClientsOnline];
+
+        $modelCoursDate = CoursDate::findOne($ident);
+        $modelCours = $modelCoursDate->fkCours;
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model->is_actif = 1;
+            $model->fk_cours_nom = $modelCours->fk_nom;
+            $model->fk_cours = $modelCours->cours_id;
+            $infoAnniversaire = $model->informations . '
+********************* INFO ANNIVERSAIRE *********************
+* ' . Yii::t('app', 'Prénom de l\'enfant') . ' : ' . $model->prenom_enfant . '
+* ' . Yii::t('app', 'Date de naissance de l\'enfant') . ' : ' . $model->date_naissance_enfant . '
+* ' . Yii::t('app', 'Age moyen des enfants') . ' : ' . $model->agemoyen . '
+* ' . Yii::t('app', 'Nombre de participant') . ' : ' . $model->nbparticipant;
+
+            if ($model->validate()) {
+                $clientDirect = [];
+
+                $inscriptionAuto = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
+
+                if (true == $inscriptionAuto) {
+                    $clientDirect[] = $this->setPersonneAttribute($model);
+                    $model->is_actif = 0;
+                } else {
+                    $model->informations = $infoAnniversaire;
+                }
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if (!$model->save()) {
+                        throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
+                    }
+                    if (true == $inscriptionAuto) {
+                        foreach ($clientDirect as $cd) {
+                            // si la personne existe déjà, on ne fait pas de doublon
+                            $isPersonne = Personnes::find()->where(['nom' => $cd->nom, 'prenom' => $cd->prenom])->one();
+                            if (null == $isPersonne) {
+                                $cd->fk_statut = Yii::$app->params['persStatutInscrit'];
+                                $cd->fk_type = 1;
+                                $cd->save();
+                                $existeID = $cd->personne_id;
+                            } else {
+                                $existeID = $isPersonne->personne_id;
+                                $isPersonne->fk_statut = Yii::$app->params['persStatutInscrit'];
+                                $isPersonne->fk_type = 1;
+                                if (!in_array($isPersonne->getOldAttribute('fk_statut'), [
+                                    Yii::$app->params['persStatutInscrit'],
+                                    Yii::$app->params['persStatutStandby'],
+                                ])) {
+                                    $oldStatut = Parametres::findOne($isPersonne->getOldAttribute('fk_statut'));
+                                    $isPersonne->suivi_client .= "\n" . Yii::t('app', 'Attention, statut du client avant fusion du {date} : {oldStatut}.',
+                                    [
+                                        'date' => date('d.m.Y'),
+                                        'oldStatut' => $oldStatut->nom,
+                                    ]);
+                                }
+                                $isPersonne->save();
+                            }
+                            $modelCoursDate->remarque = $infoAnniversaire;
+                            // on sauve l'inscription au cours
+                            $this->addClientToCours([$modelCoursDate], $existeID, $modelCours->cours_id);
+                            $sendEmailTo[] = $existeID;
+                        }
+                    }
+                    $transaction->commit();
+
+                    // on traite le mail après le commit, comme cela si l'envoi de l'email plante, on a quand même
+                    // enregistré les données dans la base
+                    if (true == $inscriptionAuto) {
+                        $emailBrut = \app\models\Parametres::findOne(Yii::$app->params['texteEmailAutoAnnivOnline'][Yii::$app->language]);
+                        $contenu['nom'] = $emailBrut->nom;
+                        $contenu['valeur'] = $emailBrut->valeur;
+                        $contenu['keyForMail'] = 'd|' . $modelCoursDate->cours_date_id;
+                        foreach ($sendEmailTo as $personneID) {
+                            $contenu['personne_id'] = $personneID;
+                            $this->actionEmail($contenu, [$model->email], true);
+                        }
+                    } else {
+                        $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInfoAnnivOnline'][Yii::$app->language]);
+                        $this->actionEmail($contenu, [$model->email], true);
+                    }
+
+                    return $this->render('confirmation');
+                } catch (\Exception $e) {
+                    Yii::$app->session->setFlash('alerte', ['type'=>'danger', 'info'=>$e->getMessage()], false);
+                    $transaction->rollBack();
+                }
+            } else {
+                Yii::$app->session->setFlash('alerte', ['type'=>'danger', 'info'=>Yii::t('app', 'Une erreur est survenue lors de l\'enregistrement.')], false);
+            }
+        }
+
+        $dataCours = Yii::t('app', 'Inscription') . ' ' .$modelCours->fkNom->nom . ' ' . Yii::t('app', 'du') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à') . ' ' . $modelCoursDate->heure_debut;
+
+        if (in_array($modelCours->fk_nom, Yii::$app->params['anniversaireLight'])) {
+            $choixAge = [
+                '2-12' => Yii::t('app', '{nombre} ans', ['nombre' => '2-12']),
+                '12+' => Yii::t('app', '{nombre} ans et +', ['nombre' => '12']),
+            ];
+        } else {
+            $choixAge = [
+                '5-7' => Yii::t('app', '{nombre} ans', ['nombre' => '5-7']),
+                '8-12' => Yii::t('app', '{nombre} ans', ['nombre' => '8-12']),
+                '12+' => Yii::t('app', '{nombre} ans et +', ['nombre' => '12']),
+            ];
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'modelsClient' => $modelsClient,
+            'dataCours' => $dataCours,
+            'selectedCours' => null,
+            'params' => new Parametres,
+            'displayForm' => '_anniversaire',
+            'choixAge' => $choixAge,
         ]);
     }
 
@@ -478,11 +608,30 @@ class ClientsOnlineController extends CommonController
         $p->localite = $model->localite;
         $p->telephone = $model->telephone;
         $p->email = $model->email;
-        $p->date_naissance = $model->date_naissance;
+        $p->date_naissance = (isset($model->date_naissance)) ? $model->date_naissance : null;
         $p->informations = Yii::t('app', 'Intéressé par le cours') . ' ' . $model->fkCoursNom->nom;
         $p->informations .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $model->date_inscription;
         if ($model->informations != '') $p->informations .= "\r\n\r\n" . $model->informations;
         $p->fk_salle_admin = ($model->fkCours) ? $model->fkCours->fk_salle : Yii::$app->params['salleAdmin'][$model->fkCoursNom->fk_langue];
         return $p;
     }
+
+    public function actionDepnbparticipants() {
+        if (isset($_POST['depdrop_parents'])) {
+            $parents = $_POST['depdrop_parents'];
+            if ($parents != null && is_array($parents)) {
+                $model = new ClientsOnline();
+                $out = $model->optsPartByAge($parents[0]);
+
+                if (!empty($out)) {
+                    return Json::encode($out);
+                }
+            }
+        }
+        return Json::encode(['output'=>'', 'selected'=>'']);
+
+
+
+    }
+
 }

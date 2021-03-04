@@ -282,7 +282,7 @@ class PersonnesController extends CommonController
             'content' => $content,
             // format content from your own css file if needed or use the
             // enhanced bootstrap css built by Krajee for mPDF formatting
-            'cssFile' => '@vendor/kartik-v/yii2-mpdf/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
             // any css to be embedded if required
             'cssInline' => '
                 table { width:100%; border-collapse:collapse; }
@@ -332,7 +332,7 @@ class PersonnesController extends CommonController
                     } else {
                         $alerte = $this->addClientToCours($modelDate, $id, $newCours[0]);
                     }
-                } elseif ($newCours[1] == Yii::$app->params['coursPonctuel']) {
+                } elseif (in_array($newCours[1], Yii::$app->params['coursPonctuelUnique'])) {
                     $modelDate = CoursDate::findOne(['cours_date_id' => $newCours[0]]);
                     $alerte = $this->addClientToCours([$modelDate], $id, $modelDate->fk_cours);
                 }
