@@ -105,7 +105,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
     {
         return [
             [['fk_parent', 'fk_cours_nom', 'fk_cours', 'is_actif'], 'integer'],
-            [['fk_cours_nom', 'adresse', 'npa', 'localite', 'telephone', 'email', 'nom', 'prenom'], 'required'],
+            [['fk_cours_nom', 'adresse', 'npa', 'localite', 'telephone', 'email'], 'required'],
             [['date_naissance', 'date_naissance_enfant', 'date_inscription'], 'safe'],
             [['informations', 'agemoyen', 'nbparticipant'], 'string'],
             [['nom', 'prenom', 'prenom_enfant'], 'string', 'max' => 60],
@@ -114,7 +114,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             [['telephone'], 'string', 'max' => 20],
             ['iagree', 'compare', 'operator' => '==', 'compareValue' => true, 'message' => Yii::t('app', 'Vous devez accepter les conditions générales')],
 
-            [['prenom_enfant', 'agemoyen', 'nbparticipant'], 'required', 'on' => ['anniversaire']],
+            [['nom', 'prenom', 'prenom_enfant', 'agemoyen', 'nbparticipant'], 'required', 'on' => ['anniversaire']],
         ];
     }
 
