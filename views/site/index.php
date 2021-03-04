@@ -160,13 +160,14 @@ $this->title = 'VH Gestion des cours';
                         'aspectRatio' => 1.6,
                         'allDaySlot' => false,
                         'eventLimit' => 3,
+                        'nowIndicator' => true,
                     ],
                     'options' => [
                         'id' => 'myCalendar' . $salle->parametre_id,
                     ],
                     'header' => [
                         'center'=>'title',
-                        'left'=>'prev,next today', 
+                        'left'=>'prev,next today',
                         'right'=>'agendaDay,agendaWeek,month'
                     ],
                     'eventRender' => 'function(event, element) {
@@ -177,7 +178,7 @@ $this->title = 'VH Gestion des cours';
                         $.ajax({
                                 type: "POST",
                                 cache: false,
-                                url: "'.Url::toRoute(['/site/setcalendarview', 'for' => $salle->parametre_id]).'",
+                                url: "'.Url::toRoute(['/site/setcalendarview', 'for' => $salle->parametre_id, 'name' => 'home']).'",
                                 data: {view: event.name, start: moment.format()},
                                 dataType: "json",
                             });

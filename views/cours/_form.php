@@ -13,7 +13,7 @@ use kartik\dialog\Dialog;
 
 $script = '
     $("#cours-prix").change(function() {
-      $("#edit-price").val($(this).val());
+        $("#edit-price").val($(this).val());
     });
     
     $("#submitButton").on("click", function() {
@@ -50,6 +50,16 @@ $this->registerJs($script, View::POS_END);
         'options' => [
             'type' => Dialog::TYPE_DEFAULT,
             'title' => Yii::t('app', 'Le prix du cours a été modifié !'),
+            'btnOKClass' => 'btn-primary',
+            'btnOKLabel' => Yii::t('app', 'Oui'),
+            'btnCancelLabel' => Yii::t('app', 'Non'),
+        ]
+    ]) ?>
+    <?= Dialog::widget([
+        'libName' => 'myDialogBareme',
+        'options' => [
+            'type' => Dialog::TYPE_DEFAULT,
+            'title' => Yii::t('app', 'Le barême du cours a été modifié !'),
             'btnOKClass' => 'btn-primary',
             'btnOKLabel' => Yii::t('app', 'Oui'),
             'btnCancelLabel' => Yii::t('app', 'Non'),
@@ -127,7 +137,7 @@ $this->registerJs($script, View::POS_END);
     
     <div class="row">
         <div class="col-sm-12">
-            <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
+            <?= $form->field($model, 'description')->widget(new \yii\redactor\widgets\Redactor()) ?>
         </div>
     </div>
 
@@ -136,6 +146,9 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'fk_categories')->checkboxList($modelParams->optsCategorie()) ?>
             <?= $form->field($model, 'fk_langue')->dropDownList($modelParams->optsLangue($model->fk_langue)) ?>
             <?= $form->field($model, 'fk_salle')->dropDownList($modelParams->optsSalle($model->fk_salle)) ?>
+
+            <label for="editBareme"><?= Yii::t('app', 'Changer le barême pour toutes les dates') ?></label>
+            <?= Html::dropDownList('editBareme', null, $modelParams->optsNiveauFormation(), ['class' => 'form-control', 'prompt'=>'Choisir un barême']) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'image')->widget(FileInput::classname(), [

@@ -5,27 +5,30 @@ use yii\bootstrap\Alert;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ClientsOnline */
+
+$arrayForm = [
+    'model' => $model,
+    'modelsClient' => $modelsClient,
+    'dataCours' => $dataCours,
+    'selectedCours' => $selectedCours,
+    'params' => $params,
+];
+if (isset($choixAge)) {
+    $arrayForm['choixAge'] = $choixAge;
+}
 ?>
 <div class="clients-online-create">
-    
-    <h3><?= Yii::t('app', 'Attention : pour les inscriptions à - de 72h , merci de nous contacter par téléphone') ?></h3>
-    <br /><br />
-    
-    <?php if ($alerte != '') {
+
+    <?php if (Yii::$app->session->hasFlash('alerte')) {
+        $alerte = Yii::$app->session->getFlash('alerte');
         echo Alert::widget([
             'options' => [
-                'class' => 'alert-danger',
+                'class' => 'alert-'.$alerte['type'],
             ],
-            'body' => $alerte,
-        ]); 
+            'body' => $alerte['info'],
+        ]);
     } ?>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-        'modelsClient' => $modelsClient,
-        'dataCours' => $dataCours,
-        'selectedCours' => $selectedCours,
-        'params' => $params,
-    ]) ?>
+    <?= $this->render($displayForm, $arrayForm) ?>
 
 </div>

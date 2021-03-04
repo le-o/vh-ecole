@@ -50,6 +50,9 @@ $this->registerJs('
     , \yii\web\View::POS_READY);
 ?>
 
+<h3><?= Yii::t('app', 'Attention : pour les inscriptions à - de 72h , merci de nous contacter par téléphone') ?></h3>
+<br /><br />
+
 <div class="clients-online-form">
 
     <?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>

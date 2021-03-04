@@ -28,6 +28,9 @@ $this->registerJs('
                             <li>#nom-de-session# : <i><?= Yii::t('app', 'nom de la session') ?></i></li>
                             <li>#nom-de-saison# : <i><?= Yii::t('app', 'nom de la saison') ?></i></li>
                             <li>#prix-du-cours# : <i><?= Yii::t('app', 'prix du cours') ?></i></li>
+                            <li>#infostarifs# : <i><?= Yii::t('app', 'tarifs du cours') ?></i></li>
+                            <li>#description-cours# : <i><?= Yii::t('app', 'description du cours') ?></i></li>
+                            <li>#extrait-cours# : <i><?= Yii::t('app', 'extrait du cours') ?></i></li>
                             <li>#date-prochain# : <i><?= Yii::t('app', 'date du prochain cours') ?></i></li>
                             <li>#toutes-les-dates#: <i><?= Yii::t('app', 'toutes les dates du cours') ?></i></li>
                             <li>#toutes-les-dates-avec-lieux# : <i><?= Yii::t('app', 'toutes les dates du cours avec lieux') ?></i></li>

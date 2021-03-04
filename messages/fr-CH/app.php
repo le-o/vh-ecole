@@ -73,6 +73,17 @@ return [
     <br />
     Vertic-Halle se réserve le droit de modifier la prestation en fonction du niveau et du nombre de participants, si les 
     conditions le permettent et que les objectifs du cours peuvent être atteints.',
+    'Conditions inscription et annulation anniversaire' => '<h4>Conditions d\'inscription et d\'annulation</h4>
+    L\'inscription aux anniversaires à Vertic-Halle se fait sur réservation. Jusqu\'à 72h avant le début du cours, aucun 
+    montant n\'est dû. Dans les 72h avant le début de l\'événement, 40% du montant de base est dû. En cas d\'annulation 
+    le jour de l\'événement, 100% du montant est dû.<br />
+    <br />
+    Vertic-Halle n\'effectue aucun remboursement des montants dus selon les conditions susmentionnées ni de remboursement 
+    partiel pour des cours manqués (hormis la part relative aux entrées et au matériel, si applicable). En cas d\'annulation 
+    par Vertic-Halle, le montant déjà versé sera remboursé proportionnellement aux cours annulés.<br />
+    <br />
+    Vertic-Halle se réserve le droit de modifier la prestation en fonction du niveau et du nombre de participants, si les 
+    conditions le permettent et que les objectifs du cours peuvent être atteints.',
     'Contenu du message à envoyer' => 'Contenu du message à envoyer',
     'Cours' => 'Cours',
     'Cours Date ID' => 'Date de cours ID',
@@ -109,6 +120,7 @@ return [
     'Etes-vous sur de vouloir supprimer cet élément?' => 'Etes-vous sur de vouloir supprimer cet élément?',
     'Exporter tous' => 'Exporter tous',
     'Faire un choix ...' => 'Faire un choix ...',
+    'Falaise' => 'Falaise',
     'Fk Age' => '@@Tranche d\'âge@@',
     'Fk Cours' => 'Nom du cours',
     'Fk Cours Date' => 'Date de cours',

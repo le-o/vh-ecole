@@ -33,6 +33,7 @@ use webvimark\modules\UserManagement\models\User;
                     'items' => [
                         ['label' => Yii::t('app', 'Planification'), 'url' => ['/cours-date/liste'], 'visible' => User::canRoute(['/cours-date/liste'])],
                         ['label' => Yii::t('app', 'Gestion des cours'), 'url' => ['/cours'], 'visible' => User::canRoute(['/cours/index'])],
+                        ['label' => Yii::t('app', 'Anniversaires'), 'url' => ['/site/anniversaire'], 'visible' => User::canRoute(['/site/anniversaire'])],
                     ],
                 ],
                 ['label' => Yii::t('app', 'Outils'), 'visible' => !Yii::$app->user->isGuest && User::canRoute(['/clients-online/index']),

@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $model app\models\Cours */
 
 $this->title = Yii::t('app', 'Cours').' '.$model->fkNom->nom.' '.$model->fkNiveau->nom.' - '.
-        $model->fkJoursNoms.' '.$model->firstCoursDate->heure_debut.' '.$model->fkSaison->nom;
+        $model->fkJoursNoms.' '.$model->firstCoursDate->heure_debut.' '. (isset($model->fk_saison) ? $model->fkSaison->nom : '');
 
 ?>
 

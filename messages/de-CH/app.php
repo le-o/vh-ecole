@@ -102,6 +102,7 @@ return [
     'Etes-vous sur de vouloir supprimer cet élément?' => 'Bist du sicher, dass du diesen Artikel löschen willst?',
     'Exporter tous' => 'Alle exportieren',
     'Faire un choix ...' => 'Eine Wahl treffen ...',
+    'Falaise' => 'Felswand',
     'Fk Cours' => 'Kurs',
     'Fk Cours Date' => 'Kursdatum',
     'Fk Interlocuteur' => 'Ansprechpartner',

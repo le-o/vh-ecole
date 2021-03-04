@@ -71,6 +71,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Moniteurs');
         ?>
 
         <div class="form-group">
+            <?= Html::checkbox('withNotification', true, ['label' => Yii::t('app', 'Avec email aux moniteurs')]) ?><br />
             <?= Html::submitButton(Yii::t('app', 'Enregistrer'), ['class' => 'btn btn-success']) ?>
         </div>
 

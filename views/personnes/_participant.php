@@ -156,7 +156,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'checkboxOptions' => function ($data, $key, $index, $column) use ($model, $forPresenceOnly) {
                     if ($forPresenceOnly) {
                         $bool = $data->getClientsHasOneCoursDate($model->cours_date_id);
-                        return ['value' => $key, 'checked' => (isset($bool->is_present)) ? $bool->is_present : false];
+                        return ['value' => $key, 'checked' => (isset($bool->is_present)) ? (bool)$bool->is_present : false];
                     }
                     return '';
                 }

@@ -30,16 +30,17 @@
         "kartik-v/yii2-export": "1.4.0",
         "kartik-v/yii2-widget-colorinput": "*",
         "kartik-v/yii2-mpdf": "*",
+        "kartik-v/yii2-widget-depdrop": "*",
         "yiidoc/yii2-redactor": "*",
         "open-ecommerce/yii2-backuprestore": "dev-master",
-        "philippfrenzel/yii2fullcalendar":"3.9.0",
+        "le-o/yii2fullcalendar":"4.0.3",
         "wbraganca/yii2-dynamicform": "dev-master",
         "spatie/calendar-links": "^1.1",
         "webvimark/module-user-management": "*",
         "lajax/yii2-language-picker": "1.*"
     },
     "require-dev": {
-        "yiisoft/yii2-codeception": "*",
+        "codeception/codeception": "*",
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*"
@@ -77,5 +78,11 @@
                 "config/web.php"
             ]
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/le-o/yii2fullcalendar.git"
+        }
+    ]
 }

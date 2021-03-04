@@ -19,7 +19,9 @@ class CoursDateSearch extends CoursDate
     public $depuis;
     public $dateA;
     public $homepage = false;
+    public $anniversairepage = false;
     public $withoutMoniteur = true;
+    public $fkTypeCours;
     
     public $fkNom;
 	
@@ -29,7 +31,7 @@ class CoursDateSearch extends CoursDate
     public function rules()
     {
         return [
-            [['cours_date_id', 'fk_cours', 'fk_lieu'], 'integer'],
+            [['cours_date_id', 'fk_cours', 'fk_lieu', 'fkTypeCours'], 'integer'],
             [['withoutMoniteur'], 'boolean'],
             [['date', 'heure_debut', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA', 'fkNom'], 'safe'],
         ];
@@ -97,9 +99,13 @@ class CoursDateSearch extends CoursDate
         $query->andFilterWhere(['like', 'nb_client_non_inscrit', $this->nb_client_non_inscrit]);
         $query->andFilterWhere(['like', 'parametres.nom', $this->fkCours]);
         $query->andFilterWhere(['like', 'cours.session', $this->session]);
-        
+        $query->andFilterWhere(['like', 'cours.fk_type', $this->fkTypeCours]);
+
         if ($this->depuis != '') {
             $query->andWhere("date >= '".date('Y-m-d', strtotime($this->depuis))."'");
+            if (true == $this->anniversairepage) {
+                $query->andWhere("cours.is_publie = 1 AND cours.fk_statut = " . Yii::$app->params['coursActif']);
+            }
             if ($this->homepage == true) {
                 $query->distinct = true;
                 $query->select = ['fk_cours'];
@@ -116,7 +122,7 @@ class CoursDateSearch extends CoursDate
         }
 
         if (true == $this->withoutMoniteur) {
-            $query->andFilterWhere(['IN', 'cours_has_moniteurs.fk_moniteur', implode(',', Yii::$app->params['sansEncadrant'])]);
+            $query->andFilterWhere(['cours_has_moniteurs.fk_moniteur' => Yii::$app->params['sansEncadrant']]);
         }
 
         return $dataProvider;

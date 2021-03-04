@@ -49,30 +49,30 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => Yii::t('app', 'Statut'),
                 'attribute' => 'fkCours.fkStatut.nom',
-                'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
+                'visible' => (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) ? true : false,
             ],
             [
                 'label' => Yii::t('app', 'Fk Niveau'),
                 'attribute' => 'fkCours.fkNiveau.nom',
-                'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
+                'visible' => (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) ? true : false,
             ],
             [
                 'label' => Yii::t('app', 'Fk Type'),
                 'attribute' => 'fkCours.fkType.nom',
-                'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
+                'visible' => (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) ? true : false,
             ],
             [
                 'attribute' => 'fkCours.session',
-                'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
+                'visible' => (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) ? true : false,
             ],
             [
                 'attribute' => 'fkCours.annee',
-                'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
+                'visible' => (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) ? true : false,
             ],
             [
                 'format' => 'ntext',
                 'attribute' => 'fkCours.description',
-                'visible' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? true : false,
+                'visible' => (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) ? true : false,
             ],
             [
                 'label' => Yii::t('app', 'Lieu'),
@@ -99,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'participantIDs' => $participantIDs,
         'parametre' => $parametre,
         'emails' => $emails,
-        'forPresenceOnly' => ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) ? false : true,
+        'forPresenceOnly' => (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) ? false : true,
         'hasPlanification' => true,
     ]) ?>
 
