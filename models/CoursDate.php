@@ -243,7 +243,7 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getVCalendarString()
     {
-        if ($this->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
+        if (in_array($this->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
             $title = (isset($this->clientsHasCoursDate[0]) ? $this->clientsHasCoursDate[0]->fkPersonne->suivi_client.' '.$this->clientsHasCoursDate[0]->fkPersonne->societe.' '.$this->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
             $title .= ' ' . $this->fkCours->fkNom->nom . ' ' . $this->fkCours->session;
         } else {
