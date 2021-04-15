@@ -62,7 +62,7 @@ use yii\bootstrap\Alert;
     </div>
     
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
 	        <label class="control-label" for="w1"><?= Yii::t('app', 'Fk Moniteur'); ?></label>
 	        <?= Select2::widget([
 				'name' => 'list_moniteurs',
@@ -74,6 +74,9 @@ use yii\bootstrap\Alert;
 			        'tags' => true,
 			    ],
 			]); ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'baremeMoniteur')->dropDownList($modelParams->optsNiveauFormation(), ['prompt'=>Yii::t('app', 'Barème non fixé')]) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu($model->fk_lieu)) ?>

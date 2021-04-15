@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\CoursDate;
+use app\models\CoursHasMoniteurs;
 use app\models\Personnes;
 use app\models\PersonnesHasInterlocuteurs;
 use Yii;
@@ -22,7 +23,7 @@ use yii\helpers\Json;
 class ClientsOnlineController extends CommonController
 {
     
-    public $freeAccessActions = ['create', 'createanniversaire', 'depnbparticipants'];
+    public $freeAccessActions = ['create', 'findanniversaire', 'createanniversaire', 'depnbparticipants'];
     
     /**
      * @inheritdoc
@@ -284,13 +285,36 @@ class ClientsOnlineController extends CommonController
     }
 
     /**
+     * @param string $lang_interface
+     * @return string
+     */
+    public function actionFindanniversaire($lang_interface = 'fr-CH') {
+        $this->layout = "main_1_logo";
+        Yii::$app->language = $lang_interface;
+
+        $salleID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : Yii::$app->params['saxon'];
+        if (Yii::$app->params['baltschieder'] == $salleID) {
+            Yii::$app->language = 'de-CH';
+        }
+
+        // set la valeur de la date début du calendrier
+        if (null === Yii::$app->session->get('anni-cal-debut')) Yii::$app->session->set('anni-cal-debut', date('Y-m-d'));
+        if (null === Yii::$app->session->get('anni-cal-view')) Yii::$app->session->set('anni-cal-view', 'agendaWeek');
+
+        return $this->render('anniversaire', [
+            'model' => Parametres::findOne($salleID),
+            'salleID' => $salleID,
+        ]);
+    }
+
+    /**
      * Creates a new ClientsOnline model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreateanniversaire($ident = null, $lang_interface = 'fr-CH')
     {
-        $this->layout = "main_1";
+        $this->layout = "main_1_logo";
         Yii::$app->language = $lang_interface;
 
         $model = new ClientsOnline();
@@ -299,6 +323,10 @@ class ClientsOnlineController extends CommonController
 
         $modelCoursDate = CoursDate::findOne($ident);
         $modelCours = $modelCoursDate->fkCours;
+
+        if (Yii::$app->params['baltschieder'] == $modelCours->fk_salle) {
+            Yii::$app->language = 'de-CH';
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             $model->is_actif = 1;
@@ -338,8 +366,6 @@ class ClientsOnlineController extends CommonController
                                 $existeID = $cd->personne_id;
                             } else {
                                 $existeID = $isPersonne->personne_id;
-                                $isPersonne->fk_statut = Yii::$app->params['persStatutInscrit'];
-                                $isPersonne->fk_type = 1;
                                 if (!in_array($isPersonne->getOldAttribute('fk_statut'), [
                                     Yii::$app->params['persStatutInscrit'],
                                     Yii::$app->params['persStatutStandby'],
@@ -371,6 +397,18 @@ class ClientsOnlineController extends CommonController
                         foreach ($sendEmailTo as $personneID) {
                             $contenu['personne_id'] = $personneID;
                             $this->actionEmail($contenu, [$model->email], true);
+                        }
+
+                        // on envoie aussi un email aux moniteurs de la date
+                        $moniteurs = [];
+                        $modelCoursHasMoniteurs = CoursHasMoniteurs::findAll($ident);
+                        foreach ($modelCoursHasMoniteurs as $coursHasMoniteur) {
+                            $moniteurs['emails'][] = $coursHasMoniteur->fkMoniteur->email;
+                            $moniteurs['noms'][] = $coursHasMoniteur->fkMoniteur->prenom . ' ' . $coursHasMoniteur->fkMoniteur->nom;
+                        }
+                        if (!empty($moniteurs)) {
+                            $contenu = $this->generateMoniteurEmail($modelCoursDate, $moniteurs['noms'], 'birthday');
+                            $this->actionEmail($contenu, $moniteurs['emails']);
                         }
                     } else {
                         $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInfoAnnivOnline'][Yii::$app->language]);

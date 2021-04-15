@@ -32,7 +32,7 @@ class CommonController extends Controller
      * @return array(array(emails), array(nom))
      * @throws Exception
      */
-    protected function saveMoniteur($cours_date_id, $moniteurs, $delete = false) {
+    protected function saveMoniteur($cours_date_id, $moniteurs, $setBareme, $delete = false) {
         $emails = [];
         $nomMoniteurs = [];
         
@@ -44,6 +44,10 @@ class CommonController extends Controller
             $addMoniteur->fk_cours_date = $cours_date_id;
             $addMoniteur->fk_moniteur = $moniteur_id;
             $addMoniteur->is_responsable = 0;
+
+            // on gère le barème selon la saisie effectuée, si il n'est pas défini, on prend celui du moniteur
+            $addMoniteur->fk_bareme = (null != $setBareme) ? $setBareme : Personnes::findOne($moniteur_id)->fk_formation;
+
             if (!($flag = $addMoniteur->save(false))) {
                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
             }
@@ -73,6 +77,9 @@ class CommonController extends Controller
             $cudObjet = 'suppression';
             $cudContent = '<p>Un cours auquel tu étais prévu comme moniteur a été supprimé. Prière de prendre bonne note de l\'annulation.<br />Merci et à bientôt.';
             $withLink = false;
+        } elseif ('birthday' == $cud) {
+            $cudObjet = 'anniversaire';
+            $cudContent = '<p>Un client est inscrit au cours pour lequel tu es prévu comme moniteur. Prière de prendre bonne note de la date.<br />Merci et à bientôt.';
         } else {
             throw new Exception('Erreur typage email');
         }

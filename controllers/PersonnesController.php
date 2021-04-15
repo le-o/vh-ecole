@@ -100,6 +100,7 @@ class PersonnesController extends CommonController
      */
     public function actionMoniteurs($isMoniteur = false)
     {
+        $this->layout = 'main_full';
         $searchModel = new PersonnesSearch();
 
         // si profil moniteur, accès uniquement à ses données
@@ -117,17 +118,33 @@ class PersonnesController extends CommonController
         
         $dataMoniteurs = [];
         $heuresTotal = 0;
+        $baremes = (new Parametres())->optsNiveauFormation();
         if (!$isMoniteur || !is_null($searchModel->personne_id)) {
             foreach ($dataProvider->models as $moniteur) {
                 $heures = 0;
+                foreach ($baremes as $key => $bareme) {
+                    $heuresBareme[$key] = 0;
+                }
                 foreach ($moniteur->moniteurHasCoursDate as $mcd) {
                     $coursDate = CoursDate::findOne($mcd->fk_cours_date);
 
                     $dateRef = date('Y-m-d', strtotime($coursDate->date));
                     if ($dateRef >= $searchFrom && $dateRef <= $searchTo) {
                         if ($searchParCours) {
-                            if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) $heures += $coursDate->duree;
-                        } else $heures += $coursDate->duree;
+                            if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) {
+                                $heures += $coursDate->duree;
+                                // total par barême
+                                if ('' != $mcd->fk_bareme) {
+                                    $heuresBareme[$mcd->fk_bareme] += $coursDate->duree;
+                                }
+                            }
+                        } else {
+                            $heures += $coursDate->duree;
+                            // total par barême
+                            if ('' != $mcd->fk_bareme) {
+                                $heuresBareme[$mcd->fk_bareme] += $coursDate->duree;
+                            }
+                        }
                     }
                 }
                 if (!$searchParCours || ($searchParCours && $heures !== 0)) {
@@ -147,6 +164,9 @@ class PersonnesController extends CommonController
                     $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;
                     $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = ($moniteur->fk_formation == 0 || is_null($moniteur->fk_formation) || !isset($moniteur->fkFormation)) ? '' : $moniteur->fkFormation->nom;
                     $dataMoniteurs[$moniteur->personne_id]['heures'] = number_format($heures, 2, '.', '\'');
+                    foreach ($baremes as $key => $bareme) {
+                        $dataMoniteurs[$moniteur->personne_id][$bareme] = number_format($heuresBareme[$key], 2, '.', '\'');
+                    }
                     $heuresTotal += $heures;
                 }
             }
@@ -213,6 +233,7 @@ class PersonnesController extends CommonController
             'heuresTotal' => number_format($heuresTotal, 2, '.', '\''),
             'fromData' => $fromData,
             'isMoniteur' => $isMoniteur,
+            'baremes' => $baremes,
         ]);
     }
 

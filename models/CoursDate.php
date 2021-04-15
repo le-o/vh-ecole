@@ -30,6 +30,7 @@ class CoursDate extends \yii\db\ActiveRecord
     const CALENDAR_EDIT = 2;
     
     public $updateSync = true;
+    public $baremeMoniteur = null;
 
     /**
      * @inheritdoc
@@ -47,7 +48,7 @@ class CoursDate extends \yii\db\ActiveRecord
         return [
             [['fk_cours', 'date', 'heure_debut', 'duree', 'prix', 'fk_lieu'], 'required'],
             [['fk_cours', 'nb_client_non_inscrit', 'fk_lieu'], 'integer'],
-            [['date', 'heure_debut', 'remarque'], 'safe']
+            [['date', 'heure_debut', 'remarque', 'baremeMoniteur'], 'safe']
         ];
     }
 
@@ -68,6 +69,7 @@ class CoursDate extends \yii\db\ActiveRecord
             'prix' => Yii::t('app', 'Prix'),
             'remarque' => Yii::t('app', 'Remarque'),
             'nb_client_non_inscrit' => Yii::t('app', 'Nombre de client sans inscription'),
+            'baremeMoniteur' => Yii::t('app', 'Barème prestation'),
         ];
     }
     

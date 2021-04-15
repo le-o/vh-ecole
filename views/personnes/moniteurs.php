@@ -30,7 +30,7 @@ $gridColumnsBegin = [
     'prenom',
     'localite',
 ];
-$gridColumnsEnd = [
+$gridColumnsMiddle = [
     [
         'attribute' => 'fk_langues',
         'label' => Yii::t('app', 'Langues parlées'),
@@ -40,7 +40,16 @@ $gridColumnsEnd = [
     [
         'attribute' => 'fk_formation',
         'label' => Yii::t('app', 'Formation'),
-    ],
+    ]
+];
+foreach ($baremes as $key => $bareme) {
+    $gridColumnsHours[] =
+        [
+            'attribute' => $bareme,
+            'label' => Yii::t('app', $bareme),
+        ];
+}
+$gridColumnsEnd = [
     [
         'attribute' => 'heures',
         'footer' => '<div style="text-align:right; font-weight:bold;">'.$heuresTotal.'</div>',
@@ -63,8 +72,8 @@ $gridColumnsEnd = [
         ],
     ],
 ];
-$gridColumns = array_merge ($gridColumnsBegin, $gridColumnsEnd);
-$gridColumnsExport = array_merge($gridColumnsBegin, ['adresse1', 'adresse2', 'npa', 'date_naissance'], $gridColumnsEnd);
+$gridColumns = array_merge ($gridColumnsBegin, $gridColumnsMiddle, $gridColumnsHours, $gridColumnsEnd);
+$gridColumnsExport = array_merge($gridColumnsBegin, ['adresse1', 'adresse2', 'npa', 'date_naissance'], $gridColumnsMiddle, $gridColumnsHours, $gridColumnsEnd);
 ?>
 
 <div class="personnes-moniteurs">

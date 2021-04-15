@@ -27,7 +27,7 @@ require_once('../vendor/le-o/simpleCalDAV/SimpleCalDAVClient.php');
 class SiteController extends Controller
 {
     
-    public $freeAccessActions = ['index', 'login'];
+    public $freeAccessActions = ['index', 'login', 'setcalendarview'];
     public $layout = 'main_full.php';
     
     public function behaviors()
@@ -371,6 +371,11 @@ class SiteController extends Controller
         return $this->render('about');
     }
 
+    /**
+     * @param $coursDateID
+     * @param $client
+     * @return null
+     */
     private function doDelete($coursDateID, $client) {
         $filter = new \CalDAVFilter("VEVENT");
 
@@ -391,6 +396,9 @@ class SiteController extends Controller
         return $events;
     }
 
+    /**
+     *
+     */
     public function actionTranslation()
     {
         $params = Parametres::find()->where(['fk_langue' => 253])->all();
@@ -407,12 +415,23 @@ class SiteController extends Controller
             ]</pre>DONE';
         exit;
     }
-    
-    public function actionSetcalendarview($for, $name) {
+
+    /**
+     * @param $for
+     * @param $name
+     * @param false $open
+     * @throws NotFoundHttpException
+     */
+    public function actionSetcalendarview($for, $name, $open = false) {
         if (Yii::$app->request->isAjax) {
             $data = Yii::$app->request->post();
-            Yii::$app->session->set($name . '-cal-view-' . $for, $data['view']);
-            Yii::$app->session->set($name . '-cal-debut-' . $for, $data['start']);
+            if (true == $open) {
+                Yii::$app->session->set($name . '-cal-view', $data['view']);
+                Yii::$app->session->set($name . '-cal-debut', $data['start']);
+            } else {
+                Yii::$app->session->set($name . '-cal-view-' . $for, $data['view']);
+                Yii::$app->session->set($name . '-cal-debut-' . $for, $data['start']);
+            }
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }

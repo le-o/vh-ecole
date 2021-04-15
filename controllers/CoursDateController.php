@@ -11,14 +11,10 @@ use app\models\Cours;
 use app\models\CoursHasMoniteurs;
 use app\models\Personnes;
 use app\models\Parametres;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\db\Exception;
-use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use webvimark\modules\UserManagement\models\User;
 
@@ -28,7 +24,7 @@ use webvimark\modules\UserManagement\models\User;
 class CoursDateController extends CommonController
 {
     
-    public $freeAccessActions = ['jsoncalendar'];
+    public $freeAccessActions = ['jsoncalendar', 'jsoncalanni', 'jsoncalannionline'];
     
     public function behaviors()
     {
@@ -106,9 +102,9 @@ class CoursDateController extends CommonController
                     if (!$model->save()) {
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                     }
-                    
+
+                    $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs, $model->baremeMoniteur, true);
                     if ($mailToMoniteurs == true) {
-                        $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs, true);
                         // on envoi l'email à tous les moniteurs
                         if (!empty($infosEmail['emails'])) {
                             $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'update');
@@ -124,13 +120,14 @@ class CoursDateController extends CommonController
                     }
 
                     $transaction->commit();
-                    if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
+                    if (in_array($myCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
                         return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
                     } else {
                         return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
                     }
                 } catch (Exception $e) {
-                    $alerte = $e->getMessage();
+                    $alerte['class'] = 'danger';
+                    $alerte['message'] = $e->getMessage();
                     $transaction->rollBack();
                 }
             } else {
@@ -148,7 +145,7 @@ class CoursDateController extends CommonController
 
         // Gestion des participants - différente si planifié ou sur demande
         $listParticipants = [];
-        if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
+        if (in_array($model->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
             foreach ($model->clientsHasCoursDate as $c) {
                 $listParticipants[] = $c->fkPersonne;
             }
@@ -184,8 +181,13 @@ class CoursDateController extends CommonController
         $myCours = Cours::findOne($model->fk_cours);
         $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
         $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
+        $allBaremes = [];
         foreach ($myMoniteurs as $moniteur) {
-            $selectedMoniteurs[] = $moniteur->fk_moniteur;//.' '.$moniteur->fkMoniteur->prenom;
+            $selectedMoniteurs[] = $moniteur->fk_moniteur;
+            $allBaremes[] = $moniteur->fk_bareme;
+        }
+        if (1 == count(array_unique($allBaremes))) {
+            $model->baremeMoniteur = $allBaremes[0];
         }
         $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
@@ -340,7 +342,7 @@ class CoursDateController extends CommonController
                     throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                 }
                 
-                $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs);
+                $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs, $model->baremeMoniteur);
                 // on envoi l'email à tous les moniteurs
                 if (!empty($infosEmail['emails'])) {
                     $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'create');
@@ -363,7 +365,7 @@ class CoursDateController extends CommonController
                 }
 		        
                 $transaction->commit();
-                if ($myCours->fk_type == Yii::$app->params['coursPonctuel']) {
+                if (in_array($myCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
                     return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
                 } else {
                     return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
@@ -411,7 +413,6 @@ class CoursDateController extends CommonController
 	        
             $post = Yii::$app->request->post();
             $date_range = $post['date_range_1'];
-            $date_exclude = $post['date_exclude_1'];
 
             // on inscrit les participants déjà existant pour les autres planifications de ce cours
             // seulement pour les cours planifiés (planifié et régulié)
@@ -435,6 +436,7 @@ class CoursDateController extends CommonController
                         $modelDate = new CoursDate;
                         $modelDate->attributes = $model->attributes;
                         $modelDate->date = $date_debut;
+                        $modelDate->baremeMoniteur = $model->baremeMoniteur;
                         if (!$modelDate->save()) {
                             throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours. '.$date_debut));
                         }
@@ -447,16 +449,7 @@ class CoursDateController extends CommonController
                                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des participant(s).'));
                             }
                         }
-
-                        foreach ($moniteurs as $moniteur_id) {
-                            $addMoniteur = new CoursHasMoniteurs();
-                            $addMoniteur->fk_cours_date = $modelDate->cours_date_id;
-                            $addMoniteur->fk_moniteur = $moniteur_id;
-                            $addMoniteur->is_responsable = 0;
-                            if (!$addMoniteur->save(false)) {
-                                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
-                            }
-                        }
+                        $this->saveMoniteur($modelDate->cours_date_id, $moniteurs, $modelDate->baremeMoniteur);
                     }
                     $date_debut = date('Y-m-d', strtotime('+ 1 day', strtotime($date_debut)));
                 }
@@ -567,38 +560,55 @@ class CoursDateController extends CommonController
         
         Yii::$app->session->set('home-cal-debut-' . $for, $start);
 
-        $events = [];
-        foreach ($times AS $time){
-            //Testing
-            $Event = new \yii2fullcalendar\models\Event();
-            $Event->id = $time->cours_date_id;
-            $Event->url = Url::to(['/cours-date/view', 'id' => $time->cours_date_id]);
-            
-            if ($time->fkCours->fk_type == Yii::$app->params['coursPonctuel']) {
-                $Event->title = (isset($time->clientsHasCoursDate[0]) ? $time->clientsHasCoursDate[0]->fkPersonne->suivi_client.' '.$time->clientsHasCoursDate[0]->fkPersonne->societe.' '.$time->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
-                $Event->title .= ' '.$time->fkCours->fkNom->nom.' '.$time->fkCours->session;
-            } else {
-                $Event->title = $time->fkCours->fkNom->nom.' '.$time->fkCours->session.'.'.$time->fkCours->annee;
-            }
+        return $this->getEvents($times);
+    }
 
-            $arrayMoniteurs = [];
-            $moniteurs = $time->coursHasMoniteurs;
-            foreach ($moniteurs as $m) {
-                $arrayMoniteurs[] = $m->fkMoniteur->nomPrenom;
-            }
-            $Event->nonstandard = implode(', ', $arrayMoniteurs);
-            $Event->start = date('Y-m-d\TH:i:s\Z',strtotime($time->date.' '.$time->heure_debut));
-            $Event->end = date('Y-m-d\TH:i:s\Z',strtotime($time->date.' '.$time->HeureFin));
-            
-            if ($time->fkCours->fkNom->info_couleur != '' && in_array($time->fkCours->fk_nom, Yii::$app->params['coursModificationCouleur'])) {
-                $Event->color = Parametres::changerTonCouleur($time->fkCours->fkNom->info_couleur, Yii::$app->params['nuanceSelonNiveau'][$time->fkCours->fkNiveau->tri]);
-            } else {
-                $Event->color = $time->fkCours->fkNom->info_couleur;
-            }
-            $events[] = $Event;
-        }
+    /**
+     * Retourne un json avec les données à afficher dans le calendrier
+     * @param null $start
+     * @param null $end
+     * @param null $_
+     * @return array
+     */
+    public function actionJsoncalanni($start=NULL,$end=NULL,$_=NULL,$for){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $times = CoursDate::find()
+            ->joinWith(['fkCours'])
+            ->where(['>=', 'date', $start])
+            ->andWhere(['<=', 'date', $end])
+            ->andWhere(['cours.fk_salle' => $for])
+            ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
+            ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
+            ->all();
 
-        return $events;
+        $sessionName = (null == $for) ? 'anni-cal-debut' : 'anni-cal-debut-' . $for;
+        Yii::$app->session->set($sessionName, $start);
+
+        return $this->getEvents($times, true);
+    }
+
+    /**
+     * Retourne un json avec les données à afficher dans le calendrier
+     * @param null $start
+     * @param null $end
+     * @param null $_
+     * @return array
+     */
+    public function actionJsoncalannionline($start=NULL,$end=NULL,$_=NULL,$for){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $times = CoursDate::find()
+            ->joinWith(['fkCours'])
+            ->where(['>=', 'date', $start])
+            ->andWhere(['<=', 'date', $end])
+            ->andWhere(['cours.fk_salle' => $for])
+            ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
+            ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
+            ->all();
+
+        $sessionName = (null == $for) ? 'anni-cal-debut' : 'anni-cal-debut-' . $for;
+        Yii::$app->session->set($sessionName, $start);
+
+        return $this->getEvents($times, true, true);
     }
     
     /**
@@ -615,5 +625,74 @@ class CoursDateController extends CommonController
                 'message' => Yii::t('app', 'Modification enregistrée')
             ]);
         }
+    }
+
+    /**
+     * @param array $times
+     * @return array
+     */
+    private function getEvents(array $times, $checkEmpty = false, $online = false)
+    {
+        $events = [];
+        foreach ($times as $time) {
+            if (false == $checkEmpty && $time->fkCours->fk_type == Yii::$app->params['coursUnique'] && empty($time->clientsHasCoursDate)) {
+                continue;
+            }
+            //Testing
+            $Event = new \yii2fullcalendar\models\Event();
+            $Event->id = $time->cours_date_id;
+
+            if (false == $online) {
+                $Event->url = Url::to(['/cours-date/view', 'id' => $time->cours_date_id]);
+                if (in_array($time->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
+                    $Event->title = (isset($time->clientsHasCoursDate[0]) ? $time->clientsHasCoursDate[0]->fkPersonne->suivi_client . ' ' . $time->clientsHasCoursDate[0]->fkPersonne->societe . ' ' . $time->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
+                    $Event->title .= ' ' . $time->fkCours->fkNom->nom . ' ' . $time->fkCours->session;
+                } else {
+                    $Event->title = $time->fkCours->fkNom->nom . ' ' . $time->fkCours->session . '.' . $time->fkCours->annee;
+                }
+            } else {
+                $Event->url = Url::to(['/clients-online/createanniversaire', 'ident' => $time->cours_date_id]);
+                $Event->title = $time->fkCours->fkNom->nom;
+            }
+
+            $arrayMoniteurs = [];
+            $noMoniteur = false;
+            $moniteurs = $time->coursHasMoniteurs;
+            foreach ($moniteurs as $m) {
+                $arrayMoniteurs[] = $m->fkMoniteur->nomPrenom;
+                if (true == $checkEmpty && in_array($m->fk_moniteur, Yii::$app->params['sansEncadrant'])) {
+                    $noMoniteur = true;
+                }
+            }
+            $Event->nonstandard = (false == $online) ? implode(', ', $arrayMoniteurs) : '';
+            $Event->start = date('Y-m-d\TH:i:s\Z', strtotime($time->date . ' ' . $time->heure_debut));
+            $Event->end = date('Y-m-d\TH:i:s\Z', strtotime($time->date . ' ' . $time->HeureFin));
+
+            if ($time->fkCours->fkNom->info_couleur != '' && in_array($time->fkCours->fk_nom, Yii::$app->params['coursModificationCouleur'])) {
+                $Event->color = Parametres::changerTonCouleur($time->fkCours->fkNom->info_couleur, Yii::$app->params['nuanceSelonNiveau'][$time->fkCours->fkNiveau->tri]);
+            } elseif (true == $checkEmpty && false == $online) {
+                if (empty($time->clientsHasCoursDate)) {
+                    $Event->color = '#ff0000';
+                } else {
+                    if (empty($time->coursHasMoniteurs) || true == $noMoniteur) {
+                        $Event->color = '#ff9900';
+                    } else {
+                        $Event->color = '#27db39';
+                    }
+                }
+            } else {
+                $Event->color = $time->fkCours->fkNom->info_couleur;
+            }
+
+            // pour les inscriptions anniversaire online, on ne met que les cours avec moniteurs et sans client
+            if (true == $online) {
+                if (!empty($time->clientsHasCoursDate) || (empty($time->coursHasMoniteurs) && false == $noMoniteur)) {
+                    continue;
+                }
+            }
+            $events[] = $Event;
+        }
+
+        return $events;
     }
 }

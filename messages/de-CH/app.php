@@ -17,6 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    '{nombre} ans' => '{nombre} Jahre alt',
+    '{nombre} ans et +' => '{nombre} Jahre alt and mehr',
     ' + ' => ' + ',
     ' au ' => ' bis ',
     ' à ' => ' um ',
@@ -25,6 +27,7 @@ return [
     'Adresse 1' => 'Adresse 1',
     'Adresse 2' => 'Adresse 2',
     'Age' => 'Alter',
+    'Age moyen des enfants' => 'Mittleres Alter der Kinder',
     'Ajouter' => 'Hinzufügen',
     'Ajouter cours ...' => 'Kurs hinzufügen ...',
     'Ajouter moniteur ...' => 'Leiter hinzufügen ...',
@@ -37,15 +40,18 @@ return [
     'Champs dynamiques disponibles' => 'Verfügbare dynamische Felder',
     'Changer mot de passe' => 'Passwort ändern',
     'Choisir la couleur ...' => 'Farbe auswählen ...',
+    'Choisir un âge moyen' => 'Mittleres Alter auswählen',
     'Choisir un cours ...' => 'Kurs auswählen ...',
     'Choisir un niveau' => 'Stufe auswählen',
     'Choisir un nom' => 'Name auswählen',
+    'Choisir un nombre de participant' => 'Zahl der Teilnehmer auswählen',
     'Choisir un/des interlocuteurs ...' => 'Einen/mehrere Ansprechpartner auswählen ...',
     'Choisir un/des moniteurs ...' => 'Einen/mehrere Leiter auswählen ...',
     'Choisir une langue ...' => 'Eine Sprache auswählen ...',
     'Choisir une saison' => 'Eine Jahreszeit auswählen',
     'Choisir une tranche d\'âge' => 'Einen Altersabschnitt auswählen',
     'Choisir une valeur' => 'Einen Wert auswählen',
+    'Choix du nombre sans importance' => 'Wahl der unwichtigen Nummer',
     'Class Key' => 'Schlüsselklasse',
     'Client' => 'Kunde',
     'Client Online ID' => 'Online Kunde ID',
@@ -60,6 +66,15 @@ return [
     <br />
     Die Anmeldung für Kletterkurse auf Anfrage ist nach Voranmeldung möglich. Bis 72 Stunden vor Kursbeginn ist kein Betrag 
     fällig. Innerhalb von 72 Stunden vor Kursbeginn sind 40% des Gesamtpreises des Kurses fällig. Ab dem Datum der 1. Kursstunde 
+    sind 100% des Betrages fällig.<br />
+    <br />
+    Verpasste Kurse werden von Vertic-Halle grundsätzlich nicht erstattet. Im Falle einer Stornierung durch Vertic-Halle 
+    wird der bereits bezahlte Betrag vollständig rückerstattet.<br />
+    Vertic-Halle behält sich das Recht vor, die Leistung je nach Niveau und Teilnehmerzahl zu ändern, sofern die Bedingungen 
+    dies zulassen und die Kursziele erreicht werden können.',
+    'Conditions inscription et annulation anniversaire' => '<h4>Stornierungsbedingungen</h4>
+    Die Anmeldung für Kletterkurse auf Anfrage ist nach Voranmeldung möglich. Bis 72 Stunden vor Kursbeginn ist kein Betrag 
+    fällig. Innerhalb von 72 Stunden vor Kursbeginn sind 40% des Gesamtpreises des Kurses fällig. Ab dem Datum der Kursstunde 
     sind 100% des Betrages fällig.<br />
     <br />
     Verpasste Kurse werden von Vertic-Halle grundsätzlich nicht erstattet. Im Falle einer Stornierung durch Vertic-Halle 
@@ -81,6 +96,7 @@ return [
     'Date' => 'Datum',
     'Date Inscription' => 'Anmeldungsdatum',
     'Date Naissance' => 'Geburtsdatum',
+    'Date de naissance de l\'enfant' => 'Kindergeburtsdatum',
     'Date d\'inscription' => 'Anmeldungsdatum',
     'Date du cours' => 'Kursdatum',
     'Date début' => 'Anfangsdatum',
@@ -132,6 +148,7 @@ return [
     'Informations' => 'Informationen',
     'Infos diverses' => 'Diverse Informationen',
     'Infos, détails et besoins particuliers' => 'Informationen, Details und besondere Bedürfnisse',
+    'Inscription' => 'Anmeldung',
     'Inscription impossible - aucune date dans le futur' => 'Keine Anmeldung möglich - kein zukünftiges Datum',
     'Inscription impossible - erreur inattendue, veuillez contactez le support.' => 'Keine Anmeldung möglich - unerwarteter Fehler, nehme bitte mit dem Support Kontakt auf',
     'Inscription online' => 'Online-Anmeldung',
@@ -182,10 +199,12 @@ return [
     'Niveau' => 'Ebene',
     'Niveau formation' => 'Ausbildungsstufe',
     'Nom' => 'Name',
+    'Nom (personne responsable)' => 'Name (Eltern)',
     'Nom (du représentant légal si mineur)' => 'Name (Eltern oder rechtmässiger Vertreter falls minderjährig)',
     'Nom du cours' => 'Kursname',
     'Nom du moniteur' => 'Name des Leiters',
     'Nombre de client sans inscription' => 'Anzahl Kunden ohne Anmeldung',
+    'Nombre maximal de participants prévus' => 'Maximale Teilnehmerzahl erwartet',
     'Nombre participant max atteint' => 'Maximale Anzahl Teilnehmer erreicht',
     'Non renseigné' => 'keine Angaben',
     'Npa' => 'PLZ',
@@ -204,6 +223,7 @@ return [
     'Plage de date' => 'Datenbereich',
     'Planification' => 'Planung',
     'Planification prévue' => 'Vorgesehene Planung',
+    'plus de {nombre} enfants' => 'mehr als {nombre} Kinder',
     'Please fill out the following fields to login:' => 'Fülle bitte folgende Felder aus, um sich einloggen zu können',
     'Prenom' => 'Vorname',
     'Priorité internet' => 'Internetpriorität',
@@ -220,6 +240,8 @@ return [
     'Problème lors de la sauvegarde du/des interlocuteur(s).' => 'Fehler während der Sicherung des/der Ansprechpartner(s)',
     'Problème lors de la sauvegarde du/des moniteur(s).' => 'Fehler während der Sicherung des/der Leiter(s)',
     'Problème lors de la transformation de la personne.' => 'Fehler während der Personenumwandlung',
+    'Prénom de l\'enfant' => 'Kinder Vorname',
+    'Prénom (personne responsable)' => 'Vorname (Eltern)',
     'Prénom (du représentant légal si mineur)' => 'Vorname (des rechtmässigen Vertreters falls minderjährig)',
     'Remarque' => 'Bemerkung',
     'Remarques générales' => 'Allgemeine Bemerkung',
