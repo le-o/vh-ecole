@@ -16,6 +16,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\Exception;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
+use xstreamka\mobiledetect\Device;
 
 /**
  * ClientsOnlineController implements the CRUD actions for ClientsOnline model.
@@ -299,7 +300,15 @@ class ClientsOnlineController extends CommonController
 
         // set la valeur de la date début du calendrier
         if (null === Yii::$app->session->get('anni-cal-debut')) Yii::$app->session->set('anni-cal-debut', date('Y-m-d'));
-        if (null === Yii::$app->session->get('anni-cal-view')) Yii::$app->session->set('anni-cal-view', 'agendaWeek');
+        // et par défaut, sur mobile, en mode liste
+        if (Device::$isMobile) {
+            $this->layout = "main_full_logo";
+            Yii::$app->session->set('anni-cal-view', 'listMonth');
+        }
+        if (null === Yii::$app->session->get('anni-cal-view')) {
+            Yii::$app->session->set('anni-cal-view', 'agendaWeek');
+        }
+
 
         return $this->render('anniversaire', [
             'model' => Parametres::findOne($salleID),

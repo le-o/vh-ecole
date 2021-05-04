@@ -66,7 +66,7 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
                 'header' => [
                     'center'=>'title',
                     'left'=>'prev,next',
-                    'right'=>'agendaDay,agendaWeek,month'
+                    'right'=>'listMonth,agendaDay,agendaWeek,month'
                 ],
                 'eventRender' => 'function(event, element) {
                     element.find(\'.fc-title\').append("<br/><br/><i>" + event.nonstandard + "</i>");
