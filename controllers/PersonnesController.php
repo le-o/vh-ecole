@@ -133,17 +133,15 @@ class PersonnesController extends CommonController
                         if ($searchParCours) {
                             if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) {
                                 $heures += $coursDate->duree;
-                                // total par barême
-                                if ('' != $mcd->fk_bareme) {
-                                    $heuresBareme[$mcd->fk_bareme] += $coursDate->duree;
-                                }
+                                // total par barème
+                                $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
+                                $heuresBareme[$key] += $coursDate->duree;
                             }
                         } else {
                             $heures += $coursDate->duree;
-                            // total par barême
-                            if ('' != $mcd->fk_bareme) {
-                                $heuresBareme[$mcd->fk_bareme] += $coursDate->duree;
-                            }
+                            // total par barème
+                            $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
+                            $heuresBareme[$key] += $coursDate->duree;
                         }
                     }
                 }

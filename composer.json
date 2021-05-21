@@ -37,7 +37,8 @@
         "wbraganca/yii2-dynamicform": "dev-master",
         "spatie/calendar-links": "^1.1",
         "webvimark/module-user-management": "*",
-        "lajax/yii2-language-picker": "1.*"
+        "lajax/yii2-language-picker": "1.*",
+        "xstreamka/yii2-mobile-detect": "*"
     },
     "require-dev": {
         "codeception/codeception": "*",
