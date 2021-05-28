@@ -59,18 +59,17 @@ return [
     'Clients' => 'Kunden',
     'Clients Onlines' => 'Online Kunden',
     'Clients actifs' => 'Aktive Kunden',
-    'Conditions inscription et annulation' => '<h4>Stornierungsbedingungen</h4>
-    Die Anmeldung für geplante Kletterkurse erfolgt nach Voranmeldung. Bis 7 Tage vor Kursbeginn ist kein Betrag fällig. 
-    Innerhalb von 7 Tagen vor Kursbeginn sind 50% des Gesamtpreises des Kurses fällig (25% bei Anmeldung zu einem Jahresangebot). 
-    Ab dem Datum der 1. Kursstunde sind 100% des Betrages fällig.<br />
+    'Conditions inscription et annulation' => '<h4>Anmeldungs- und Stornierungsbedingungen</h4>
+    Die Anmeldung für Kletterkurse erfolgt nach Voranmeldung. Bis 7 Tage vor Kursbeginn werden keine Stornogebühren erhoben. 
+    Innerhalb von 7 Tagen vor Kursbeginn werden 25% des Gesamtbetrages von regulären Schuljahreskursen und 40% des 
+    Gesamtbetrages für alle anderen Kurse verrechnet. Ab dem Datum des 1. Kurses sind 100% des Betrages fällig.<br />
     <br />
-    Die Anmeldung für Kletterkurse auf Anfrage ist nach Voranmeldung möglich. Bis 72 Stunden vor Kursbeginn ist kein Betrag 
-    fällig. Innerhalb von 72 Stunden vor Kursbeginn sind 40% des Gesamtpreises des Kurses fällig. Ab dem Datum der 1. Kursstunde 
-    sind 100% des Betrages fällig.<br />
+    Die Vertic-Halle leistet keine Rückerstattungen, die gemäss den oben genannten Bedingungen geschuldet werden, noch leistet 
+    sie eine Teilrückerstattung für versäumte Unterrichtsstunden (mit Ausnahme des Anteils, der sich auf die Eintritte und 
+    das Material bezieht, falls dies zutreffend ist). Im Falle einer Stornierung durch Vertic-Halle wird der bereits bezahlte 
+    Betrag zurückerstattet.<br />
     <br />
-    Verpasste Kurse werden von Vertic-Halle grundsätzlich nicht erstattet. Im Falle einer Stornierung durch Vertic-Halle 
-    wird der bereits bezahlte Betrag vollständig rückerstattet.<br />
-    Vertic-Halle behält sich das Recht vor, die Leistung je nach Niveau und Teilnehmerzahl zu ändern, sofern die Bedingungen 
+    Vertic-Halle behält sich das Recht vor, die Dienstleistung je nach Niveau und Teilnehmerzahl zu ändern, wenn die Bedingungen 
     dies zulassen und die Kursziele erreicht werden können.',
     'Conditions inscription et annulation anniversaire' => '<h4>Stornierungsbedingungen</h4>
     Die Anmeldung für Kletterkurse auf Anfrage ist nach Voranmeldung möglich. Bis 72 Stunden vor Kursbeginn ist kein Betrag 

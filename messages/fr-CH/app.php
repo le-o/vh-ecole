@@ -55,21 +55,14 @@ return [
     'Clients Onlines' => 'Clients Onlines',
     'Clients actifs' => '',
     'Conditions inscription et annulation' => '<h4>Conditions d\'inscription et d\'annulation</h4>
-    L\'inscription aux cours d\'escalade planifiés se fait sur réservation. Jusqu\'à 7 jours avant le début du cours, aucun 
-    montant n\'est dû. Dans les 7 jours avant le début du cours, 50% du montant total du cours est dû (25% en cas d\'inscription 
-    à une offre annuelle). À partir de la date du 1er cours, 100% du montant est dû. Le versement peut être effectué par 
-    virement bancaire ou directement sur place avant le cours.<br />
-    <br />
-    L\'inscription aux cours d\'escalade sur demande se fait sur réservation. Jusqu\'à 72h avant le début du cours, aucun 
-    montant n\'est dû. Dans les 72h avant le début du cours, 40% du montant total du cours est dû. À partir de la date du 
+    L\'inscription aux cours d\'escalade se fait sur réservation. Jusqu\'à 7 jours avant le début du cours, aucun frais 
+    d\'annulation n\'est facturé. Dans les 7 jours avant le début du cours, 25% du montant total est facturé pour les 
+    cours réguliers à la saison et 40% du montant total est facturé pour tous les autres cours. À partir de la date du 
     1er cours, 100% du montant est dû.<br />
     <br />
     Vertic-Halle n\'effectue aucun remboursement des montants dus selon les conditions susmentionnées ni de remboursement 
     partiel pour des cours manqués (hormis la part relative aux entrées et au matériel, si applicable). En cas d\'annulation 
     par Vertic-Halle, le montant déjà versé sera remboursé proportionnellement aux cours annulés.<br />
-    <br />
-    Conditions de remboursement spécifiques en raison de la pandémie COVID pour les cours réguliers : [prix du cours - 
-    frais administratif de 120.-] x [nbre de cours perdus/nbre de cours totaux].<br />
     <br />
     Vertic-Halle se réserve le droit de modifier la prestation en fonction du niveau et du nombre de participants, si les 
     conditions le permettent et que les objectifs du cours peuvent être atteints.',

@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use webvimark\modules\UserManagement\models\User;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDateSearch */
@@ -25,23 +26,43 @@ use webvimark\modules\UserManagement\models\User;
             <?= $form->field($model, 'session')->textInput(['placeholder' => Yii::t('app', 'Session')])->label(false) ?>
         </div>
         <?php if (User::canRoute(['/cours-date/search'])) { ?>
-        <div class="col-sm-3">
-            <?php echo DatePicker::widget([
-                'model' => $model,
-                'attribute' => 'depuis',
-                'attribute2' => 'dateA',
-                'options' => ['placeholder' => Yii::t('app', 'Date début')],
-                'options2' => ['placeholder' => Yii::t('app', 'Date fin')],
-                'type' => DatePicker::TYPE_RANGE,
-                'separator' => '&nbsp;'.Yii::t('app', ' à ').'&nbsp;',
-                'form' => $form,
-                'pluginOptions' => [
-                    'format' => 'dd.mm.yyyy',
-                    'autoclose' => true,
-                ]
+            <div class="col-sm-3">
+                <?php echo DatePicker::widget([
+                    'model' => $model,
+                    'attribute' => 'depuis',
+                    'attribute2' => 'dateA',
+                    'options' => ['placeholder' => Yii::t('app', 'Date début')],
+                    'options2' => ['placeholder' => Yii::t('app', 'Date fin')],
+                    'type' => DatePicker::TYPE_RANGE,
+                    'separator' => '&nbsp;'.Yii::t('app', ' à ').'&nbsp;',
+                    'form' => $form,
+                    'pluginOptions' => [
+                        'format' => 'dd.mm.yyyy',
+                        'autoclose' => true,
+                    ]
+                ]); ?>
+            </div>
+        <?php } ?>
+        <div class="col-sm-2">
+            <?= Select2::widget([
+                'name' => 'fkTypeCours',
+                'value' => $selectedTypeCours, // initial value
+                'data' => $dataTypeCours,
+                'options' => ['placeholder' => Yii::t('app', 'Type de cours')],
+                'pluginOptions' => ['allowClear' => true],
             ]); ?>
         </div>
-        <?php } ?>
+        <div class="col-sm-2">
+            <?= Select2::widget([
+                'name' => 'fkSalle',
+                'value' => $selectedSalle, // initial value
+                'data' => $dataSalle,
+                'options' => ['placeholder' => Yii::t('app', 'Salle')],
+                'pluginOptions' => ['allowClear' => true],
+            ]); ?>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-sm-2">
             <?= $form->field($model, 'withoutMoniteur')->checkbox(['label' => Yii::t('app', 'Sans moniteur')]) ?>
         </div>

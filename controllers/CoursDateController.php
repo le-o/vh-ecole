@@ -239,7 +239,11 @@ class CoursDateController extends CommonController
     {
         $searchModel = new CoursDateSearch();
         $searchModel->depuis = date('d.m.Y');
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $searchParams = Yii::$app->request->queryParams;
+        $searchModel->fkTypeCours = isset($searchParams['fkTypeCours']) ? $searchParams['fkTypeCours'] : null;
+        $searchModel->fkSalle= isset($searchParams['fkSalle']) ? $searchParams['fkSalle'] : null;
+        $dataProvider = $searchModel->search($searchParams);
         $alerte = [];
         
         if ($msg === 'suppdate') {
@@ -249,11 +253,22 @@ class CoursDateController extends CommonController
             $alerte['class'] = 'danger';
             $alerte['message'] = $msg;
         }
+
+        $modelParams = new Parametres();
+        $dataTypeCours = $modelParams->optsTypeCours();
+        $selectedTypeCours = (isset($searchParams['fkTypeCours'])) ? $searchParams['fkTypeCours'] : '';
+
+        $dataSalle = $modelParams->optsSalle();
+        $selectedSalle = (isset($searchParams['fkSalle'])) ? $searchParams['fkSalle'] : '';
         
         return $this->render('liste', [
             'alerte' => $alerte,
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
+            'dataTypeCours' => $dataTypeCours,
+            'selectedTypeCours' => $selectedTypeCours,
+            'dataSalle' => $dataSalle,
+            'selectedSalle' => $selectedSalle,
         ]);
     }
     

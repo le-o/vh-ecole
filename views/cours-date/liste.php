@@ -24,11 +24,17 @@ $gridColumns = [
         'value' => 'fkCours.fkNom.nom',
     ],
     [
+        'label' => Yii::t('app', 'Type'),
+        'attribute' => 'fkTypeCours',
+        'value' => 'fkCours.fkType.nom',
+    ],
+    [
         'attribute' => 'session',
         'value' => 'fkCours.session',
     ],
     [
         'label' => Yii::t('app', 'Salle'),
+        'attribute' => 'fkSalle',
         'value' => 'fkCours.fkSalle.nom',
     ],
     [
@@ -113,7 +119,13 @@ $gridColumns = [
 <div class="cours-date-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php echo $this->render('_search', [
+            'model' => $searchModel,
+            'dataTypeCours' => $dataTypeCours,
+            'selectedTypeCours' => $selectedTypeCours,
+            'dataSalle' => $dataSalle,
+            'selectedSalle' => $selectedSalle,
+        ]); ?>
     
     <?php if (User::canRoute(['/gridview/export'])) { ?>
         <div style="margin-bottom: 10px;">
