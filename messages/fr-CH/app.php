@@ -67,8 +67,8 @@ return [
     Vertic-Halle se réserve le droit de modifier la prestation en fonction du niveau et du nombre de participants, si les 
     conditions le permettent et que les objectifs du cours peuvent être atteints.',
     'Conditions inscription et annulation anniversaire' => '<h4>Conditions d\'inscription et d\'annulation</h4>
-    L\'inscription aux anniversaires à Vertic-Halle se fait sur réservation. Jusqu\'à 72h avant le début de l\'événement, 
-    aucun montant n\'est dû. Dans les 72h avant le début de l\'événement, 40% du montant de base est dû. En cas d\'annulation 
+    L\'inscription aux anniversaires à Vertic-Halle se fait sur réservation. Jusqu\'à 7 jours avant le début de l\'événement, 
+    aucun montant n\'est dû. Dans les 7 jours avant le début de l\'événement, 40% du montant de base est dû. En cas d\'annulation 
     le jour de l\'événement, 100% du montant est dû.<br />
     <br />
     Vertic-Halle n\'effectue aucun remboursement des montants dus selon les conditions susmentionnées. En cas d\'annulation 
@@ -142,7 +142,7 @@ return [
     'Imprimer la liste des participants' => '',
     'Info Couleur' => 'Info couleur',
     'Info Special' => 'Info spécial',
-    'Informations' => 'Informations',
+    'Informations' => 'Infos & suivi client',
     'Infos diverses' => 'Infos diverses',
     'Infos, détails et besoins particuliers' => 'Remarque(s) particulière(s)',
     'Infos, détails et besoins particuliers (date et horaire, nom de la session, offres, 2 cours à l\'essai, etc.)' => '@@Infos, détails et besoins particuliers (date et horaire, nom de la session, offres, 2 cours à l\'essai, etc.)@@',
@@ -157,13 +157,11 @@ return [
     'Is Materiel Compris' => 'Matériel compris',
     'Is Publié' => 'Publié sur le site internet',
     'Is Responsable' => 'Est responsable',
-    'Je souhaite inscrire mon enfant pour 2 cours à l\'essai (je déciderai au terme des 2 cours si j\'inscris mon enfant pour un semestre ou à l\'année)' => '',
-    'Je souhaite inscrire mon enfant pour un semestre uniquement' => '',
+    'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet.' => '',
+    'J\'inscris mon enfant pour la saison et je paie le montant du cours en un seul versement' => '',
+    'J\'inscris mon enfant pour la saison et je paie le montant du cours en plusieurs versements (+ CHF 40 de frais administratifs)' => '',
+    'Je souhaite inscrire mon enfant pour un semestre uniquement' => 'Je souhaite inscrire mon enfant pour un semestre (uniquement pour les cours réguliers marmousets)',
     'Je souhaite profiter de l\'offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)' => 'Je souhaite profiter de l\'offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert - uniquement pour les cours réguliers)',
-    'Je souhaite étaler le paiement du cours en plusieurs tranches' => '',
-    'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)' => '@@Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)@@',
-    'Je choisis d\'étaler le paiement du solde en plusieurs tranches (CHF 10 par tranche)' => 'Je choisis d\'étaler le paiement du solde en plusieurs tranches (CHF 10 par tranche)',
-    'Je souhaite étaler le paiement du cours en plusieurs tranches (Frais administratifs: CHF 10 inscription pour un semestre, CHF 25 inscription pour la saison complète)' => '',
     'Jour semaine' => 'Jour de la semaine',
     'Jours' => '',
     'Jours de la semaine' => 'Jours de la semaine',
@@ -260,7 +258,7 @@ return [
     'Son statut a été modifié en inscrit.' => '@@Son statut a été modifié en inscrit.@@',
     'Statistiques moniteurs' => '@@Statistiques moniteurs@@',
     'Statut' => 'Statut',
-    'Suivi client' => 'Suivi client',
+    'Suivi client' => 'Infos paiement',
     'Sujet' => 'Sujet',
     'Supprimer futur' => 'Supprimer futur',
     'Synchro calendrier' => '',

@@ -440,7 +440,12 @@ class CoursController extends CommonController
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             if ($from == 'cours-date') {
-                ClientsHasCoursDate::deleteAll(['fk_personne' => $personne_id, 'fk_cours_date' => $cours_ou_date_id]);
+                $clientHasCoursDate = ClientsHasCoursDate::findOne(['fk_personne' => $personne_id, 'fk_cours_date' => $cours_ou_date_id]);
+                if (Yii::$app->params['coursUnique'] == $clientHasCoursDate->fkCoursDate->fkCours->fk_type) {
+                    $clientsHasCours = ClientsHasCours::findOne(['fk_cours' => $clientHasCoursDate->fkCoursDate->fk_cours, 'fk_personne' => $personne_id]);
+                    $clientsHasCours->delete();
+                }
+                $clientHasCoursDate->delete();
             } else {
                 if ($from == 'coursfutur') {
                     $coursDate = CoursDate::find()
@@ -566,7 +571,7 @@ class CoursController extends CommonController
                     }
                     foreach ($model->coursDates as $coursDate) {
                         $laDate = date('Ymd', strtotime($coursDate->date));
-                        
+
                         // on test si l'entrée existe déjà
                         // si oui, on choisit si il faut laisser l'entrée (inscrit = coche) ou la supprimer (pas inscrit)
                         // si non, on créé l'entrée dans le cas ou il y a la coche
@@ -575,7 +580,7 @@ class CoursController extends CommonController
                             $key = $coursDate->cours_date_id . '|' . $partID;
                             $myClientsHasCoursDate = ClientsHasCoursDate::findOne(['fk_cours_date' => $coursDate->cours_date_id, 'fk_personne' => $partID]);
                             if (null === $myClientsHasCoursDate) {
-                                if (in_array($key, $post['dateparticipant'][$laDate])) {
+                                if (isset($post['dateparticipant'][$laDate]) && in_array($key, $post['dateparticipant'][$laDate])) {
                                     $myClientsHasCoursDate = new ClientsHasCoursDate;
                                     $myClientsHasCoursDate->fk_cours_date = $coursDate->cours_date_id;
                                     $myClientsHasCoursDate->fk_personne = $partID;
@@ -583,8 +588,12 @@ class CoursController extends CommonController
                                     $myClientsHasCoursDate->save(false);
                                 }
                             } else {
-                                if (!in_array($key, $post['dateparticipant'][$laDate])) {
+                                if (!isset($post['dateparticipant']) || !isset($post['dateparticipant'][$laDate]) || !in_array($key, $post['dateparticipant'][$laDate])) {
                                     $myClientsHasCoursDate->delete();
+                                }
+                                // si plus aucune inscription pour le client, on supprime aussi le clientHasCours
+                                if (!isset($post['dateparticipant'])) {
+                                    ClientsHasCours::deleteAll(['fk_cours' => $coursDate->fk_cours, 'fk_personne' => $partID]);
                                 }
                             }
                         }

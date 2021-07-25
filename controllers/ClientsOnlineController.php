@@ -103,18 +103,14 @@ class ClientsOnlineController extends CommonController
             if (isset($post['offre_supp']) && in_array($model->fk_cours_nom, Yii::$app->params['nomsCoursEnfant'])) {
                 if ($post['offre_supp'] == 'cours_essai') {
                     $model->informations .= '
-                        + '.Yii::t('app', 'Je souhaite inscrire mon enfant pour 2 cours à l’essai (je déciderai au terme des 2 cours si j’inscris mon enfant pour un semestre ou à l’année)');
-                } elseif ($post['offre_supp'] == 'semestre') {
+                        + '.Yii::t('app', 'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet');
+                } elseif ($post['offre_supp'] == 'pmt_complet') {
                     $model->informations .= '
-                        + '.Yii::t('app', 'Je souhaite inscrire mon enfant pour un semestre uniquement');
-                } elseif ($post['offre_supp'] == 'offre_annuelle') {
+                        + '.Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en un seul versement');
+                } elseif ($post['offre_supp'] == 'pmt_tranche') {
                     $model->informations .= '
-                        + '.Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)');
+                        + '.Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en plusieurs versements (+ CHF 40 de frais administratifs)');
                 }
-            }
-            if (isset($post['pmt_tranche'])) {
-                $model->informations .= '
-                    + '.Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches');
             }
 
             $clientAuto = false;
@@ -321,7 +317,7 @@ class ClientsOnlineController extends CommonController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreateanniversaire($ident = null, $lang_interface = 'fr-CH')
+    public function actionCreateanniversaire($ident = null, $lang_interface = 'fr-CH', $free = false)
     {
         $this->layout = "main_1_logo";
         Yii::$app->language = $lang_interface;
@@ -330,8 +326,13 @@ class ClientsOnlineController extends CommonController
         $model->setScenario('anniversaire');
         $modelsClient = [new ClientsOnline];
 
-        $modelCoursDate = CoursDate::findOne($ident);
-        $modelCours = $modelCoursDate->fkCours;
+        if (false == $free) {
+            $modelCoursDate = CoursDate::findOne($ident);
+            $modelCours = $modelCoursDate->fkCours;
+        } else {
+            $modelCoursDate = new CoursDate;
+            $modelCours = (isset(Yii::$app->request->post()['anni-cours']) ? Cours::findOne(Yii::$app->request->post()['anni-cours']) : new Cours);
+        }
 
         if (Yii::$app->params['baltschieder'] == $modelCours->fk_salle) {
             Yii::$app->language = 'de-CH';
@@ -341,17 +342,24 @@ class ClientsOnlineController extends CommonController
             $model->is_actif = 1;
             $model->fk_cours_nom = $modelCours->fk_nom;
             $model->fk_cours = $modelCours->cours_id;
+
+            // Set de la date selon la saisie
+            $date = (false == $free ? $modelCoursDate->date : Yii::$app->request->post()['anni-date']);
+            $heure = (false == $free ? $modelCoursDate->heure_debut : Yii::$app->request->post()['anni-heure']);
+
             $infoAnniversaire = $model->informations . '
 ********************* INFO ANNIVERSAIRE *********************
 * ' . Yii::t('app', 'Prénom de l\'enfant') . ' : ' . $model->prenom_enfant . '
 * ' . Yii::t('app', 'Date de naissance de l\'enfant') . ' : ' . $model->date_naissance_enfant . '
 * ' . Yii::t('app', 'Age moyen des enfants') . ' : ' . $model->agemoyen . '
-* ' . Yii::t('app', 'Nombre de participant') . ' : ' . $model->nbparticipant;
+* ' . Yii::t('app', 'Nombre de participant') . ' : ' . $model->nbparticipant . '
+*
+* ' . Yii::t('app', 'Date choisie') . ' : ' . $date . ' ' . $heure;
 
             if ($model->validate()) {
                 $clientDirect = [];
 
-                $inscriptionAuto = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
+                $inscriptionAuto = !$free && $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
 
                 if (true == $inscriptionAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
@@ -434,7 +442,11 @@ class ClientsOnlineController extends CommonController
             }
         }
 
-        $dataCours = Yii::t('app', 'Inscription') . ' ' .$modelCours->fkNom->nom . ' ' . Yii::t('app', 'du') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à') . ' ' . $modelCoursDate->heure_debut;
+        if (false == $free) {
+            $titrePage = Yii::t('app', 'Inscription') . ' ' .$modelCours->fkNom->nom . ' ' . Yii::t('app', 'du') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à') . ' ' . $modelCoursDate->heure_debut;
+        } else {
+            $titrePage = Yii::t('app', 'Inscription anniversaire : date et heure à choix');
+        }
 
         if (in_array($modelCours->fk_nom, Yii::$app->params['anniversaireLight'])) {
             $choixAge = [
@@ -449,6 +461,14 @@ class ClientsOnlineController extends CommonController
             ];
         }
 
+        $query = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('parametres.tri')->where(['fk_statut' => Yii::$app->params['coursActif'], 'is_publie' => true]);
+        $query->andWhere(['OR', 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
+        $query->andWhere(['fk_type' => Yii::$app->params['coursUnique']]);
+        $modelCoursAnni = $query->all();
+        foreach ($modelCoursAnni as $anni) {
+            $dataCours[$anni->cours_id] = $anni->fkNom->nom;
+        }
+
         return $this->render('create', [
             'model' => $model,
             'modelsClient' => $modelsClient,
@@ -457,6 +477,8 @@ class ClientsOnlineController extends CommonController
             'params' => new Parametres,
             'displayForm' => '_anniversaire',
             'choixAge' => $choixAge,
+            'titrePage' => $titrePage,
+            'free' => $free,
         ]);
     }
 

@@ -52,7 +52,7 @@ class ClientsHasCoursDate extends \yii\db\ActiveRecord
      */
     public function getFkCoursDate()
     {
-        return $this->hasOne(CoursDate::className(), ['cours_date_id' => 'fk_cours_date']);
+        return $this->hasOne(CoursDate::class, ['cours_date_id' => 'fk_cours_date']);
     }
 
     /**
@@ -60,6 +60,6 @@ class ClientsHasCoursDate extends \yii\db\ActiveRecord
      */
     public function getFkPersonne()
     {
-        return $this->hasOne(Personnes::className(), ['personne_id' => 'fk_personne']);
+        return $this->hasOne(Personnes::class, ['personne_id' => 'fk_personne']);
     }
 }

@@ -7,6 +7,10 @@ use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Alert;
 use yii\web\View;
+use webvimark\modules\UserManagement\models\User;
+use kartik\export\ExportMenu;
+use kartik\date\DatePicker;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\CoursDateSearch */
@@ -36,18 +40,22 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 $gridColumns = [
     ['class' => 'kartik\grid\CheckboxColumn'],
     ['class' => 'kartik\grid\SerialColumn'],
-    'statutPart',
-    [
-        'label' => 'Cours',
-        'value' => function($data) {
-            return '<a href="'. Url::to(['/cours/view', 'id' => $data['cours_id']]).'">'.$data['nomCours'].' '.$data['niveauCours'].'</a>';
-        },
-        'format' => 'html',
-    ],
+
+    'personne_id',
+    'cours_info',
     'nom',
     'prenom',
-    'suivi_client',
+    [
+        'label' => Yii::t('app', 'Suivi client'),
+        'attribute' => 'suivi_client',
+    ],
     'age',
+    'adresse1',
+    'adresse2',
+    'npa',
+    'localite',
+    'email',
+    'telephone',
 
     ['class' => 'yii\grid\ActionColumn',
         'template'=>'{partView} {partUpdate}',
@@ -86,19 +94,19 @@ $gridColumns = [
     <h1><?= Html::encode($this->title) ?></h1>
     
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-2">
             <?php $form = ActiveForm::begin(['options' => ['style' => 'display:inline;']]); ?>
             <?php Modal::begin([
                 'id' => 'modal',
                 'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
                 'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default showModalButton'],
             ]);
-            
+
             echo '<a id="toggleEmail" href="#">'.Yii::t('app', 'Voir email(s)').'</a>';
             echo '<div id="item" style="display:none;">';
             echo implode(', ', $listeEmails);
             echo '</div>';
-            
+
             echo Html::hiddenInput('checkedEmails', implode(', ', $listeEmails), ['id'=>'checkedEmails']);
 
             echo $form->field($parametre, 'parametre_id')->dropDownList(
@@ -126,8 +134,78 @@ $gridColumns = [
             Modal::end(); ?>
             <?php ActiveForm::end(); ?>
         </div>
+
+        <?php $searchForm = ActiveForm::begin([
+            'action' => ['actif'],
+            'method' => 'get',
+        ]); ?>
+        <div class="col-sm-3">
+            <?= Select2::widget([
+                'name' => 'list_cours',
+                'value' => $selectedCours, // initial value
+                'data' => $dataCours,
+                'options' => ['placeholder' => Yii::t('app', 'Choisir un/des cours ...'), 'multiple' => true],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'tags' => true,
+                ],
+            ]); ?>
+        </div>
+        <div class="col-sm-3">
+            <?php echo DatePicker::widget([
+                'model' => $searchModel,
+                'attribute' => 'depuis',
+                'attribute2' => 'dateA',
+                'options' => ['placeholder' => Yii::t('app', 'Date début')],
+                'options2' => ['placeholder' => Yii::t('app', 'Date fin')],
+                'type' => DatePicker::TYPE_RANGE,
+                'separator' => '&nbsp;'.Yii::t('app', ' à ').'&nbsp;',
+                'form' => $searchForm,
+                'pluginOptions' => [
+                    'format' => 'dd.mm.yyyy',
+                    'autoclose' => true,
+                ]
+            ]); ?>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+                <?= Html::a(Yii::t('app', 'Reset'), ['cours-date/actif'], ['class'=>'btn btn-default']) ?>
+            </div>
+        </div>
+        <?php ActiveForm::end(); ?>
     </div>
     <br />
+
+    <?php if (User::hasRole(['admin', 'gestion'])) { ?>
+        <div style="margin-bottom: 10px;">
+            <?php
+            // Renders a export dropdown menu
+            echo ExportMenu::widget([
+                'dataProvider' => $dataProvider,
+                'columns' => $gridColumns,
+                'target' => ExportMenu::TARGET_SELF,
+                'showConfirmAlert' => false,
+                'showColumnSelector' => true,
+                'columnBatchToggleSettings' => [
+                    'label' => Yii::t('app', 'Tous/aucun'),
+                ],
+                'noExportColumns' => [12],
+                'dropdownOptions' => [
+                    'class' => 'btn btn-default',
+                    'label' => Yii::t('app', 'Exporter tous'),
+                ],
+                'exportConfig' => [
+                    ExportMenu::FORMAT_HTML => false,
+                    ExportMenu::FORMAT_TEXT => false,
+                    ExportMenu::FORMAT_PDF => false,
+                    ExportMenu::FORMAT_EXCEL_X => false,
+                ]
+            ]);
+            ?>
+        </div>
+    <?php } ?>
+
     <?= GridView::widget([
         'id' => 'personnegrid',
         'dataProvider' => $dataProvider,

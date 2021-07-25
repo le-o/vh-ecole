@@ -31,7 +31,7 @@ class PersonnesController extends CommonController
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['post'],
                 ],
@@ -135,12 +135,18 @@ class PersonnesController extends CommonController
                                 $heures += $coursDate->duree;
                                 // total par barème
                                 $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
+                                if (!isset($heuresBareme[$key])) {
+                                    $heuresBareme[$key] = 0;
+                                }
                                 $heuresBareme[$key] += $coursDate->duree;
                             }
                         } else {
                             $heures += $coursDate->duree;
                             // total par barème
                             $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
+                            if (!isset($heuresBareme[$key])) {
+                                $heuresBareme[$key] = 0;
+                            }
                             $heuresBareme[$key] += $coursDate->duree;
                         }
                     }

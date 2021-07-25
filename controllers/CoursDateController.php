@@ -30,7 +30,7 @@ class CoursDateController extends CommonController
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['post'],
                 ],
@@ -278,11 +278,21 @@ class CoursDateController extends CommonController
      */
     public function actionActif()
     {
+        $this->layout = 'main_full.php';
         $searchModel = new CoursDateSearch();
         $searchModel->depuis = date('d.m.Y');
+
+        $searchModel->withoutMoniteur = false;
+        // on clone le searchModel pour la liste déroulante des cours actifs
+        $searchModelAllCours = clone($searchModel);
+
+        $searchModel->listCours = (isset(Yii::$app->request->queryParams['list_cours'])) ? Yii::$app->request->queryParams['list_cours'] : [];
+        $selectedCours = $searchModel->listCours;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $dataProviderAllCours = $searchModelAllCours->search(Yii::$app->request->queryParams);
         
-        if (!empty(Yii::$app->request->post())) {
+        if (!empty(Yii::$app->request->post()) && isset(Yii::$app->request->post()['checkedEmails'])) {
             $mail = Yii::$app->request->post();
             $this->actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
 
@@ -294,33 +304,51 @@ class CoursDateController extends CommonController
         $listeEmails = [];
         foreach ($dataProvider->models as $data) {
             foreach ($data->clientsHasCoursDate as $client) {
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['statutPart'] = $client->fkStatut->nom;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['nomCours'] = $data->fkCours->fkNom->nom;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['niveauCours'] = $data->fkCours->fkNiveau->nom;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['nom'] = $client->fkPersonne->nom;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['prenom'] = $client->fkPersonne->prenom;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['suivi_client'] = $client->fkPersonne->suivi_client;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['age'] = $client->fkPersonne->age;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['cours_id'] = $data->fk_cours;
-                $arrayParticipants[$data->fk_cours.'*'.$client->fk_personne]['personne_id'] = $client->fk_personne;
-                
-                if (strpos($client->fkPersonne->email, '@') !== false) {
-                    $listeEmails[$client->fkPersonne->email] = trim($client->fkPersonne->email);
-                }
-                foreach ($client->fkPersonne->personneHasInterlocuteurs as $pi) {
-                    $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
+                if (!isset($arrayParticipants[$client->fk_personne])) {
+                    $arrayParticipants[$client->fk_personne]['nom'] = $client->fkPersonne->nom;
+                    $arrayParticipants[$client->fk_personne]['prenom'] = $client->fkPersonne->prenom;
+                    $arrayParticipants[$client->fk_personne]['suivi_client'] = $client->fkPersonne->suivi_client;
+                    $arrayParticipants[$client->fk_personne]['age'] = $client->fkPersonne->age;
+                    $arrayParticipants[$client->fk_personne]['cours_id'] = $data->fk_cours;
+                    $arrayParticipants[$client->fk_personne]['personne_id'] = $client->fk_personne;
+                    $arrayParticipants[$client->fk_personne]['adresse1'] = $client->fkPersonne->adresse1;
+                    $arrayParticipants[$client->fk_personne]['adresse2'] = $client->fkPersonne->adresse2;
+                    $arrayParticipants[$client->fk_personne]['npa'] = $client->fkPersonne->npa;
+                    $arrayParticipants[$client->fk_personne]['localite'] = $client->fkPersonne->localite;
+                    $arrayParticipants[$client->fk_personne]['email'] =
+                        ('interloc.' == $client->fkPersonne->email) ?
+                            $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->email :
+                            $client->fkPersonne->email;
+                    $arrayParticipants[$client->fk_personne]['telephone'] =
+                        ('interloc.' == $client->fkPersonne->telephone) ?
+                            $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->telephone :
+                            $client->fkPersonne->telephone;
+
+                    if (strpos($client->fkPersonne->email, '@') !== false) {
+                        $listeEmails[$client->fkPersonne->email] = trim($client->fkPersonne->email);
+                    }
+                    foreach ($client->fkPersonne->personneHasInterlocuteurs as $pi) {
+                        $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
+                    }
+                    $arrayParticipants[$client->fk_personne]['cours_info'] = $data->fkCours->fkNom->nom . ' ' . $data->fkCours->session . ' ' . $data->fkCours->fkSaison->nom . ' ' . $data->fkCours->fkSalle->nom;
                 }
             }
         }
         // pour trier, par chance c'est dans le bon ordre :)
         asort($arrayParticipants);
-        
+
         $participantDataProvider = new ArrayDataProvider([
             'allModels' => $arrayParticipants,
             'pagination' => [
                 'pageSize' => 100,
             ],
         ]);
+
+        $dataCours = [];
+        foreach ($dataProviderAllCours->models as $data) {
+            $dataCours[$data->fk_cours] = $data->fkCours->fkNom->nom . ' ' . $data->fkCours->session;
+        }
+        asort($dataCours);
         
         $parametre = new Parametres();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
@@ -328,6 +356,8 @@ class CoursDateController extends CommonController
         return $this->render('actif', [
             'dataProvider' => $participantDataProvider,
             'searchModel' => $searchModel,
+            'selectedCours' => $selectedCours,
+            'dataCours' => $dataCours,
             'parametre' => $parametre,
             'emails' => $emails,
             'listeEmails' => $listeEmails,

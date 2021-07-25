@@ -119,7 +119,7 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getFkCours()
     {
-        return $this->hasOne(Cours::className(), ['cours_id' => 'fk_cours']);
+        return $this->hasOne(Cours::class, ['cours_id' => 'fk_cours']);
     }
 
     /**
@@ -127,7 +127,15 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getFkLieu()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_lieu']);
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_lieu']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientHasCours($personneID)
+    {
+        return ClientsHasCours::findOne(['fk_cours' => $this->fk_cours, 'fk_personne' => $personneID]);
     }
 
     /**
@@ -135,7 +143,7 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getClientsHasCoursDate()
     {
-        return $this->hasMany(ClientsHasCoursDate::className(), ['fk_cours_date' => 'cours_date_id']);
+        return $this->hasMany(ClientsHasCoursDate::class, ['fk_cours_date' => 'cours_date_id']);
     }
 
     /**
@@ -151,7 +159,7 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function getCoursHasMoniteurs()
     {
-        return $this->hasMany(CoursHasMoniteurs::className(), ['fk_cours_date' => 'cours_date_id']);
+        return $this->hasMany(CoursHasMoniteurs::class, ['fk_cours_date' => 'cours_date_id']);
     }
 
     /**

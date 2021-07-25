@@ -168,7 +168,9 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                     'partView' => User::canRoute(['/personnes/view']),
                     'partUpdate' => (User::canRoute(['/clients-has-cours/update']) && $viewAndId[0] != 'cours-date') ? true : false,
                     'partDeleteFutur' => (User::canRoute(['/cours/participant-delete']) && $model::className() == 'app\models\Cours') ? (isset($model->fk_type) ? in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) : in_array($model->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) : false,
-                    'partDelete' => (User::canRoute(['/cours/participant-delete']) && $model::className() == 'app\models\Cours') ? true : false,
+                    'partDelete' => (User::canRoute(['/cours/participant-delete']) &&
+                                        ('app\models\Cours' == $model::className() || ('app\models\CoursDate' == $model::className() && Yii::$app->params['coursUnique'] == $model->fkCours->fk_type))
+                                    ) ? true : false,
                 ],
                 'buttons'=>[
                     'partView' => function ($model, $key, $index) {

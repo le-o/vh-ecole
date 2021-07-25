@@ -16,6 +16,12 @@ $arrayForm = [
 if (isset($choixAge)) {
     $arrayForm['choixAge'] = $choixAge;
 }
+if (isset($titrePage)) {
+    $arrayForm['titrePage'] = $titrePage;
+}
+if (isset($free)) {
+    $arrayForm['free'] = $free;
+}
 ?>
 <div class="clients-online-create">
 

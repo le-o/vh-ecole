@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use wbraganca\dynamicform\DynamicFormWidget;
+use app\models\Cours;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ClientsOnline */
@@ -15,24 +16,20 @@ $this->registerJs('
         displayMessage(jQuery("#choix_cours"), ' . implode(',', $selectedCours) . ');
     });
     function displayMessage(that, type) {
-        var arEnfant = ['.implode(',', Yii::$app->params['nomsCoursEnfant']).'];
-        var arDemande = ['.$params->optsNomCoursByType(Yii::$app->params['coursPonctuel']).'];
+        var arRegulier = [' . Cours::getCoursByType(Yii::$app->params['coursRegulie']) . '];
+        var arDemande = [' . $params->optsNomCoursByType(Yii::$app->params['coursPonctuel']) . '];
         if (typeof type != \'undefined\') testType = parseInt(type);
         else testType = parseInt(that.val());
 
-        if ($.inArray(testType, arEnfant) != -1) {
-            $("#choix_enfant").show();
+        if ($.inArray(testType, arRegulier) != -1) {
+            $("#choix_regulier").show();
         } else {
-            $("#choix_enfant").hide();
+            $("#choix_regulier").hide();
         }
         if ($.inArray(testType, arDemande) != -1) {
             $("#sur_demande_info").show();
-            $("#pmt_tranche").hide();
         } else {
             $("#sur_demande_info").hide();
-            if (!isNaN(testType)) {
-                $("#pmt_tranche").show();
-            }
         }
     }'
     , \yii\web\View::POS_END);
@@ -118,13 +115,10 @@ $this->registerJs('
     <div class="row">
         <div class="col-sm-12">
             <?= yii\bootstrap\BaseHtml::radioList('offre_supp', false, [
-                'cours_essai' => Yii::t('app', 'Je souhaite inscrire mon enfant pour 2 cours à l’essai (je déciderai au terme des 2 cours si j’inscris mon enfant pour un semestre ou à l’année)'),
-                'semestre' => Yii::t('app', 'Je souhaite inscrire mon enfant pour un semestre uniquement'),
-                'offre_annuelle' => Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)')
-            ], ['id' => 'choix_enfant', 'style' => 'display:none;']) ?>
-            <div id="pmt_tranche" style="display:none;">
-                <?= yii\bootstrap\BaseHtml::checkbox('pmt_tranche', false, ['label' => Yii::t('app', 'Je choisis d\'étaler le paiement du solde en plusieurs tranches (CHF 10 par tranche)')]) ?>
-            </div>
+                'cours_essai' => Yii::t('app', 'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet'),
+                'pmt_complet' => Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en un seul versement'),
+                'pmt_tranche' => Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en plusieurs versements (+ CHF 40 de frais administratifs)')
+            ], ['id' => 'choix_regulier', 'style' => 'display:none;']) ?>
         </div>
     </div>
     

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
+use kartik\time\TimePicker;
 use kartik\select2\Select2;
 use kartik\depdrop\DepDrop;
 use yii\helpers\Url;
@@ -15,7 +16,7 @@ use yii\helpers\Url;
 
 <div class="clients-online-form">
 
-    <h1><?= $dataCours ?></h1>
+    <h1><?= $titrePage ?></h1>
 
     <?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
     
@@ -91,6 +92,48 @@ use yii\helpers\Url;
             ]) ?>
         </div>
     </div>
+    <?php if (isset($free) && true == $free) { ?>
+        <div class="row">
+            <div class="col-sm-4">
+                <label for="anni-cours"><?= Yii::t('app', 'Choisir un anniversaire') ?></label>
+                <?= Select2::widget([
+                        'name' => 'anni-cours',
+                        'data' => $dataCours,
+                        'options' => [
+                            'id' => 'choix_cours',
+                            'multiple' => false,
+                            'onchange'=>"displayMessage($(this))",
+                            'disabled' => (count($dataCours) == 1) ? true : false,
+                        ],
+                        'pluginOptions' => [
+                            'initialize' => true,
+                            'tags' => true,
+                        ],
+                ]); ?>
+            </div>
+            <div class="col-sm-4">
+                <label for="anni-date"><?= Yii::t('app', 'Date souhaitée pour l\'anniversaire') ?></label>
+                <?= DatePicker::widget([
+                    'name' => 'anni-date',
+                    'removeButton'=>false,
+                    'pluginOptions' => [
+                        'autoclose'=>true,
+                        'format' => 'dd.mm.yyyy'
+                    ]
+                ]); ?>
+            </div>
+            <div class="col-sm-4">
+                <label for="anni-date"><?= Yii::t('app', 'Heure souhaitée pour l\'anniversaire') ?></label>
+                <?= TimePicker::widget([
+                    'name' => 'anni-heure',
+                    'pluginOptions' => [
+                        'autoclose'=>true,
+                        'showMeridian' => false,
+                    ]
+                ]); ?>
+            </div>
+        </div>
+    <?php } ?>
 
     <div class="row">
         <div class="col-sm-12"><br />

@@ -299,4 +299,18 @@ class Cours extends \yii\db\ActiveRecord
         $partEssai = ClientsHasCours::find()->where(['fk_cours' => $this->cours_id])->andWhere(['fk_statut' => Yii::$app->params['part2Essai']])->count();
         return $this->getNombreClientsInscrits() + $partEssai;
     }
+
+    /**
+     * !! Only for javascript !!
+     * @return string options id separate by ,
+     */
+    public static function getCoursByType()
+    {
+        $cours = self::find()->where(['IN', 'fk_type', Yii::$app->params['coursRegulie']])->all();
+        $temp = [];
+        foreach($cours as $c) {
+            $temp[]= $c['cours_id'];
+        }
+        return implode(', ', $temp);
+    }
 }

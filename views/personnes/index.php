@@ -120,7 +120,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'value' => 'fkType.nom',
                 'filter' => $typeFilter,
             ],
-            'suivi_client',
+            'informations',
             'societe',
             'nom',
             'prenom',

@@ -245,7 +245,7 @@ class CommonController extends Controller
                 $heure_debut = $myCoursDate->heure_debut;
                 $heure_fin = $myCoursDate->heureFin;
                 $date = $myCoursDate->date;
-                $jour_cours = Yii::$app->params['joursSemaine'][date('w', strtotime($date))];
+                $jour_cours = Yii::t('app', ucfirst(Yii::$app->params['joursSemaine'][date('w', strtotime($date))]));
             } else {
                 $heure_debut = isset($dateCours->heure_debut) ? $dateCours->heure_debut : $allDatesCours[0]->heure_debut;
                 $heure_fin = isset($dateCours->heureFin) ? $dateCours->heureFin : $allDatesCours[0]->heureFin;

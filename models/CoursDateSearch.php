@@ -24,6 +24,8 @@ class CoursDateSearch extends CoursDate
     public $fkTypeCours;
     public $fkSalle;
 
+    public $listCours;
+
     public $fkNom;
 	
     /**
@@ -110,6 +112,11 @@ class CoursDateSearch extends CoursDate
         $query->andFilterWhere(['like', 'cours.session', $this->session]);
         $query->andFilterWhere(['like', 'cours.fk_type', $this->fkTypeCours]);
         $query->andFilterWhere(['like', 'cours.fk_salle', $this->fkSalle]);
+
+
+        if (!empty($this->listCours)) {
+            $query->andWhere(['IN', 'fk_cours', $this->listCours]);
+        }
 
         if ($this->depuis != '') {
             $query->andWhere("date >= '".date('Y-m-d', strtotime($this->depuis))."'");
