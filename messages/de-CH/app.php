@@ -345,6 +345,7 @@ return [
     '5-6 ans' => '5-6 Jahre',
     'désinscrit futur' => 'künftig abgemeldet',
     '2-6 ans' => '2-6 Jahre',
+    '4-6 ans' => '4-6 Jahre',
     '8-10 ans' => '8-10 Jahre',
     '10-13 ans' => '10-13 Jahre',
     'Dès 17 ans' => 'Ab 17 Jahren',

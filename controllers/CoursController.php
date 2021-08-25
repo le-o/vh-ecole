@@ -947,6 +947,15 @@ class CoursController extends CommonController
                 $datesLieux = [];
                 $premierJourSession = '';
                 $isUnique = Yii::$app->params['coursUnique'] == $c->fk_type;
+                // pour les cours anniversaires (type 304 unique, on les mets en type sur demande 15)
+                // cela permet de corriger l'affichage sur le site internet
+                if (true == $isUnique) {
+                    $param = Parametres::findOne(Yii::$app->params['coursPonctuel']);
+                    $typeNom = $param->nom;
+                } else {
+                    $typeNom = $c->fkType->nom;
+                }
+
                 foreach ($c->coursDates as $d) {
                     if (!$isUnique || ($isUnique && empty($d->clientsHasCoursDate))) {
                         if (empty($premierJourSession)) {
@@ -966,7 +975,7 @@ class CoursController extends CommonController
                     'session' => $c->session,
                     'salle' => Yii::t('app', $c->fkSalle->nom, [], $language),
                     'jours_semaine' => $jours,
-                    'type' => $c->fkType->nom,
+                    'type' => $typeNom,
                     'annee' => $c->annee,
                     'duree' => $c->duree,
                     'prix' => $c->prix,

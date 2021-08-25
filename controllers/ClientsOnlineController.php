@@ -44,6 +44,11 @@ class ClientsOnlineController extends CommonController
         ];
     }
 
+    public function beforeAction($action) {
+        $this->enableCsrfValidation = ($action->id !== "findanniversaire"); // <-- here
+        return parent::beforeAction($action);
+    }
+
     /**
      * Lists all ClientsOnline models.
      * @return mixed
@@ -92,6 +97,14 @@ class ClientsOnlineController extends CommonController
         $modelsClient = [new ClientsOnline];
         if ($cours_id !== null && $cours_id !== '') {
             $modelCours = Cours::findOne($cours_id);
+            if (Yii::$app->params['coursUnique'] == $modelCours->fk_type) {
+                return $this->redirect(['clients-online/findanniversaire',
+                    'lang_interface' => $lang_interface,
+                    'salleID' => $modelCours->fk_salle,
+                    'goodlooking' => $goodlooking]
+                );
+//                return $this->actionFindanniversaire($lang_interface, $modelCours->fk_salle, $goodlooking);
+            }
         }
 
         if ($model->load(Yii::$app->request->post())) {
@@ -285,11 +298,11 @@ class ClientsOnlineController extends CommonController
      * @param string $lang_interface
      * @return string
      */
-    public function actionFindanniversaire($lang_interface = 'fr-CH') {
-        $this->layout = "main_1_logo";
+    public function actionFindanniversaire($lang_interface = 'fr-CH', $salleID = 214, $goodlooking = false) {
+        $this->layout = (false == $goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
-        $salleID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : Yii::$app->params['saxon'];
+        $salleID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : $salleID;
         if (Yii::$app->params['baltschieder'] == $salleID) {
             Yii::$app->language = 'de-CH';
         }
@@ -319,7 +332,7 @@ class ClientsOnlineController extends CommonController
      */
     public function actionCreateanniversaire($ident = null, $lang_interface = 'fr-CH', $free = false)
     {
-        $this->layout = "main_1_logo";
+        $this->layout = "main_1";
         Yii::$app->language = $lang_interface;
 
         $model = new ClientsOnline();
