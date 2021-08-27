@@ -28,7 +28,7 @@ return [
     'Adresse 2' => 'Adresse 2',
     'Afficher' => 'Anzeigen',
     'Age' => 'Alter',
-    'Age moyen des enfants' => 'Mittleres Alter der Kinder',
+    'Age moyen des enfants' => 'Durchschnittsalter der Kinder',
     'Ajouter' => 'Hinzufügen',
     'Ajouter cours ...' => 'Kurs hinzufügen ...',
     'Ajouter moniteur ...' => 'Leiter hinzufügen ...',
@@ -73,15 +73,14 @@ return [
     <br />
     Vertic-Halle behält sich das Recht vor, die Dienstleistung je nach Niveau und Teilnehmerzahl zu ändern, wenn die Bedingungen 
     dies zulassen und die Kursziele erreicht werden können.',
-    'Conditions inscription et annulation anniversaire' => '<h4>Stornierungsbedingungen</h4>
-    Die Anmeldung für Kletterkurse auf Anfrage ist nach Voranmeldung möglich. Bis 72 Stunden vor Kursbeginn ist kein Betrag 
-    fällig. Innerhalb von 72 Stunden vor Kursbeginn sind 40% des Gesamtpreises des Kurses fällig. Ab dem Datum der Kursstunde 
-    sind 100% des Betrages fällig.<br />
-    <br />
-    Verpasste Kurse werden von Vertic-Halle grundsätzlich nicht erstattet. Im Falle einer Stornierung durch Vertic-Halle 
-    wird der bereits bezahlte Betrag vollständig rückerstattet.<br />
-    Vertic-Halle behält sich das Recht vor, die Leistung je nach Niveau und Teilnehmerzahl zu ändern, sofern die Bedingungen 
-    dies zulassen und die Kursziele erreicht werden können.',
+    'Conditions inscription et annulation anniversaire' => '<h4>Anmeldungs- und Stornierungsbedingungen</h4>
+    Die Veranstaltung einer Geburtstagsfeier in der Vertic-Halle ist nur nach vorheriger Reservierung möglich.<br /><br />
+    Im Falle einer Stornierung:<br />
+    Bis 7 Tage vor Beginn der Veranstaltung werden keine Stornierungsgebühren erhoben.<br />
+    Innert 7 Tage vor der Veranstaltung werden 40 % des Gesamtbetrags in Rechnung gestellt.<br />
+    Am Tag der Veranstaltung sind 100 % des Betrags fällig.<br /><br />
+    Vertic-Halle leistet keine Rückerstattung der unter den oben genannten Bedingungen fälligen Beträge.<br />
+    Im Falle einer Stornierung durch Vertic-Halle wird der bereits gezahlte Betrag zurückerstattet.',
     'Contenu du message à envoyer' => 'Inhalt der zu sendenden Nachricht',
     'Cours' => 'Kurse',
     'Cours Date ID' => 'Kursdatum',
@@ -97,7 +96,7 @@ return [
     'Date' => 'Datum',
     'Date Inscription' => 'Anmeldungsdatum',
     'Date Naissance' => 'Geburtsdatum',
-    'Date de naissance de l\'enfant' => 'Kindergeburtsdatum',
+    'Date de naissance de l\'enfant' => 'Geburtsdatum Kind',
     'Date d\'inscription' => 'Anmeldungsdatum',
     'Date du cours' => 'Kursdatum',
     'Date début' => 'Anfangsdatum',
@@ -205,7 +204,7 @@ return [
     'Nom du cours' => 'Kursname',
     'Nom du moniteur' => 'Name des Leiters',
     'Nombre de client sans inscription' => 'Anzahl Kunden ohne Anmeldung',
-    'Nombre maximal de participants prévus' => 'Maximale Teilnehmerzahl erwartet',
+    'Nombre maximal de participants prévus' => 'Maximale Anzahl der Teilnehmer',
     'Nombre participant max atteint' => 'Maximale Anzahl Teilnehmer erreicht',
     'Non renseigné' => 'keine Angaben',
     'Npa' => 'PLZ',
@@ -241,7 +240,7 @@ return [
     'Problème lors de la sauvegarde du/des interlocuteur(s).' => 'Fehler während der Sicherung des/der Ansprechpartner(s)',
     'Problème lors de la sauvegarde du/des moniteur(s).' => 'Fehler während der Sicherung des/der Leiter(s)',
     'Problème lors de la transformation de la personne.' => 'Fehler während der Personenumwandlung',
-    'Prénom de l\'enfant' => 'Kinder Vorname',
+    'Prénom de l\'enfant' => 'Vorname Kind',
     'Prénom (personne responsable)' => 'Vorname (Eltern)',
     'Prénom (du représentant légal si mineur)' => 'Vorname (des rechtmässigen Vertreters falls minderjährig)',
     'Remarque' => 'Bemerkung',
