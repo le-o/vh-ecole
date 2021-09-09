@@ -128,10 +128,20 @@ class PersonnesController extends CommonController
                 foreach ($moniteur->moniteurHasCoursDate as $mcd) {
                     $coursDate = CoursDate::findOne($mcd->fk_cours_date);
 
-                    $dateRef = date('Y-m-d', strtotime($coursDate->date));
-                    if ($dateRef >= $searchFrom && $dateRef <= $searchTo) {
-                        if ($searchParCours) {
-                            if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) {
+                    if (true == $this->keepDateInStatistics($coursDate)) {
+                        $dateRef = date('Y-m-d', strtotime($coursDate->date));
+                        if ($dateRef >= $searchFrom && $dateRef <= $searchTo) {
+                            if ($searchParCours) {
+                                if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) {
+                                    $heures += $coursDate->duree;
+                                    // total par barème
+                                    $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
+                                    if (!isset($heuresBareme[$key])) {
+                                        $heuresBareme[$key] = 0;
+                                    }
+                                    $heuresBareme[$key] += $coursDate->duree;
+                                }
+                            } else {
                                 $heures += $coursDate->duree;
                                 // total par barème
                                 $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
@@ -140,14 +150,6 @@ class PersonnesController extends CommonController
                                 }
                                 $heuresBareme[$key] += $coursDate->duree;
                             }
-                        } else {
-                            $heures += $coursDate->duree;
-                            // total par barème
-                            $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
-                            if (!isset($heuresBareme[$key])) {
-                                $heuresBareme[$key] = 0;
-                            }
-                            $heuresBareme[$key] += $coursDate->duree;
                         }
                     }
                 }
@@ -241,6 +243,9 @@ class PersonnesController extends CommonController
         ]);
     }
 
+    /**
+     * @return mixed
+     */
     public function actionMycours() {
         return $this->actionMoniteurs(true);
     }
@@ -261,9 +266,13 @@ class PersonnesController extends CommonController
         $listeCoursDate = [];
         foreach ($model->moniteurHasCoursDate as $mcd) {
             if ($fromData['selectedCours'] != '' && $mcd->fkCoursDate->fkCours->fk_nom == $fromData['selectedCours']) {
-                $listeCoursDate[] = $mcd->fk_cours_date;
+                if (true == $this->keepDateInStatistics($mcd->fkCoursDate)) {
+                    $listeCoursDate[] = $mcd->fk_cours_date;
+                }
             } elseif ($fromData['selectedCours'] == '') {
-                $listeCoursDate[] = $mcd->fk_cours_date;
+                if (true == $this->keepDateInStatistics($mcd->fkCoursDate)) {
+                    $listeCoursDate[] = $mcd->fk_cours_date;
+                }
             }
         }
         $coursDate = CoursDate::find()
@@ -386,7 +395,10 @@ class PersonnesController extends CommonController
         if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
             $listeCoursDate = [];
             foreach ($model->moniteurHasCoursDate as $mcd) {
-                $listeCoursDate[] = $mcd->fk_cours_date;
+                $coursDate = CoursDate::findOne($mcd->fk_cours_date);
+                if (true == $this->keepDateInStatistics($coursDate)) {
+                    $listeCoursDate[] = $mcd->fk_cours_date;
+                }
             }
             $coursDate = CoursDate::find()->where(['in', 'cours_date_id', $listeCoursDate])->orderBy(['date' => SORT_DESC]);
             $coursDateDataProvider = new ActiveDataProvider([
@@ -610,6 +622,23 @@ class PersonnesController extends CommonController
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @param $coursDate
+     * @return bool
+     */
+    protected function keepDateInStatistics($coursDate) {
+        $keep = false;
+        if (Yii::$app->params['coursUnique'] == $coursDate->fkCours->fk_type) {
+            $hasClient = $coursDate->clientsHasCoursDate;
+            if (count($hasClient) > 0) {
+                $keep = true;
+            }
+        } else {
+            $keep = true;
+        }
+        return $keep;
     }
 
     /**

@@ -456,7 +456,7 @@ class ClientsOnlineController extends CommonController
         }
 
         if (false == $free) {
-            $titrePage = Yii::t('app', 'Inscription') . ' ' .$modelCours->fkNom->nom . ' ' . Yii::t('app', 'du') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à') . ' ' . $modelCoursDate->heure_debut;
+            $titrePage = Yii::t('app', 'Inscription') . ' ' .$modelCours->fkNom->nom . ' ' . Yii::t('app', 'du_date') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à_heure') . ' ' . $modelCoursDate->heure_debut;
         } else {
             $titrePage = Yii::t('app', 'Inscription anniversaire : date et heure à choix');
         }
