@@ -56,7 +56,7 @@ class CoursDateSearch extends CoursDate
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $pagesize = 80)
     {
         $query = CoursDate::find();
         $query->joinWith(['fkCours.fkNom coursNom', 'fkCours.fkType coursType', 'fkCours.fkSalle coursSalle', 'coursHasMoniteurs']);
@@ -65,7 +65,7 @@ class CoursDateSearch extends CoursDate
             'query' => $query,
             'sort' => ['defaultOrder' => ['date' => SORT_ASC]],
             'pagination' => [
-                'pagesize' => 80,
+                'pagesize' => $pagesize,
             ],
         ]);
         
@@ -108,7 +108,7 @@ class CoursDateSearch extends CoursDate
 
         $query->andFilterWhere(['like', 'remarque', $this->remarque]);
         $query->andFilterWhere(['like', 'nb_client_non_inscrit', $this->nb_client_non_inscrit]);
-        $query->andFilterWhere(['like', 'parametres.nom', $this->fkCours]);
+        $query->andFilterWhere(['like', 'coursNom.nom', $this->fkCours]);
         $query->andFilterWhere(['like', 'cours.session', $this->session]);
         $query->andFilterWhere(['like', 'cours.fk_type', $this->fkTypeCours]);
         $query->andFilterWhere(['like', 'cours.fk_salle', $this->fkSalle]);

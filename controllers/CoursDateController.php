@@ -290,7 +290,7 @@ class CoursDateController extends CommonController
         $selectedCours = $searchModel->listCours;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $dataProviderAllCours = $searchModelAllCours->search(Yii::$app->request->queryParams);
+        $dataProviderAllCours = $searchModelAllCours->search(Yii::$app->request->queryParams, false);
         
         if (!empty(Yii::$app->request->post()) && isset(Yii::$app->request->post()['checkedEmails'])) {
             $mail = Yii::$app->request->post();
