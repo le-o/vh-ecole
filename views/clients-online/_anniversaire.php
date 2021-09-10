@@ -99,11 +99,12 @@ use yii\helpers\Url;
                 <?= Select2::widget([
                         'name' => 'anni-cours',
                         'data' => $dataCours,
+                        'value' => $selectedCours, // initial value
                         'options' => [
                             'id' => 'choix_cours',
                             'multiple' => false,
                             'onchange'=>"displayMessage($(this))",
-                            'disabled' => (count($dataCours) == 1) ? true : false,
+                            'disabled' => (count($dataCours) == 1 || !empty($selectedCours)) ? true : false,
                         ],
                         'pluginOptions' => [
                             'initialize' => true,

@@ -101,9 +101,9 @@ class ClientsOnlineController extends CommonController
                 return $this->redirect(['clients-online/findanniversaire',
                     'lang_interface' => $lang_interface,
                     'salleID' => $modelCours->fk_salle,
+                    'ident' => $cours_id,
                     'goodlooking' => $goodlooking]
                 );
-//                return $this->actionFindanniversaire($lang_interface, $modelCours->fk_salle, $goodlooking);
             }
         }
 
@@ -298,7 +298,7 @@ class ClientsOnlineController extends CommonController
      * @param string $lang_interface
      * @return string
      */
-    public function actionFindanniversaire($lang_interface = 'fr-CH', $salleID = 214, $goodlooking = false) {
+    public function actionFindanniversaire($lang_interface = 'fr-CH', $salleID = 214, $ident = null, $goodlooking = false) {
         $this->layout = (false == $goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
@@ -318,10 +318,10 @@ class ClientsOnlineController extends CommonController
             Yii::$app->session->set('anni-cal-view', 'agendaWeek');
         }
 
-
         return $this->render('anniversaire', [
             'model' => Parametres::findOne($salleID),
             'salleID' => $salleID,
+            'ident' => $ident,
         ]);
     }
 
@@ -339,12 +339,20 @@ class ClientsOnlineController extends CommonController
         $model->setScenario('anniversaire');
         $modelsClient = [new ClientsOnline];
 
+        $selectedCours = [];
         if (false == $free) {
             $modelCoursDate = CoursDate::findOne($ident);
             $modelCours = $modelCoursDate->fkCours;
         } else {
             $modelCoursDate = new CoursDate;
-            $modelCours = (isset(Yii::$app->request->post()['anni-cours']) ? Cours::findOne(Yii::$app->request->post()['anni-cours']) : new Cours);
+            if (isset(Yii::$app->request->post()['anni-cours'])) {
+                $modelCours = Cours::findOne(Yii::$app->request->post()['anni-cours']);
+            } elseif (null !== $ident) {
+                $modelCours = Cours::findOne($ident);
+                $selectedCours = [$modelCours->cours_id];
+            } else {
+                $modelCours = new Cours;
+            }
         }
 
         if (Yii::$app->params['baltschieder'] == $modelCours->fk_salle) {
@@ -431,7 +439,7 @@ class ClientsOnlineController extends CommonController
 
                         // on envoie aussi un email aux moniteurs de la date
                         $moniteurs = [];
-                        $modelCoursHasMoniteurs = CoursHasMoniteurs::findAll($ident);
+                        $modelCoursHasMoniteurs = CoursHasMoniteurs::findAll($modelCoursDate->cours_date_id);
                         foreach ($modelCoursHasMoniteurs as $coursHasMoniteur) {
                             $moniteurs['emails'][] = $coursHasMoniteur->fkMoniteur->email;
                             $moniteurs['noms'][] = $coursHasMoniteur->fkMoniteur->prenom . ' ' . $coursHasMoniteur->fkMoniteur->nom;
@@ -486,7 +494,7 @@ class ClientsOnlineController extends CommonController
             'model' => $model,
             'modelsClient' => $modelsClient,
             'dataCours' => $dataCours,
-            'selectedCours' => null,
+            'selectedCours' => $selectedCours,
             'params' => new Parametres,
             'displayForm' => '_anniversaire',
             'choixAge' => $choixAge,

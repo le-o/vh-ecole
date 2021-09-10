@@ -16,7 +16,7 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
     <div class="row">
         <div class="col-sm-12">
             <?= Yii::t('app', 'Vous souhaitez effectuer une réservation dans un délai de moins de 2 semaines ou dans une horaire autre que ceux qui sont affichés ?') ?>
-            <a class="btn btn-info" href="https://ecole.vertic-halle.ch/web/index.php?r=clients-online%2Fcreateanniversaire&free=1&lang_interface=<?= Yii::$app->language ?>"><?= Yii::t('app', 'Horaire au choix') ?></a><br /><br />
+            <a class="btn btn-info" href="https://ecole.vertic-halle.ch/web/index.php?r=clients-online%2Fcreateanniversaire&ident=<?= $ident ?>&free=1&lang_interface=<?= Yii::$app->language ?>"><?= Yii::t('app', 'Horaire au choix') ?></a><br /><br />
         </div>
     </div>
     
