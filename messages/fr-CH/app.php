@@ -158,7 +158,7 @@ return [
     'Is Materiel Compris' => 'Matériel compris',
     'Is Publié' => 'Publié sur le site internet',
     'Is Responsable' => 'Est responsable',
-    'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet.' => '',
+    'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet' => '',
     'J\'inscris mon enfant pour la saison et je paie le montant du cours en un seul versement' => '',
     'J\'inscris mon enfant pour la saison et je paie le montant du cours en plusieurs versements (+ CHF 40 de frais administratifs)' => '',
     'Je souhaite inscrire mon enfant pour un semestre uniquement' => 'Je souhaite inscrire mon enfant pour un semestre (uniquement pour les cours réguliers marmousets)',
