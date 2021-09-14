@@ -17,8 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    '{nombre} ans' => '{nombre} Jahre alt',
-    '{nombre} ans et +' => '{nombre} Jahre alt and mehr',
+    '{nombre} ans' => '{nombre} Jahre',
+    '{nombre} ans et +' => '{nombre} Jahre and mehr',
     ' + ' => ' + ',
     ' au ' => ' bis ',
     ' à ' => ' um ',
