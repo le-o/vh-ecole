@@ -18,7 +18,7 @@
  */
 return [
     '{nombre} ans' => '{nombre} Jahre',
-    '{nombre} ans et +' => '{nombre} Jahre and mehr',
+    '{nombre} ans et +' => '{nombre} Jahre und mehr',
     ' + ' => ' + ',
     ' au ' => ' bis ',
     ' à ' => ' um ',

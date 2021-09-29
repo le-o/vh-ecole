@@ -641,14 +641,29 @@ class CoursDateController extends CommonController
      */
     public function actionJsoncalannionline($start=NULL,$end=NULL,$_=NULL,$for){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $times = CoursDate::find()
+        // d'abord les anniversaires light 72h (contrainte affichage javascript + start3)
+        $start3 = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . ' + 3 days'));
+        $lights = CoursDate::find()
             ->joinWith(['fkCours'])
-            ->where(['>=', 'date', $start])
+            ->where(['>=', 'date', $start3])
             ->andWhere(['<=', 'date', $end])
             ->andWhere(['cours.fk_salle' => $for])
             ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
             ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
+            ->andWhere(['IN', 'cours.fk_nom', Yii::$app->params['anniversaireLight']])
             ->all();
+        // puis les autres anniversaires (affichage après 14 jours)
+        $start14 = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . ' + 14 days'));
+        $autres = CoursDate::find()
+            ->joinWith(['fkCours'])
+            ->where(['>=', 'date', $start14])
+            ->andWhere(['<=', 'date', $end])
+            ->andWhere(['cours.fk_salle' => $for])
+            ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
+            ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
+            ->andWhere(['NOT IN', 'cours.fk_nom', Yii::$app->params['anniversaireLight']])
+            ->all();
+        $times = array_merge($lights, $autres);
 
         $sessionName = (null == $for) ? 'anni-cal-debut' : 'anni-cal-debut-' . $for;
         Yii::$app->session->set($sessionName, $start);
