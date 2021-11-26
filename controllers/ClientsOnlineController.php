@@ -215,6 +215,10 @@ class ClientsOnlineController extends CommonController
                                         'oldStatut' => $oldStatut->nom,
                                     ]);
                                 }
+
+                                $newInfos = $cd->informations;
+                                $newInfos .= "\r\n\r\n" . $isPersonne->informations;
+                                $isPersonne->informations = $newInfos;
                                 $isPersonne->save();
                             }
 
@@ -332,7 +336,7 @@ class ClientsOnlineController extends CommonController
      */
     public function actionCreateanniversaire($ident = null, $lang_interface = 'fr-CH', $free = false)
     {
-        $this->layout = "main_1";
+        $this->layout = (false == $free) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
         $model = new ClientsOnline();
@@ -610,9 +614,11 @@ class ClientsOnlineController extends CommonController
         $personne->telephone = $clientOnline->telephone;
         $personne->email = $clientOnline->email;
         $personne->date_naissance = $clientOnline->date_naissance;
-        $personne->informations .= "\r\n".Yii::t('app', 'Intéressé par le cours').' '.$clientOnline->fkCoursNom->nom;
-        $personne->informations .= "\r\n".Yii::t('app', 'Date d\'inscription').': '.$clientOnline->date_inscription;
-        if ($clientOnline->informations != '') $personne->informations .= "\r\n\r\n".$clientOnline->informations;
+        $newInfos = Yii::t('app', 'Intéressé par le cours') . ' ' . $clientOnline->fkCoursNom->nom;
+        $newInfos .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $clientOnline->date_inscription;
+        if ($clientOnline->informations != '') $newInfos .= "\r\n\r\n" . $clientOnline->informations;
+        $newInfos .= "\r\n\r\n" . $personne->informations;
+        $personne->informations = $newInfos;
         $personne->fk_salle_admin = ($clientOnline->fkCours) ? $clientOnline->fkCours->fk_salle : Yii::$app->params['salleAdmin'][$clientOnline->fkCoursNom->fk_langue];
         
         $clientsLies = ClientsOnline::findAll(['fk_parent' => $clientOnline->client_online_id]);
