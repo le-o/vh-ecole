@@ -214,6 +214,7 @@ class PersonnesController extends CommonController
                 ],
             ],
             'defaultOrder' => [
+                'type' => SORT_ASC,
                 'nom' => SORT_ASC
             ]
         ]);
