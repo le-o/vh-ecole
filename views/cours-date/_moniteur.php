@@ -21,18 +21,30 @@ use yii\helpers\Url;
             ['class' => 'yii\grid\SerialColumn'],
             
             'date',
-            'fkCours.fkNom.nom',
+            [
+                'label' => Yii::t('app', 'Nom'),
+                'value' => function($data) {
+                    if (isset($data->fkCours)) return $data->fkCours->fkNom->nom;
+                    return $data['nom'];
+                },
+            ],
             'heure_debut',
             [
                 'label' => Yii::t('app', 'Heure Fin'),
                 'value' => function($data) {
-                    return $data->heureFin;
+                    return (isset($data->heureFin) ? $data->heureFin : $data['heure_fin']);
                 },
             ],
             [
                 'label' => Yii::t('app', 'Lieu'),
-                'value' => 'fkLieu.nom',
+                'value' => function($data) {
+                    return (isset($data->fkLieu) ? $data->fkLieu->nom : $data['lieu']);
+                },
                 'footer' => '<strong>' . Yii::t('app', 'Total') . '</strong>',
+            ],
+            [
+                'attribute' => 'bareme',
+                'visible' => $withSum,
             ],
             [
                 'attribute' => 'duree',

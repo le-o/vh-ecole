@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
+use app\models\Parametres;
 
 /* @var $this yii\web\View */
 
@@ -20,7 +21,7 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
                 'options'=>[
                     'multiple' => false,
                 ],
-                'data' => \yii\helpers\ArrayHelper::map(\app\models\Parametres::find()->where('class_key = 16')->orderBy('tri')->all(), 'parametre_id', 'nom'),
+                'data' => (new Parametres())->optsNomCoursAnniversaire($model->parametre_id),
                 'pluginOptions'=>[
                     'initialize' => true,
                     'allowClear' => false,

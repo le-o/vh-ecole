@@ -302,14 +302,15 @@ class ClientsOnlineController extends CommonController
      * @param string $lang_interface
      * @return string
      */
-    public function actionFindanniversaire($lang_interface = 'fr-CH', $salleID = 214, $ident = null, $goodlooking = false) {
+    public function actionFindanniversaire($lang_interface = 'fr-CH', $nomCoursID = 29, $ident = null, $goodlooking = false) {
         $this->layout = (false == $goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
-        $salleID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : $salleID;
-        if (Yii::$app->params['baltschieder'] == $salleID) {
-            Yii::$app->language = 'de-CH';
-        }
+        $nomCoursID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : $nomCoursID;
+        $model = Parametres::findOne($nomCoursID);
+        Yii::$app->language = (isset(Yii::$app->params['interface_language_label'][$model->fk_langue]) ?
+            Yii::$app->params['interface_language_label'][$model->fk_langue] :
+            $lang_interface);
 
         // set la valeur de la date début du calendrier
         if (null === Yii::$app->session->get('anni-cal-debut')) Yii::$app->session->set('anni-cal-debut', date('Y-m-d'));
@@ -323,8 +324,8 @@ class ClientsOnlineController extends CommonController
         }
 
         return $this->render('anniversaire', [
-            'model' => Parametres::findOne($salleID),
-            'salleID' => $salleID,
+            'model' => $model,
+            'nomCoursID' => $nomCoursID,
             'ident' => $ident,
         ]);
     }

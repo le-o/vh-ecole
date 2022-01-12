@@ -150,6 +150,14 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array options nom cours for drop-down
+     */
+    public function optsNomCoursAnniversaire($selectedParam = null)
+    {
+        return $this->optsDropDown(7, $selectedParam, ['info_special' => 304], false);
+    }
+
+    /**
      * !! Only for javascript !!
      * @param int $type parametres_id from info_special
      * @return string options id separate by ,

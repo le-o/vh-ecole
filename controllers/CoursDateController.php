@@ -184,10 +184,6 @@ class CoursDateController extends CommonController
         $allBaremes = [];
         foreach ($myMoniteurs as $moniteur) {
             $selectedMoniteurs[] = $moniteur->fk_moniteur;
-            $allBaremes[] = $moniteur->fk_bareme;
-        }
-        if (1 == count(array_unique($allBaremes))) {
-            $model->baremeMoniteur = $allBaremes[0];
         }
         $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
@@ -640,30 +636,18 @@ class CoursDateController extends CommonController
      * @return array
      */
     public function actionJsoncalannionline($start=NULL,$end=NULL,$_=NULL,$for){
+        // On calcule la date de début : anniversaires light 72h, autre anniversaire après 14 jours
+        $startFrom = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . (in_array($for, Yii::$app->params['anniversaireLight']) ? ' + 3 days' : ' + 14 days')));
+
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        // d'abord les anniversaires light 72h (contrainte affichage javascript + start3)
-        $start3 = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . ' + 3 days'));
-        $lights = CoursDate::find()
+        $times =  CoursDate::find()
             ->joinWith(['fkCours'])
-            ->where(['>=', 'date', $start3])
+            ->where(['>=', 'date', $startFrom])
             ->andWhere(['<=', 'date', $end])
-            ->andWhere(['cours.fk_salle' => $for])
+            ->andWhere(['cours.fk_nom' => $for])
             ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
             ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
-            ->andWhere(['IN', 'cours.fk_nom', Yii::$app->params['anniversaireLight']])
             ->all();
-        // puis les autres anniversaires (affichage après 14 jours)
-        $start14 = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . ' + 14 days'));
-        $autres = CoursDate::find()
-            ->joinWith(['fkCours'])
-            ->where(['>=', 'date', $start14])
-            ->andWhere(['<=', 'date', $end])
-            ->andWhere(['cours.fk_salle' => $for])
-            ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
-            ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
-            ->andWhere(['NOT IN', 'cours.fk_nom', Yii::$app->params['anniversaireLight']])
-            ->all();
-        $times = array_merge($lights, $autres);
 
         $sessionName = (null == $for) ? 'anni-cal-debut' : 'anni-cal-debut-' . $for;
         Yii::$app->session->set($sessionName, $start);
@@ -740,13 +724,21 @@ class CoursDateController extends CommonController
                         $Event->color = '#27db39';
                     }
                 }
+            } elseif (true == $checkEmpty && true == $online) {
+                if (!empty($time->clientsHasCoursDate)) {
+                    $Event->title .= ' RESERVE';
+                    $Event->color = '#ff0000';
+                } else {
+                    $Event->color = '#27db39';
+                }
+//                $Event->color = (empty($time->clientsHasCoursDate) ? '#27db39' : '#ff0000');
             } else {
                 $Event->color = $time->fkCours->fkNom->info_couleur;
             }
 
-            // pour les inscriptions anniversaire online, on ne met que les cours avec moniteurs et sans client
+            // pour les inscriptions anniversaire online, on ne met que les cours avec moniteurs
             if (true == $online) {
-                if (!empty($time->clientsHasCoursDate) || (empty($time->coursHasMoniteurs) && false == $noMoniteur)) {
+                if (empty($time->coursHasMoniteurs) && false == $noMoniteur) {
                     continue;
                 }
             }

@@ -262,17 +262,13 @@ class PersonnesController extends CommonController
         $model = $this->findModel($id);
         
         $fromData = unserialize($fromData);
-        
-        $coursDateDataProvider = [];
+
         $listeCoursDate = [];
         foreach ($model->moniteurHasCoursDate as $mcd) {
-            if ($fromData['selectedCours'] != '' && $mcd->fkCoursDate->fkCours->fk_nom == $fromData['selectedCours']) {
+            if ($fromData['selectedCours'] == '' || ($fromData['selectedCours'] != '' && $mcd->fkCoursDate->fkCours->fk_nom == $fromData['selectedCours'])) {
                 if (true == $this->keepDateInStatistics($mcd->fkCoursDate)) {
                     $listeCoursDate[] = $mcd->fk_cours_date;
-                }
-            } elseif ($fromData['selectedCours'] == '') {
-                if (true == $this->keepDateInStatistics($mcd->fkCoursDate)) {
-                    $listeCoursDate[] = $mcd->fk_cours_date;
+                    $baremeCours[$mcd->fk_cours_date] = (null != $mcd->fk_bareme ? $mcd->fkBareme->nom : $mcd->fkMoniteur->fkFormation->nom);
                 }
             }
         }
@@ -280,14 +276,27 @@ class PersonnesController extends CommonController
             ->where(['in', 'cours_date_id', $listeCoursDate])
             ->andWhere(['between', 'date', $fromData['searchFrom'], $fromData['searchTo']])
             ->orderBy(['date' => SORT_DESC]);
-        $coursDateDataProvider = new ActiveDataProvider([
-            'query' => $coursDate,
-            'pagination' => [
-                'pageSize' => 100,
-            ],
-        ]);
-        
+
         if (!$print) {
+            $arrayCoursDate = [];
+            foreach($coursDate->all() as $cd) {
+                $arrayCoursDate[] = [
+                    'date' => $cd->date,
+                    'nom' => $cd->fkCours->fkNom->nom,
+                    'heure_debut' => $cd->heure_debut,
+                    'heure_fin' => $cd->heureFin,
+                    'lieu' => $cd->fkLieu->nom,
+                    'duree' => $cd->duree,
+                    'bareme' => $baremeCours[$cd->cours_date_id],
+                ];
+            }
+            $coursDateDataProvider = new ArrayDataProvider([
+                'allModels' => $arrayCoursDate,
+                'pagination' => [
+                    'pageSize' => false,
+                ],
+            ]);
+
             return $this->render('viewmoniteur', [
                 'model' => $model,
                 'coursDateDataProvider' => $coursDateDataProvider,
@@ -295,6 +304,13 @@ class PersonnesController extends CommonController
                 'sum' => $coursDate->sum('duree'),
             ]);
         }
+
+        $coursDateDataProvider = new ActiveDataProvider([
+            'query' => $coursDate,
+            'pagination' => [
+                'pageSize' => false,
+            ],
+        ]);
         
         $content = $this->renderPartial('viewmoniteur', [
             'model' => $model,
