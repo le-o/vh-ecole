@@ -90,7 +90,7 @@ class ClientsOnlineController extends CommonController
      */
     public function actionCreate($cours_id = null, $lang_interface = 'fr-CH', $goodlooking = false)
     {
-        $this->layout = (false == $goodlooking) ? "main_1" : "main_1_logo";
+        $this->layout = (!$goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
         $model = new ClientsOnline();
@@ -157,7 +157,7 @@ class ClientsOnlineController extends CommonController
                 if (0 == count($modelDate) || $modelCours->getNombreClientsInscrits() >= $modelCours->participant_max) {
                     $clientAuto = false;
                 }
-                if (true == $clientAuto) {
+                if ($clientAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
                     $model->is_actif = 0;
                 }
@@ -180,7 +180,7 @@ class ClientsOnlineController extends CommonController
                             $client->email = $model->email;
                             $client->is_actif = 1;
 
-                            if (true == $clientAuto) {
+                            if ($clientAuto) {
                                 $clientDirect[] = $this->setPersonneAttribute($client);
                                 $client->is_actif = 0;
                             }
@@ -190,7 +190,7 @@ class ClientsOnlineController extends CommonController
                             }
                         }
                     }
-                    if (true == $clientAuto) {
+                    if ($clientAuto) {
                         $inscritCours = (1 < count($clientDirect)) ? false : true;
                         $parentID = null;
 
@@ -223,7 +223,7 @@ class ClientsOnlineController extends CommonController
                             }
 
                             // si on a un interlocuteur, on ne sauve pas l'inscription au cours, mais juste la personne
-                            if (false == $inscritCours) {
+                            if (!$inscritCours) {
                                 $inscritCours = true;
                                 $parentID = $existeID;
                                 continue;
@@ -249,7 +249,7 @@ class ClientsOnlineController extends CommonController
 
                     // on traite le mail après le commit, comme cela si l'envoi de l'email plante, on a quand même
                     // enregistré les données dans la base
-                    if (true == $clientAuto && true == Yii::$app->params['emailConfirmationInscription']) {
+                    if ($clientAuto && Yii::$app->params['emailConfirmationInscription']) {
                         $emailBrut = \app\models\Parametres::findOne(Yii::$app->params['texteEmailConfirmationOnline'][Yii::$app->language]);
                         $contenu['nom'] = $emailBrut->nom;
                         $contenu['valeur'] = $emailBrut->valeur;
@@ -303,7 +303,7 @@ class ClientsOnlineController extends CommonController
      * @return string
      */
     public function actionFindanniversaire($lang_interface = 'fr-CH', $nomCoursID = 29, $ident = null, $goodlooking = false) {
-        $this->layout = (false == $goodlooking) ? "main_1" : "main_1_logo";
+        $this->layout = (!$goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
         if (!is_null($ident)) {
@@ -317,7 +317,9 @@ class ClientsOnlineController extends CommonController
             $lang_interface);
 
         // set la valeur de la date début du calendrier
-        if (null === Yii::$app->session->get('anni-cal-debut')) Yii::$app->session->set('anni-cal-debut', date('Y-m-d'));
+        if (null === Yii::$app->session->get('anni-cal-debut')) {
+            Yii::$app->session->set('anni-cal-debut', date('Y-m-d'));
+        }
         // et par défaut, sur mobile, en mode liste
         if (Device::$isMobile) {
             $this->layout = "main_full_logo";
@@ -341,7 +343,7 @@ class ClientsOnlineController extends CommonController
      */
     public function actionCreateanniversaire($ident = null, $lang_interface = 'fr-CH', $free = false)
     {
-        $this->layout = (false == $free) ? "main_1" : "main_1_logo";
+        $this->layout = (!$free) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
         $model = new ClientsOnline();
@@ -349,7 +351,7 @@ class ClientsOnlineController extends CommonController
         $modelsClient = [new ClientsOnline];
 
         $selectedCours = [];
-        if (false == $free) {
+        if (!$free) {
             $modelCoursDate = CoursDate::findOne($ident);
             $modelCours = $modelCoursDate->fkCours;
         } else {
@@ -374,8 +376,8 @@ class ClientsOnlineController extends CommonController
             $model->fk_cours = $modelCours->cours_id;
 
             // Set de la date selon la saisie
-            $date = (false == $free ? $modelCoursDate->date : Yii::$app->request->post()['anni-date']);
-            $heure = (false == $free ? $modelCoursDate->heure_debut : Yii::$app->request->post()['anni-heure']);
+            $date = (!$free ? $modelCoursDate->date : Yii::$app->request->post()['anni-date']);
+            $heure = (!$free ? $modelCoursDate->heure_debut : Yii::$app->request->post()['anni-heure']);
 
             $infoAnniversaire = $model->informations . '
 ********************* INFO ANNIVERSAIRE *********************
@@ -391,7 +393,7 @@ class ClientsOnlineController extends CommonController
 
                 $inscriptionAuto = !$free && $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
 
-                if (true == $inscriptionAuto) {
+                if ($inscriptionAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
                     $model->is_actif = 0;
                 } else {
@@ -402,7 +404,7 @@ class ClientsOnlineController extends CommonController
                     if (!$model->save()) {
                         throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
                     }
-                    if (true == $inscriptionAuto) {
+                    if ($inscriptionAuto) {
                         foreach ($clientDirect as $cd) {
                             // si la personne existe déjà, on ne fait pas de doublon
                             $isPersonne = Personnes::find()->where(['nom' => $cd->nom, 'prenom' => $cd->prenom])->one();
@@ -436,7 +438,7 @@ class ClientsOnlineController extends CommonController
 
                     // on traite le mail après le commit, comme cela si l'envoi de l'email plante, on a quand même
                     // enregistré les données dans la base
-                    if (true == $inscriptionAuto) {
+                    if ($inscriptionAuto) {
                         $emailBrut = \app\models\Parametres::findOne(Yii::$app->params['texteEmailAutoAnnivOnline'][Yii::$app->language]);
                         $contenu['nom'] = $emailBrut->nom;
                         $contenu['valeur'] = $emailBrut->valeur;
@@ -472,7 +474,7 @@ class ClientsOnlineController extends CommonController
             }
         }
 
-        if (false == $free) {
+        if (!$free) {
             $titrePage = Yii::t('app', 'Inscription') . ' ' .$modelCours->fkNom->nom . ' ' . Yii::t('app', 'du_date') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à_heure') . ' ' . $modelCoursDate->heure_debut;
         } else {
             $titrePage = Yii::t('app', 'Inscription anniversaire : date et heure à choix');
@@ -621,7 +623,9 @@ class ClientsOnlineController extends CommonController
         $personne->date_naissance = $clientOnline->date_naissance;
         $newInfos = Yii::t('app', 'Intéressé par le cours') . ' ' . $clientOnline->fkCoursNom->nom;
         $newInfos .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $clientOnline->date_inscription;
-        if ($clientOnline->informations != '') $newInfos .= "\r\n\r\n" . $clientOnline->informations;
+        if ($clientOnline->informations != '') {
+            $newInfos .= "\r\n\r\n" . $clientOnline->informations;
+        }
         $newInfos .= "\r\n\r\n" . $personne->informations;
         $personne->informations = $newInfos;
         $personne->fk_salle_admin = ($clientOnline->fkCours) ? $clientOnline->fkCours->fk_salle : Yii::$app->params['salleAdmin'][$clientOnline->fkCoursNom->fk_langue];
@@ -712,7 +716,9 @@ class ClientsOnlineController extends CommonController
         $p->date_naissance = (isset($model->date_naissance)) ? $model->date_naissance : null;
         $p->informations = Yii::t('app', 'Intéressé par le cours') . ' ' . $model->fkCoursNom->nom;
         $p->informations .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $model->date_inscription;
-        if ($model->informations != '') $p->informations .= "\r\n\r\n" . $model->informations;
+        if ($model->informations != '') {
+            $p->informations .= "\r\n\r\n" . $model->informations;
+        }
         $p->fk_salle_admin = ($model->fkCours) ? $model->fkCours->fk_salle : Yii::$app->params['salleAdmin'][$model->fkCoursNom->fk_langue];
         return $p;
     }

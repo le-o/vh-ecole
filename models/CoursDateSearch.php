@@ -68,22 +68,25 @@ class CoursDateSearch extends CoursDate
                 'pagesize' => $pagesize,
             ],
         ]);
+
+        $coursNom = 'coursNom.nom';
+        $coursSession = 'cours.session';
         
         $dataProvider->sort->attributes['fkNom'] = [
-            'asc' => ['coursNom.nom' => SORT_ASC, 'cours.session' => SORT_ASC],
-            'desc' => ['coursNom.nom' => SORT_DESC, 'cours.session' => SORT_DESC],
+            'asc' => [$coursNom => SORT_ASC, $coursSession => SORT_ASC],
+            'desc' => [$coursNom => SORT_DESC, $coursSession => SORT_DESC],
         ];
         $dataProvider->sort->attributes['fkTypeCours'] = [
-            'asc' => ['coursType.nom' => SORT_ASC, 'cours.session' => SORT_ASC],
-            'desc' => ['coursType.nom' => SORT_DESC, 'cours.session' => SORT_DESC],
+            'asc' => ['coursType.nom' => SORT_ASC, $coursSession => SORT_ASC],
+            'desc' => ['coursType.nom' => SORT_DESC, $coursSession => SORT_DESC],
         ];
         $dataProvider->sort->attributes['fkSalle'] = [
-            'asc' => ['coursSalle.nom' => SORT_ASC, 'cours.session' => SORT_ASC],
-            'desc' => ['coursSalle.nom' => SORT_DESC, 'cours.session' => SORT_DESC],
+            'asc' => ['coursSalle.nom' => SORT_ASC, $coursSession => SORT_ASC],
+            'desc' => ['coursSalle.nom' => SORT_DESC, $coursSession => SORT_DESC],
         ];
         $dataProvider->sort->attributes['session'] = [
-            'asc' => ['cours.session' => SORT_ASC, 'coursNom.nom' => SORT_ASC],
-            'desc' => ['cours.session' => SORT_DESC, 'coursNom.nom' => SORT_DESC],
+            'asc' => [$coursSession => SORT_ASC, $coursNom => SORT_ASC],
+            'desc' => [$coursSession => SORT_DESC, $coursNom => SORT_DESC],
         ];
 
         $this->load($params);
@@ -120,17 +123,17 @@ class CoursDateSearch extends CoursDate
 
         if ($this->depuis != '') {
             $query->andWhere("date >= '".date('Y-m-d', strtotime($this->depuis))."'");
-            if (true == $this->anniversairepage) {
+            if ($this->anniversairepage) {
                 $query->andWhere("cours.is_publie = 1 AND cours.fk_statut = " . Yii::$app->params['coursActif']);
             }
-            if ($this->homepage == true) {
+            if ($this->homepage) {
                 $query->distinct = true;
                 $query->select = ['fk_cours'];
             }
         }
         if ($this->dateA != '') {
             $query->andWhere("date <= '".date('Y-m-d', strtotime($this->dateA))."'");
-            if ($this->homepage == true) {
+            if ($this->homepage) {
                 $query->andWhere("cours.fk_statut = " . Yii::$app->params['coursActif']);
                 $query->andWhere("fk_cours NOT IN (SELECT DISTINCT(d2.fk_cours) FROM cours_date d2 WHERE d2.date > '".date('Y-m-d', strtotime($this->dateA))."')");
                 $query->distinct = true;
@@ -138,7 +141,7 @@ class CoursDateSearch extends CoursDate
             }
         }
 
-        if (true == $this->withoutMoniteur) {
+        if ($this->withoutMoniteur) {
             $query->andFilterWhere(['cours_has_moniteurs.fk_moniteur' => Yii::$app->params['sansEncadrant']]);
         }
 
