@@ -306,6 +306,10 @@ class ClientsOnlineController extends CommonController
         $this->layout = (false == $goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
+        if (!is_null($ident)) {
+            $modelCours = Cours::findOne($ident);
+            $nomCoursID = $modelCours->fk_nom;
+        }
         $nomCoursID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : $nomCoursID;
         $model = Parametres::findOne($nomCoursID);
         Yii::$app->language = (isset(Yii::$app->params['interface_language_label'][$model->fk_langue]) ?
