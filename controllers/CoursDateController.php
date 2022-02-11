@@ -728,6 +728,7 @@ class CoursDateController extends CommonController
                 if (!empty($time->clientsHasCoursDate)) {
                     $Event->title .= ' RESERVE';
                     $Event->color = '#ff0000';
+                    $Event->url = '';
                 } else {
                     $Event->color = '#27db39';
                 }
