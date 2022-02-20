@@ -142,6 +142,12 @@ class SiteController extends Controller
         ]);
     }
 
+//    public function actionDailyTask()
+//    {
+//        $consoleController = new \app\commands\DailyTaskController('cronjob', Yii::$app);
+//        $consoleController->runAction('convert-birthday-to-light');
+//    }
+
     public function actionAnniversaire()
     {
         // liste des anniversaire sans moniteur
