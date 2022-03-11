@@ -36,7 +36,7 @@ class CommonController extends Controller
         $emails = [];
         $nomMoniteurs = [];
         
-        if ($delete == true) {
+        if ($delete) {
             CoursHasMoniteurs::deleteAll('fk_cours_date = ' . $cours_date_id);
         }
         foreach ($moniteurs as $moniteur_id) {
@@ -46,9 +46,10 @@ class CommonController extends Controller
             $addMoniteur->is_responsable = 0;
 
             // on gère le barème selon la saisie effectuée, si il n'est pas défini, on prend celui du moniteur
-            $addMoniteur->fk_bareme = (null != $setBareme) ? $setBareme : Personnes::findOne($moniteur_id)->fk_formation;
+//            $addMoniteur->fk_bareme = (null != $setBareme) ? $setBareme : Personnes::findOne($moniteur_id)->fk_formation;
+            $addMoniteur->fk_bareme = $setBareme;
 
-            if (!($flag = $addMoniteur->save(false))) {
+            if (!$addMoniteur->save(false)) {
                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
             }
             $emails[] = $addMoniteur->fkMoniteur->email;
@@ -69,17 +70,17 @@ class CommonController extends Controller
         $withLink = true;
         if ('create' == $cud) {
             $cudObjet = 'nouveauté';
-            $cudContent = '<p>Un cours auquel tu es prévu comme moniteur a été créé. Prière de prendre bonne note de la nouvelle date.<br />Merci et à bientôt.';
+            $cudContent = '<p>Un cours auquel tu es prévu comme moniteur.rice a été créé. Prière de prendre bonne note de la nouvelle date.<br />Merci et à bientôt.';
         } elseif ('update' == $cud) {
             $cudObjet = 'modifications';
-            $cudContent = '<p>Un cours auquel tu es prévu comme moniteur a été modifié. Prière de prendre bonne note des changements effectués.<br />Merci et à bientôt.';
+            $cudContent = '<p>Un cours auquel tu es prévu comme moniteur.rice a été modifié. Prière de prendre bonne note des changements effectués.<br />Merci et à bientôt.';
         } elseif ('delete' == $cud) {
             $cudObjet = 'suppression';
-            $cudContent = '<p>Un cours auquel tu étais prévu comme moniteur a été supprimé. Prière de prendre bonne note de l\'annulation.<br />Merci et à bientôt.';
+            $cudContent = '<p>Un cours auquel tu étais prévu comme moniteur.rice a été supprimé. Prière de prendre bonne note de l\'annulation.<br />Merci et à bientôt.';
             $withLink = false;
         } elseif ('birthday' == $cud) {
             $cudObjet = 'anniversaire';
-            $cudContent = '<p>Un client est inscrit au cours pour lequel tu es prévu comme moniteur. Prière de prendre bonne note de la date.<br />Merci et à bientôt.';
+            $cudContent = '<p>Un client est inscrit au cours pour lequel tu es prévu comme moniteur.rice. Prière de prendre bonne note de la date.<br />Merci et à bientôt.';
         } else {
             throw new Exception('Erreur typage email');
         }
@@ -90,8 +91,9 @@ class CommonController extends Controller
         
         // infos for addtocal link
         if ($withLink) {
-            $from = DateTime::createFromFormat('Y-m-d H:i', date('Y-m-d H:i', strtotime($model->date.' '.$model->heure_debut)));
-            $to = DateTime::createFromFormat('Y-m-d H:i', date('Y-m-d H:i', strtotime($model->date.' '.$model->heureFin)));
+            $format = 'Y-m-d H:i';
+            $from = DateTime::createFromFormat($format, date($format, strtotime($model->date.' '.$model->heure_debut)));
+            $to = DateTime::createFromFormat($format, date($format, strtotime($model->date.' '.$model->heureFin)));
 
             $link = Link::create($calNom, $from, $to, false, $model->cours_date_id)
                 ->description($model->remarque)
@@ -106,10 +108,10 @@ class CommonController extends Controller
             foreach($allDate as $date) {
                 $datesCours[] = date('d.m.Y', strtotime($date->date)).' '.substr($model->heure_debut, 0, 5);
             }
-            $dateheure = 'Date : '.implode(', ', $datesCours).'<br />';
+            $dateheure = 'Date : '.implode(', ', $datesCours) . '<br />';
         } else {
-            $dateheure = 'Date : '.date('d.m.Y', strtotime($model->date)).'<br />';
-            $dateheure .= 'Heure : '.substr($model->heure_debut, 0, 5).'<br />';
+            $dateheure = 'Date : '.date('d.m.Y', strtotime($model->date)) . '<br />';
+            $dateheure .= 'Heure : '.substr($model->heure_debut, 0, 5) . '<br />';
         }
         
         // on génère l'email à envoyer
@@ -118,7 +120,7 @@ class CommonController extends Controller
                 '.$calNom.'<br />
                 '.$dateheure.'
                 Infos : '.$model->remarque.'<br />
-                Moniteur(s) : '.  implode(', ', $nomMoniteurs).'</p>'.
+                Moniteur(s).trice(s) : '.  implode(', ', $nomMoniteurs).'</p>'.
                 $calLink
         ];
     }
@@ -313,10 +315,8 @@ class CommonController extends Controller
             $existe = ClientsHasCours::find()
                 ->where([ 'fk_personne' => $personneID, 'fk_cours' => $coursID])
                 ->exists();
-            if (!$existe) {
-                if (!$modelClientsHasCours->save()) {
-                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-cours.'));
-                }
+            if (!$existe && !$modelClientsHasCours->save()) {
+                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du lien client-cours.'));
             }
             foreach ($modelDate as $date) {
                 $existe = ClientsHasCoursDate::find()

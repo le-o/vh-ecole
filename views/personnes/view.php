@@ -100,6 +100,11 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
     
     <?php if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
+        echo $this->render('/moniteurs-has-bareme/_moniteur', [
+            'model' => $model,
+            'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
+        ]);
+
         echo '<br /><h3>'.Yii::t('app', 'Mes cours comme moniteurs').'</h3>';
         echo $this->render('/cours-date/_moniteur', [
             'coursDateDataProvider' => $coursDateDataProvider,

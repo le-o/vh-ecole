@@ -576,7 +576,7 @@ class ClientsOnlineController extends CommonController
                 foreach ($clients as $client) {
                     $c = new Personnes;
                     $c->fk_statut = Yii::$app->params['persStatutStandby'];
-                    $c->fk_type = Yii::$app->params['typeADefinir'];
+                    $c->fk_type = Yii::$app->params['typeClient'];
                     $c->nom = $client->nom;
                     $c->prenom = $client->prenom;
                     $c->adresse1 = $client->adresse;
@@ -646,7 +646,7 @@ class ClientsOnlineController extends CommonController
                     if (!array_key_exists($key, $enfants)) {
                         $c = new Personnes;
                         $c->fk_statut = Yii::$app->params['persStatutStandby'];
-                        $c->fk_type = Yii::$app->params['typeADefinir'];
+                        $c->fk_type = Yii::$app->params['typeClient'];
                         $c->nom = $client->nom;
                         $c->prenom = $client->prenom;
                         $c->adresse1 = $client->adresse;
@@ -705,7 +705,7 @@ class ClientsOnlineController extends CommonController
     {
         $p = new Personnes;
         $p->fk_statut = Yii::$app->params['persStatutStandby'];
-        $p->fk_type = Yii::$app->params['typeADefinir'];
+        $p->fk_type = Yii::$app->params['typeClient'];
         $p->nom = $model->nom;
         $p->prenom = ($model->prenom != '') ? $model->prenom : 'non renseigné';
         $p->adresse1 = $model->adresse;

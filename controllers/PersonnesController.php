@@ -111,14 +111,19 @@ class PersonnesController extends CommonController
         
         $searchParams = Yii::$app->request->queryParams;
         $searchParCours = (isset($searchParams['list_cours']) && $searchParams['list_cours'] !== '') ? true : false;
-        if (!isset($searchParams['from_date'])) $searchParams['from_date'] = date('01.01.Y');
-        if (!isset($searchParams['to_date'])) $searchParams['to_date'] = date('31.12.Y');
+        if (!isset($searchParams['from_date'])) {
+            $searchParams['from_date'] = date('01.01.Y');
+        }
+        if (!isset($searchParams['to_date'])) {
+            $searchParams['to_date'] = date('31.12.Y');
+        }
         $searchFrom = (isset($searchParams['from_date']) && $searchParams['from_date'] !== '') ? date('Y-m-d', strtotime($searchParams['from_date'])) : '1970-01-01';
         $searchTo = (isset($searchParams['to_date']) && $searchParams['to_date'] !== '') ? date('Y-m-d', strtotime($searchParams['to_date'])) : '9999-12-31';
         
         $dataMoniteurs = [];
         $heuresTotal = 0;
         $baremes = (new Parametres())->optsNiveauFormation();
+        $baremes[-1] = 'Non défini'; // pour reprendre les heures si paramétrage inexistant
         if (!$isMoniteur || !is_null($searchModel->personne_id)) {
             foreach ($dataProvider->models as $moniteur) {
                 $heures = 0;
@@ -128,14 +133,14 @@ class PersonnesController extends CommonController
                 foreach ($moniteur->moniteurHasCoursDate as $mcd) {
                     $coursDate = CoursDate::findOne($mcd->fk_cours_date);
 
-                    if (true == $this->keepDateInStatistics($coursDate)) {
+                    if ($this->keepDateInStatistics($coursDate)) {
                         $dateRef = date('Y-m-d', strtotime($coursDate->date));
                         if ($dateRef >= $searchFrom && $dateRef <= $searchTo) {
                             if ($searchParCours) {
                                 if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) {
                                     $heures += $coursDate->duree;
                                     // total par barème
-                                    $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
+                                    $key = $this->getBaremeID($mcd);
                                     if (!isset($heuresBareme[$key])) {
                                         $heuresBareme[$key] = 0;
                                     }
@@ -144,7 +149,8 @@ class PersonnesController extends CommonController
                             } else {
                                 $heures += $coursDate->duree;
                                 // total par barème
-                                $key = ('' != $mcd->fk_bareme) ? $mcd->fk_bareme : $moniteur->fk_formation;
+                                $key = $this->getBaremeID($mcd);
+
                                 if (!isset($heuresBareme[$key])) {
                                     $heuresBareme[$key] = 0;
                                 }
@@ -265,10 +271,16 @@ class PersonnesController extends CommonController
 
         $listeCoursDate = [];
         foreach ($model->moniteurHasCoursDate as $mcd) {
-            if ($fromData['selectedCours'] == '' || ($fromData['selectedCours'] != '' && $mcd->fkCoursDate->fkCours->fk_nom == $fromData['selectedCours'])) {
-                if (true == $this->keepDateInStatistics($mcd->fkCoursDate)) {
-                    $listeCoursDate[] = $mcd->fk_cours_date;
-                    $baremeCours[$mcd->fk_cours_date] = (null != $mcd->fk_bareme ? $mcd->fkBareme->nom : $mcd->fkMoniteur->fkFormation->nom);
+            if (($fromData['selectedCours'] == '' ||
+                ($fromData['selectedCours'] != '' && $mcd->fkCoursDate->fkCours->fk_nom == $fromData['selectedCours'])) &&
+                $this->keepDateInStatistics($mcd->fkCoursDate)
+            ) {
+                $listeCoursDate[] = $mcd->fk_cours_date;
+                if (null != $mcd->fk_bareme) {
+                    $baremeCours[$mcd->fk_cours_date] = '*' . $mcd->fkBareme->nom;
+                } else {
+                    $isBaremeSet = $mcd->fkMoniteur->getMoniteursHasBaremeFromDate(date('Y-m-d', strtotime($mcd->fkCoursDate->date)));
+                    $baremeCours[$mcd->fk_cours_date] = (null != $isBaremeSet ? $isBaremeSet->fkBareme->nom : 'Paramétrage inexistant');
                 }
             }
         }
@@ -409,11 +421,30 @@ class PersonnesController extends CommonController
         }
         
         $coursDateDataProvider = [];
+        $moniteursHasBaremeDataProvider = [];
         if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
+            // on retrouve les barèmes
+//            foreach ($model->moniteursHasBareme as $mb) {
+//                echo '<pre>';
+//                print_r($mb);
+//                echo '</pre>';
+//                exit;
+////            }
+//            echo '<pre>';
+//            print_r($model->moniteursHasBareme);
+//            echo '</pre>';
+//            exit;
+
+
+            $moniteursHasBaremeDataProvider = new ActiveDataProvider([
+                'query' => $model->getMoniteursHasBareme()
+            ]);
+
+            // on retrouve les cours
             $listeCoursDate = [];
             foreach ($model->moniteurHasCoursDate as $mcd) {
                 $coursDate = CoursDate::findOne($mcd->fk_cours_date);
-                if (true == $this->keepDateInStatistics($coursDate)) {
+                if ($this->keepDateInStatistics($coursDate)) {
                     $listeCoursDate[] = $mcd->fk_cours_date;
                 }
             }
@@ -479,6 +510,7 @@ class PersonnesController extends CommonController
         return $this->render('view', [
             'alerte' => $alerte,
             'model' => $this->findModel($id),
+            'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
             'coursDateDataProvider' => $coursDateDataProvider,
             'dataCours' => $dataCours,
             'coursDataProvider' => $coursDataProvider,
@@ -513,7 +545,7 @@ class PersonnesController extends CommonController
                     $addInterlocuteur = new PersonnesHasInterlocuteurs();
                     $addInterlocuteur->fk_personne = $model->personne_id;
                     $addInterlocuteur->fk_interlocuteur = $interlocuteur_id;
-                    if (!($flag = $addInterlocuteur->save(false))) {
+                    if (!$addInterlocuteur->save(false)) {
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des interlocuteur(s).'));
                     }
                 }
@@ -521,7 +553,6 @@ class PersonnesController extends CommonController
                 $transaction->commit();
                 return $this->redirect(['view', 'id' => $model->personne_id]);
             } catch (Exception $e) {
-                $alerte = $e->getMessage();
                 $transaction->rollBack();
             }
         }
@@ -567,7 +598,7 @@ class PersonnesController extends CommonController
                     $addInterlocuteur = new PersonnesHasInterlocuteurs();
                     $addInterlocuteur->fk_personne = $model->personne_id;
                     $addInterlocuteur->fk_interlocuteur = $interlocuteur_id;
-                    if (!($flag = $addInterlocuteur->save(false))) {
+                    if (!$addInterlocuteur->save(false)) {
                         throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des interlocuteur(s).'));
                     }
                 }
@@ -575,7 +606,6 @@ class PersonnesController extends CommonController
                 $transaction->commit();
                 return $this->redirect(['view', 'id' => $model->personne_id]);
             } catch (Exception $e) {
-                $alerte = $e->getMessage();
                 $transaction->rollBack();
             }
         }
@@ -672,5 +702,20 @@ class PersonnesController extends CommonController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $mcd
+     * @return array
+     */
+    private function getBaremeID($mcd): int
+    {
+        if (null != $mcd->fk_bareme) {
+            $key = $mcd->fk_bareme;
+        } else {
+            $isBaremeSet = $mcd->fkMoniteur->getMoniteursHasBaremeFromDate(date('Y-m-d', strtotime($mcd->fkCoursDate->date)));
+            $key = (!is_null($isBaremeSet) ? $isBaremeSet->fk_bareme : -1);
+        }
+        return $key;
     }
 }

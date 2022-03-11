@@ -39,6 +39,7 @@ use yii\helpers\ArrayHelper;
  * @property Parametres $fkStatut
  * @property Parametres $fkType
  * @property Parametres $fkFormation
+ * @property MoniteursHasBareme $moniteursHasBareme
  */
 class Personnes extends \yii\db\ActiveRecord
 {
@@ -176,7 +177,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getFkStatut()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_statut']);
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_statut']);
     }
 
     /**
@@ -184,7 +185,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getFkType()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_type']);
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_type']);
     }
 
     /**
@@ -192,7 +193,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getFkFormation()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_formation']);
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_formation']);
     }
 
     /**
@@ -200,7 +201,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getFkSalleadmin()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_salle_admin']);
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_salle_admin']);
     }
 
     /**
@@ -208,7 +209,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getFkLangues()
     {
-        return $this->hasMany(Parametres::className(), ['parametre_id' => 'fk_langues']);
+        return $this->hasMany(Parametres::class, ['parametre_id' => 'fk_langues']);
     }
 
     /**
@@ -217,7 +218,7 @@ class Personnes extends \yii\db\ActiveRecord
     public function getFkLanguesNoms()
     {
         $langueNom = [];
-        $langues = $this->hasMany(Parametres::className(), ['parametre_id' => 'fk_langues']);
+        $langues = $this->hasMany(Parametres::class, ['parametre_id' => 'fk_langues']);
         foreach ($langues->all() as $l) {
             $langueNom[] = $l->nom;
         }
@@ -227,9 +228,18 @@ class Personnes extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getMoniteursHasBareme()
+    {
+        return $this->hasMany(MoniteursHasBareme::class, ['fk_personne' => 'personne_id'])
+            ->orderBy('date_debut DESC');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getCours()
     {
-        return $this->hasMany(ClientsHasCours::className(), ['fk_personne' => 'personne_id']);
+        return $this->hasMany(ClientsHasCours::class, ['fk_personne' => 'personne_id']);
     }
 
     /**
@@ -237,7 +247,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getClientsHasCours()
     {
-        return $this->hasMany(ClientsHasCours::className(), ['fk_personne' => 'personne_id']);
+        return $this->hasMany(ClientsHasCours::class, ['fk_personne' => 'personne_id']);
     }
 
     /**
@@ -245,7 +255,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getClientsHasCoursDate()
     {
-        return $this->hasMany(ClientsHasCoursDate::className(), ['fk_personne' => 'personne_id']);
+        return $this->hasMany(ClientsHasCoursDate::class, ['fk_personne' => 'personne_id']);
     }
     
     /**
@@ -265,13 +275,21 @@ class Personnes extends \yii\db\ActiveRecord
     {
         return ClientsHasCoursDate::findOne(['fk_personne' => $this->personne_id, 'fk_cours_date' => $fk_cours_date]);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMoniteursHasBaremeFromDate($date)
+    {
+        return MoniteursHasBareme::find()->where(['fk_personne' => $this->personne_id])->andWhere(':mydate BETWEEN date_debut AND date_fin', [':mydate' => $date])->one();
+    }
     
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getMoniteurHasCoursDate()
     {
-        return $this->hasMany(CoursHasMoniteurs::className(), ['fk_moniteur' => 'personne_id']);
+        return $this->hasMany(CoursHasMoniteurs::class, ['fk_moniteur' => 'personne_id']);
     }
     
     /**
@@ -279,7 +297,7 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getPersonneHasInterlocuteurs()
     {
-        return $this->hasMany(PersonnesHasInterlocuteurs::className(), ['fk_personne' => 'personne_id']);
+        return $this->hasMany(PersonnesHasInterlocuteurs::class, ['fk_personne' => 'personne_id']);
     }
     
     /**

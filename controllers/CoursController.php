@@ -120,7 +120,7 @@ class CoursController extends CommonController
                 'class' => (in_array($s->parametre_id, $searchModel->bySalle)) ? ' btn-info' : '',
             ];
         }
-        $btnClassPriorise = ($onlyForWeb == true) ? ' btn-info' : '';
+        $btnClassPriorise = ($onlyForWeb ? ' btn-info' : '');
         
         $parametre = new Parametres();
         $saisonFilter = $parametre->optsSaison();
@@ -247,7 +247,7 @@ class CoursController extends CommonController
                                     CoursHasMoniteurs::updateAll(['fk_bareme' => Yii::$app->request->post()['editBareme']], 'fk_cours_date = ' . $modelCoursDate->cours_date_id);
                                 } else {
                                     foreach ($modelCoursDate->coursHasMoniteurs as $coursHasMoniteur) {
-                                        $coursHasMoniteur->fk_bareme = $coursHasMoniteur->fkMoniteur->fk_formation;
+                                        $coursHasMoniteur->fk_bareme = null;
                                         $coursHasMoniteur->save(false);
                                     }
                                 }
@@ -351,8 +351,8 @@ class CoursController extends CommonController
                 }
             }
             if (!$model->save()) {
-                    $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
-                } else {
+                $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
+            } else {
                 return $this->redirect(['view', 'id' => $model->cours_id]);
             }
         }
@@ -627,7 +627,9 @@ class CoursController extends CommonController
         }
         
         // on ajoute au tableau le nouveau participant choisi
-        if (isset($newParticipant)) $arrayParticipants[$newParticipant->fk_personne] = $newParticipant;
+        if (isset($newParticipant)) {
+            $arrayParticipants[$newParticipant->fk_personne] = $newParticipant;
+        }
         
         return $this->render('inscriptions', [
             'alerte' => $alerte,
@@ -656,7 +658,7 @@ class CoursController extends CommonController
                 $newMoniteur = new CoursHasMoniteurs();
                 $newMoniteur->fk_moniteur = $post['new_moniteur'];
             } else {
-                $withNotification = (isset($post['withNotification']) && true == $post['withNotification']);
+                $withNotification = (isset($post['withNotification']) && $post['withNotification']);
                 $arrayBefore = [];
                 // préparation du tableau de comparaison
                 foreach ($model->coursDates as $coursDate) {
@@ -684,10 +686,10 @@ class CoursController extends CommonController
                             $addMoniteur->fk_cours_date = $ids[0];
                             $addMoniteur->fk_moniteur = $ids[1];
                             $addMoniteur->is_responsable = 0;
-                            if (!($flag = $addMoniteur->save(false))) {
+                            if (!$addMoniteur->save(false)) {
                                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                             }
-                            if (true == $withNotification) {
+                            if ($withNotification) {
                                 $dates[$addMoniteur->fk_cours_date]['date'] = $addMoniteur->fkCoursDate->date;
                                 $dates[$addMoniteur->fk_cours_date]['heure'] = substr($addMoniteur->fkCoursDate->heure_debut, 0, 5);
                                 $dates[$addMoniteur->fk_cours_date]['moniteurs'][] = $addMoniteur->fkMoniteur->prenom . ' ' . $addMoniteur->fkMoniteur->nom;
@@ -695,7 +697,7 @@ class CoursController extends CommonController
                             }
                         }
                     }
-                    if (true == $withNotification) {
+                    if ($withNotification) {
                         $this->sendNotifications($dates, $arrayBefore, $post['datemoniteur']);
                     }
 
@@ -729,7 +731,9 @@ class CoursController extends CommonController
         }
         
         // on ajoute au tableau le nouveau moniteur choisi
-        if (isset($newMoniteur)) $arrayMoniteurs[$newMoniteur->fk_moniteur] = $newMoniteur;
+        if (isset($newMoniteur)) {
+            $arrayMoniteurs[$newMoniteur->fk_moniteur] = $newMoniteur;
+        }
         
         return $this->render('moniteurs', [
             'alerte' => $alerte,
@@ -766,7 +770,7 @@ class CoursController extends CommonController
                         $ids = explode('|', $key);
                         $myClientCours = ClientsHasCoursDate::find()->where('fk_personne = :personne_id AND fk_cours_date = :cours_date_id', ['personne_id' => $ids[1], 'cours_date_id' => $ids[0]])->one();
                         $myClientCours->is_present = 1;
-                        if (!($flag = $myClientCours->save())) {
+                        if (!$myClientCours->save()) {
                             throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la présence (IDs '.$ids[1].'|'.$ids[0].'.'));
                         }
                     }
@@ -836,12 +840,6 @@ class CoursController extends CommonController
         $participants = Personnes::find()->distinct()->joinWith('clientsHasCours')->where(['IN', 'fk_cours', $model->cours_id])->orderBy('clients_has_cours.fk_statut ASC')->all();
         
         // on cherche à définir le statut actuelle des participants
-        // dernière date
-        $coursDate = CoursDate::find()->where(['fk_cours' => $model->cours_id])->andWhere(['<=', 'date', date('Y-m-d')])->orderBy('date DESC')->one();
-        if (null === $coursDate) {
-            // alors la prochaine date
-            $coursDate = CoursDate::find()->where(['fk_cours' => $model->cours_id])->andWhere(['>=', 'date', date('Y-m-d')])->orderBy('date DESC')->one();
-        }
         foreach($participants as $part) {
             $toGroup = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->cours_id]);
             $part->statutPart = $toGroup->fkStatut->nom;
@@ -863,7 +861,6 @@ class CoursController extends CommonController
             'participants' => $allParticipants,
             'decoupage' => $decoupage,
         ]);
-//        return $content;
 
         // setup kartik\mpdf\Pdf component
         $pdf = new Pdf([
@@ -924,15 +921,16 @@ class CoursController extends CommonController
      * @return json La liste des cours
      */
     public function actionGetcoursjson() {
-        $searchModel = new CoursSearch();
-        $searchModel->fk_statut = Yii::$app->params['coursActif'];
-        $searchModel->is_publie = 1;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, 0);
+        $params = [
+            'fk_statut' => Yii::$app->params['coursActif'],
+            'is_publie' => 1,
+        ];
+        $arrayModelCours = Cours::findAll($params);
         
-        if ($dataProvider->count == 0) {
+        if (empty($arrayModelCours)) {
             $data = ["Aucune donnée trouvée"];
         } else {
-            foreach ($dataProvider->getModels() as $c) {
+            foreach ($arrayModelCours as $c) {
                 // quelle langue ?
                 $language = (isset(Yii::$app->params['interface_language_label'][$c->fk_langue])) ? Yii::$app->params['interface_language_label'][$c->fk_langue] : 'fr-CH';
                 $jours = [];
@@ -949,7 +947,7 @@ class CoursController extends CommonController
                 $isUnique = Yii::$app->params['coursUnique'] == $c->fk_type;
                 // pour les cours anniversaires (type 304 unique, on les mets en type sur demande 15)
                 // cela permet de corriger l'affichage sur le site internet
-                if (true == $isUnique) {
+                if ($isUnique) {
                     $param = Parametres::findOne(Yii::$app->params['coursPonctuel']);
                     $typeNom = $param->nom;
                 } else {
@@ -982,8 +980,8 @@ class CoursController extends CommonController
                     'participant_max' => $c->participant_max,
                     'nombre_inscrit' => $c->getNombreClientsInscritsForExport(),
                     'tranche_age' => Yii::t('app', $c->fkAge->nom, [], $language),
-                    'materiel_compris' => ($c->is_materiel_compris == true) ? Yii::t('app', 'Oui', [], $language) : Yii::t('app', 'Non', [], $language),
-                    'entree_compris' => ($c->is_entree_compris == true) ? Yii::t('app', 'Oui', [], $language) : Yii::t('app', 'Non', [], $language),
+                    'materiel_compris' => ($c->is_materiel_compris) ? Yii::t('app', 'Oui', [], $language) : Yii::t('app', 'Non', [], $language),
+                    'entree_compris' => ($c->is_entree_compris) ? Yii::t('app', 'Oui', [], $language) : Yii::t('app', 'Non', [], $language),
                     'infos_tarifs' => $c->offre_speciale,
                     'premier_jour_session' => $premierJourSession,
                     'toutes_les_dates' => $dates,
@@ -1003,7 +1001,6 @@ class CoursController extends CommonController
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         header('Content-Type: application/json; charset=utf-8');
         return $data;
-        exit;
     }
     
     /**

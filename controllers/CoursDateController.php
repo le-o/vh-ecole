@@ -78,6 +78,12 @@ class CoursDateController extends CommonController
             if (!empty($post['new_participant'])) {
                 // soit on ajoute un participant
                 $alerte = $this->addClientToCours([$model], $post['new_participant'], $model->fk_cours);
+                $moniteursForMail = [];
+                foreach ($model->coursHasMoniteurs as $myMoniteur) {
+                    $moniteursForMail['emails'][] = $myMoniteur->fkMoniteur->email;
+                    $moniteursForMail['noms'][] = $myMoniteur->fkMoniteur->prenom . ' ' . $myMoniteur->fkMoniteur->nom;
+                }
+                $this->sendMoniteurEmail($model, $moniteursForMail);
             } elseif (!empty($post['CoursDate'])) {
                 $clone = clone($model);
                 $model->load(Yii::$app->request->post());
@@ -89,11 +95,10 @@ class CoursDateController extends CommonController
                 }
                 
                 $mailToMoniteurs = false;
-                if ($moniteurs != $moniteursOld) {
-                    $mailToMoniteurs = true;
-                } elseif ($model->date !== $clone->date) {
-                    $mailToMoniteurs = true;
-                } elseif ($model->heure_debut != $clone->heure_debut || $model->duree != $clone->duree) {
+                if ($moniteurs != $moniteursOld
+                    || $model->date !== $clone->date
+                    || ($model->heure_debut != $clone->heure_debut || $model->duree != $clone->duree)
+                ) {
                     $mailToMoniteurs = true;
                 }
 
@@ -104,12 +109,9 @@ class CoursDateController extends CommonController
                     }
 
                     $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs, $model->baremeMoniteur, true);
-                    if ($mailToMoniteurs == true) {
-                        // on envoi l'email à tous les moniteurs
-                        if (!empty($infosEmail['emails'])) {
-                            $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'update');
-                            $this->actionEmail($contenu, $infosEmail['emails']);
-                        }
+                    // on envoi l'email à tous les moniteurs
+                    if ($mailToMoniteurs) {
+                        $this->sendMoniteurEmail($model, $infosEmail);
                     }
                     
                     $myCours = Cours::findOne($model->fk_cours);
@@ -181,14 +183,14 @@ class CoursDateController extends CommonController
         $myCours = Cours::findOne($model->fk_cours);
         $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
         $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
-        $allBaremes = [];
+        $setBareme = (1 == count($myMoniteurs) ? true : false);
         foreach ($myMoniteurs as $moniteur) {
             $selectedMoniteurs[] = $moniteur->fk_moniteur;
+            if ($setBareme) {
+                $model->baremeMoniteur = $moniteur->fk_bareme;
+            }
         }
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
-        foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
-        }
+        $dataMoniteurs = $this->getDataMoniteurs();
         
         $participantDataProvider = new ArrayDataProvider([
             'allModels' => $arrayParticipants,
@@ -419,13 +421,14 @@ class CoursDateController extends CommonController
         }
         
         $dataCours = [$cours_id => $myCours->fkNom->nom];
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => 2])->orderBy('nom, prenom')->all();
-        foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
+        $dataMoniteurs = $this->getDataMoniteurs();
+
+        if ($model->duree == '') {
+            $model->duree = $myCours->duree;
         }
-        
-        if ($model->duree == '') $model->duree = $myCours->duree;
-        if ($model->prix == '') $model->prix = $myCours->prix;
+        if ($model->prix == '') {
+            $model->prix = $myCours->prix;
+        }
         
         return $this->render('create', [
             'alerte' => $alerte,
@@ -505,13 +508,14 @@ class CoursDateController extends CommonController
         
         $myCours = Cours::findOne($cours_id);
         $dataCours = [$cours_id => $myCours->fkNom->nom];
-        $modelMoniteurs = Personnes::find()->where(['fk_type' => 2])->orderBy('nom, prenom')->all();
-        foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
-        }
+        $dataMoniteurs = $this->getDataMoniteurs();
         
-        if ($model->duree == '') $model->duree = $myCours->duree;
-        if ($model->prix == '') $model->prix = $myCours->prix;
+        if ($model->duree == '') {
+            $model->duree = $myCours->duree;
+        }
+        if ($model->prix == '') {
+            $model->prix = $myCours->prix;
+        }
         
         return $this->render('recursive', [
             'alerte' => $alerte,
@@ -533,7 +537,6 @@ class CoursDateController extends CommonController
     public function actionDelete($id, $from = null)
     {
         $model = $this->findModel($id);
-        $moniteurs = $model->coursHasMoniteurs;
         
         foreach ($model->coursHasMoniteurs as $moniteur) {
             $emails[] = $moniteur->fkMoniteur->email;
@@ -587,9 +590,10 @@ class CoursDateController extends CommonController
      * @param null $start
      * @param null $end
      * @param null $_
+     * @param null $for
      * @return array
      */
-    public function actionJsoncalendar($start=NULL,$end=NULL,$_=NULL,$for){
+    public function actionJsoncalendar($start=NULL,$end=NULL,$_=NULL,$for=NULL){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $times = CoursDate::find()
             ->joinWith(['fkCours'])
@@ -609,9 +613,10 @@ class CoursDateController extends CommonController
      * @param null $start
      * @param null $end
      * @param null $_
+     * @param null $for
      * @return array
      */
-    public function actionJsoncalanni($start=NULL,$end=NULL,$_=NULL,$for){
+    public function actionJsoncalanni($start=NULL,$end=NULL,$_=NULL,$for=NULL){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $times = CoursDate::find()
             ->joinWith(['fkCours'])
@@ -633,9 +638,10 @@ class CoursDateController extends CommonController
      * @param null $start
      * @param null $end
      * @param null $_
+     * @param null $for
      * @return array
      */
-    public function actionJsoncalannionline($start=NULL,$end=NULL,$_=NULL,$for){
+    public function actionJsoncalannionline($start=NULL,$end=NULL,$_=NULL,$for=NULL){
         // On calcule la date de début : anniversaires light 72h, autre anniversaire après 14 jours
         $startFrom = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . (in_array($for, Yii::$app->params['anniversaireLight']) ? ' + 3 days' : ' + 14 days')));
 
@@ -679,14 +685,14 @@ class CoursDateController extends CommonController
     {
         $events = [];
         foreach ($times as $time) {
-            if (false == $checkEmpty && $time->fkCours->fk_type == Yii::$app->params['coursUnique'] && empty($time->clientsHasCoursDate)) {
+            if (!$checkEmpty && $time->fkCours->fk_type == Yii::$app->params['coursUnique'] && empty($time->clientsHasCoursDate)) {
                 continue;
             }
             //Testing
             $Event = new \yii2fullcalendar\models\Event();
             $Event->id = $time->cours_date_id;
 
-            if (false == $online) {
+            if (!$online) {
                 $Event->url = Url::to(['/cours-date/view', 'id' => $time->cours_date_id]);
                 if (in_array($time->fkCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
                     $Event->title = (isset($time->clientsHasCoursDate[0]) ? $time->clientsHasCoursDate[0]->fkPersonne->suivi_client . ' ' . $time->clientsHasCoursDate[0]->fkPersonne->societe . ' ' . $time->clientsHasCoursDate[0]->fkPersonne->nomPrenom : Yii::t('app', 'Client non défini'));
@@ -704,27 +710,27 @@ class CoursDateController extends CommonController
             $moniteurs = $time->coursHasMoniteurs;
             foreach ($moniteurs as $m) {
                 $arrayMoniteurs[] = $m->fkMoniteur->nomPrenom;
-                if (true == $checkEmpty && in_array($m->fk_moniteur, Yii::$app->params['sansEncadrant'])) {
+                if ($checkEmpty && in_array($m->fk_moniteur, Yii::$app->params['sansEncadrant'])) {
                     $noMoniteur = true;
                 }
             }
-            $Event->nonstandard = (false == $online) ? implode(', ', $arrayMoniteurs) : '';
+            $Event->nonstandard = (!$online) ? implode(', ', $arrayMoniteurs) : '';
             $Event->start = date('Y-m-d\TH:i:s\Z', strtotime($time->date . ' ' . $time->heure_debut));
             $Event->end = date('Y-m-d\TH:i:s\Z', strtotime($time->date . ' ' . $time->HeureFin));
 
             if ($time->fkCours->fkNom->info_couleur != '' && in_array($time->fkCours->fk_nom, Yii::$app->params['coursModificationCouleur'])) {
                 $Event->color = Parametres::changerTonCouleur($time->fkCours->fkNom->info_couleur, Yii::$app->params['nuanceSelonNiveau'][$time->fkCours->fkNiveau->tri]);
-            } elseif (true == $checkEmpty && false == $online) {
+            } elseif ($checkEmpty && !$online) {
                 if (empty($time->clientsHasCoursDate)) {
                     $Event->color = '#ff0000';
                 } else {
-                    if (empty($time->coursHasMoniteurs) || true == $noMoniteur) {
+                    if (empty($time->coursHasMoniteurs) || $noMoniteur) {
                         $Event->color = '#ff9900';
                     } else {
                         $Event->color = '#27db39';
                     }
                 }
-            } elseif (true == $checkEmpty && true == $online) {
+            } elseif ($checkEmpty && $online) {
                 if (!empty($time->clientsHasCoursDate)) {
                     $Event->title .= ' RESERVE';
                     $Event->color = '#ff0000';
@@ -732,20 +738,44 @@ class CoursDateController extends CommonController
                 } else {
                     $Event->color = '#27db39';
                 }
-//                $Event->color = (empty($time->clientsHasCoursDate) ? '#27db39' : '#ff0000');
             } else {
                 $Event->color = $time->fkCours->fkNom->info_couleur;
             }
 
             // pour les inscriptions anniversaire online, on ne met que les cours avec moniteurs
-            if (true == $online) {
-                if (empty($time->coursHasMoniteurs) && false == $noMoniteur) {
-                    continue;
-                }
+            if ($online && empty($time->coursHasMoniteurs) && !$noMoniteur) {
+                continue;
             }
             $events[] = $Event;
         }
 
         return $events;
+    }
+
+
+    /**
+     * @return array
+     */
+    private function getDataMoniteurs(): array
+    {
+        $dataMoniteurs = [];
+        $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
+        foreach ($modelMoniteurs as $moniteur) {
+            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
+        }
+        return $dataMoniteurs;
+    }
+
+    /**
+     * @param CoursDate $model
+     * @param array $infosEmail
+     * @return void
+     */
+    private function sendMoniteurEmail(CoursDate $model, array $infosEmail): void
+    {
+        if (isset($infosEmail['emails']) && !empty($infosEmail['emails'])) {
+            $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'update');
+            $this->actionEmail($contenu, $infosEmail['emails']);
+        }
     }
 }
