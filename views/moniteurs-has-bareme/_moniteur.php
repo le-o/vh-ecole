@@ -18,7 +18,9 @@ use webvimark\modules\UserManagement\models\User;
     <div class="row">
         <div class="col-sm-12">
             <h3><?= Yii::t('app', 'Historique des barèmes') ?></h3>
-            <?= Html::a(Yii::t('app', 'Ajouter un barème'), ['/moniteurs-has-bareme/create', 'fk_personne' => $model->personne_id], ['class' => 'btn btn-primary']) ?>
+            <?php if (User::canRoute(['/moniteurs-has-bareme/create'])) {
+                echo Html::a(Yii::t('app', 'Ajouter un barème'), ['/moniteurs-has-bareme/create', 'fk_personne' => $model->personne_id], ['class' => 'btn btn-primary']);
+            } ?>
         </div>
     </div>
     
