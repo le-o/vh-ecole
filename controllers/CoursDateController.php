@@ -623,7 +623,7 @@ class CoursDateController extends CommonController
             ->where(['>=', 'date', $start])
             ->andWhere(['<=', 'date', $end])
             ->andWhere(['cours.fk_salle' => $for])
-            ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
+            ->andWhere(['cours.fk_statut' => Yii::$app->params['coursActif']])
             ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
             ->all();
 
@@ -642,8 +642,11 @@ class CoursDateController extends CommonController
      * @return array
      */
     public function actionJsoncalannionline($start=NULL,$end=NULL,$_=NULL,$for=NULL){
-        // On calcule la date de début : anniversaires light 72h, autre anniversaire après 14 jours
-        $startFrom = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . (in_array($for, Yii::$app->params['anniversaireLight']) ? ' + 3 days' : ' + 14 days')));
+        // On calcule la date de début minimal : anniversaires light et autre 72h
+        $startFrom = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . ' + 3 days'));
+        if ($startFrom < $start) {
+            $startFrom = $start;
+        }
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $times =  CoursDate::find()
@@ -651,7 +654,7 @@ class CoursDateController extends CommonController
             ->where(['>=', 'date', $startFrom])
             ->andWhere(['<=', 'date', $end])
             ->andWhere(['cours.fk_nom' => $for])
-            ->andWhere(['cours.fk_statut' => [Yii::$app->params['coursActif'], Yii::$app->params['coursInactif']]])
+            ->andWhere(['cours.fk_statut' => Yii::$app->params['coursActif']])
             ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
             ->all();
 
