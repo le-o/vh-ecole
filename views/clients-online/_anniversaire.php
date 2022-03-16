@@ -86,7 +86,7 @@ use yii\helpers\Url;
                 'data' => $model->optsPartByAge($model->agemoyen),
                 'pluginOptions'=>[
                     'depends'=>['age-moyen'],
-                    'placeholder'=>Yii::t('app', 'Choisir un nombre de participant'),
+                    'placeholder'=>Yii::t('app', 'Choisir un nombre de participant (enfants et adultes)'),
                     'url'=> Url::to(['depnbparticipants']),
                 ],
             ]) ?>

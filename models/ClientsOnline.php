@@ -49,11 +49,10 @@ class ClientsOnline extends \yii\db\ActiveRecord
             10 => true,
             11 => true,
             12 => true,
-            14 => true,
-            '14+' => false,
+            '12+' => false,
         ],
         // anniversaire avec moniteur
-        '5-7' => [
+        '5-6' => [
             1 => true,
             2 => true,
             3 => true,
@@ -68,7 +67,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             12 => false,
             '12+' => false,
         ],
-        '8-12' => [
+        '7-12' => [
             1 => true,
             2 => true,
             3 => true,
@@ -81,9 +80,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             10 => true,
             11 => false,
             12 => false,
-            13 => false,
-            14 => false,
-            '14+' => false,
+            '12+' => false,
         ],
         '12+' => [
             'contact' => false,
@@ -141,7 +138,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             'is_actif' => Yii::t('app', 'Transformé en client?'),
             'iagree' => Yii::t('app', 'En cochant cette case je déclare avoir lu et accepté les conditions d\'inscription et d\'annulation indiquées au bas de cette page'),
             'agemoyen' => Yii::t('app', 'Age moyen des enfants'),
-            'nbparticipant' => Yii::t('app', 'Nombre maximal de participants prévus'),
+            'nbparticipant' => Yii::t('app', 'Nombre maximal de participants prévus (enfants et adultes)'),
             'prenom_enfant' => Yii::t('app', 'Prénom de l\'enfant'),
             'date_naissance_enfant' => Yii::t('app', 'Date de naissance de l\'enfant'),
         ];
@@ -201,42 +198,24 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public function optsPartByAge($agemoyen)
     {
         $out = [];
+        $arrayAge = ['2-12', '5-6', '7-12', '12+'];
+        if (!in_array($agemoyen, $arrayAge)) {
+            return $out;
+        }
+
         $selected = '';
-        $min = $max = 1;
-        if ('2-12' == $agemoyen) {
-//            $out = [
-//                ['id' => '1-14', 'name' => Yii::t('app', '{nombre} enfants', ['nombre' => '1-14'])],
-//                ['id' => '14+', 'name' => Yii::t('app', 'plus de {nombre} enfants', ['nombre' => '14'])],
-//            ];
-            $max = 14;
-        } elseif ('5-7' == $agemoyen) {
-//            $out = [
-//                ['id' => '1-6', 'name' => Yii::t('app', '{nombre} enfants', ['nombre' => '1-6'])],
-//                ['id' => '7-12', 'name' => Yii::t('app', '{nombre} enfants', ['nombre' => '7-12'])],
-//                ['id' => '12+', 'name' => Yii::t('app', 'plus de {nombre} enfants', ['nombre' => '12'])],
-//            ];
-            $max = 12;
-        } elseif ('8-12' == $agemoyen) {
-//            $out = [
-//                ['id' => '1-10', 'name' => Yii::t('app', '{nombre} enfants', ['nombre' => '1-10'])],
-//                ['id' => '10-14', 'name' => Yii::t('app', '{nombre} enfants', ['nombre' => '10-14'])],
-//                ['id' => '14+', 'name' => Yii::t('app', 'plus de {nombre} enfants', ['nombre' => '14'])],
-//            ];
-            $max = 14;
-        } elseif ('12+' == $agemoyen) {
+        if ('12+' == $agemoyen) {
             $out = [
                 ['id' => 'contact', 'name' => Yii::t('app', 'Choix du nombre sans importance')],
             ];
             $selected = 'contact';
         } else {
-            return $out;
-        }
-
-        if (empty($out)) {
+            $min = 1;
+            $max = 12;
             for ($i = $min; $i <= $max; $i++) {
                 $out[] = ['id' => $i, 'name' => $i];
             }
-            $out[] = ['id' => $max . '+', 'name' => Yii::t('app', 'plus de {nombre} enfants', ['nombre' => $max])];
+            $out[] = ['id' => $max . '+', 'name' => Yii::t('app', 'plus de {nombre} personnes', ['nombre' => $max])];
         }
 
         return ['output'=>$out, 'selected'=>$selected];

@@ -391,7 +391,9 @@ class ClientsOnlineController extends CommonController
             if ($model->validate()) {
                 $clientDirect = [];
 
-                $inscriptionAuto = !$free && $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
+                $inscriptionAuto = !$free
+                    && $model->inscriptionRules[$model->agemoyen][$modelCours->fk_salle][$model->nbparticipant]
+                    && Yii::$app->params['monthey'] !== $modelCours->fk_salle;
 
                 if ($inscriptionAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
@@ -487,8 +489,8 @@ class ClientsOnlineController extends CommonController
             ];
         } else {
             $choixAge = [
-                '5-7' => Yii::t('app', '{nombre} ans', ['nombre' => '5-7']),
-                '8-12' => Yii::t('app', '{nombre} ans', ['nombre' => '8-12']),
+                '5-6' => Yii::t('app', '{nombre} ans', ['nombre' => '5-6']),
+                '7-12' => Yii::t('app', '{nombre} ans', ['nombre' => '7-12']),
                 '12+' => Yii::t('app', '{nombre} ans et +', ['nombre' => '12']),
             ];
         }
