@@ -68,11 +68,10 @@ $gridColumns = [
     'remarque',
 
     ['class' => 'yii\grid\ActionColumn',
-        'template'=>'{coursPresence} {coursDateView} {coursDateUpdate} {coursDateDelete}',
+        'template'=>'{coursPresence} {coursDateView} {coursDateDelete}',
         'visibleButtons'=>[
             'coursPresence' => User::canRoute('/cours/presence'),
             'coursDateView' => User::canRoute('/cours-date/view'),
-            'coursDateUpdate' => User::canRoute('/cours-date/update'),
             'coursDateDelete' => User::canRoute('/cours-date/delete'),
         ],
         'buttons'=>[
@@ -82,15 +81,8 @@ $gridColumns = [
                 ]);
             },
             'coursDateView' => function ($url, $model, $key) {
-//                if ($model->fkCours->fk_type == Yii::$app->params['coursPlanifie']) {
-                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
-                        'title' => Yii::t('yii', 'View'),
-                    ]);
-//                }
-            },
-            'coursDateUpdate' => function ($url, $model, $key) {
-                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours-date/update', 'id' => $key]), [
-                    'title' => Yii::t('yii', 'Update'),
+                return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
+                    'title' => Yii::t('yii', 'View'),
                 ]);
             },
             'coursDateDelete' => function ($url, $model, $key) {
