@@ -138,7 +138,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             'is_actif' => Yii::t('app', 'Transformé en client?'),
             'iagree' => Yii::t('app', 'En cochant cette case je déclare avoir lu et accepté les conditions d\'inscription et d\'annulation indiquées au bas de cette page'),
             'agemoyen' => Yii::t('app', 'Age moyen des enfants'),
-            'nbparticipant' => Yii::t('app', 'Nombre maximal de participants prévus (enfants et adultes)'),
+            'nbparticipant' => Yii::t('app', 'Choisir un nombre de participant (enfants et adultes)'),
             'prenom_enfant' => Yii::t('app', 'Prénom de l\'enfant'),
             'date_naissance_enfant' => Yii::t('app', 'Date de naissance de l\'enfant'),
         ];
