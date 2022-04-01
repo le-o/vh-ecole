@@ -48,7 +48,8 @@ class Personnes extends \yii\db\ActiveRecord
     protected $oldAttributes;
     
     public $statutPart;
-    
+    public $statutPartID;
+
     /**
      * @inheritdoc
      */

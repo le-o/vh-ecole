@@ -203,6 +203,7 @@ class CoursDateController extends CommonController
             $isInscrit = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->fk_cours]);
             if (isset($isInscrit->fk_statut)) {
                 $part->statutPart = $isInscrit->fkStatut->nom;
+                $part->statutPartID = $isInscrit->fk_statut;
             }
         }
         

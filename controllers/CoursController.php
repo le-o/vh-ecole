@@ -302,6 +302,7 @@ class CoursController extends CommonController
         ]);
         foreach($participantDataProvider->models as $part) {
             $part->statutPart = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->cours_id])->fkStatut->nom;
+            $part->statutPartID = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->cours_id])->fk_statut;
         }
 
         $parametre = new Parametres();
@@ -454,7 +455,7 @@ class CoursController extends CommonController
                         ->all();
                     $from = 'cours';
                     $clientsHasCours = ClientsHasCours::findOne(['fk_cours' => $cours_ou_date_id, 'fk_personne' => $personne_id]);
-                    $clientsHasCours->fk_statut = Yii::$app->params['partStatutDesinscritFutur'];
+                    $clientsHasCours->fk_statut = Yii::$app->params['partDesinscrit'];
                     $clientsHasCours->save();
                 } elseif ($from == 'cours-datefutur') {
                     $coursDateBase = CoursDate::find()
@@ -466,7 +467,7 @@ class CoursController extends CommonController
                         ->all();
                     $from = 'cours-date';
                     $clientsHasCours = ClientsHasCours::findOne(['fk_cours' => $coursDateBase->fk_cours, 'fk_personne' => $personne_id]);
-                    $clientsHasCours->fk_statut = Yii::$app->params['partStatutDesinscritFutur'];
+                    $clientsHasCours->fk_statut = Yii::$app->params['partDesinscrit'];
                     $clientsHasCours->save();
                 } else {
                     $coursDate = CoursDate::find()

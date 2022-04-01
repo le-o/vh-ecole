@@ -121,13 +121,17 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
     <?= GridView::widget([
         'dataProvider' => $participantDataProvider,
         'id' => 'participantgrid',
+        'rowOptions' => function($model){
+            if(Yii::$app->params['partDesinscrit'] == $model->statutPartID){
+                return ['class' => 'danger'];
+            }
+        },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             
             [
                 'attribute' => 'statutPart',
                 'label' => 'Statut',
-                'visible' => (!isset($model->fk_type) || (isset($model->fk_type) && in_array($model->fk_type, Yii::$app->params['coursPlanifieS']))) ? true : true,
             ],
             'suivi_client',
             'societe',

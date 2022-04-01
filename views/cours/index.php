@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\CoursSearch */
@@ -13,19 +15,17 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="cours-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        
-    <div class="btn-toolbar" role="toolbar">
-        <?= Html::a(Yii::t('app', 'Create Cours'), ['create'], ['class' => 'btn btn-success']) ?>
-        <div class="btn-group">
-            <?php foreach ($btnSalle as $s) { ?>
-                <?= Html::a(Yii::t('app', $s['label']), ['index', 'salle' => $s['salleID']], ['class' => 'btn btn-default' . $s['class']]) ?>
-            <?php } ?>
+        <div class="btn-toolbar" role="toolbar">
+            <?= Html::a(Yii::t('app', 'Create Cours'), ['create'], ['class' => 'btn btn-success']) ?>
+            <div class="btn-group">
+                <?php foreach ($btnSalle as $s) { ?>
+                    <?= Html::a(Yii::t('app', $s['label']), ['index', 'salle' => $s['salleID']], ['class' => 'btn btn-default' . $s['class']]) ?>
+                <?php } ?>
+            </div>
+            <?= Html::a(Yii::t('app', 'Priorité internet'), ['index', 'onlyForWeb' => ($btnClassPriorise == '') ? true : false], ['class' => 'btn btn-default' . $btnClassPriorise]) ?>
         </div>
-        <?= Html::a(Yii::t('app', 'Priorité internet'), ['index', 'onlyForWeb' => ($btnClassPriorise == '') ? true : false], ['class' => 'btn btn-default' . $btnClassPriorise]) ?>
-    </div>
     </p>
 
     <?= GridView::widget([
@@ -83,7 +83,18 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{view} {delete}',
+                'template'=>'{view} {printParticipant} {delete}',
+                'visibleButtons'=>[
+                    'printParticipant' => User::canRoute(['/cours/presence']),
+                ],
+                'buttons'=>[
+                    'printParticipant' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-print"></span>', Url::to(['/cours/presence', 'id' => $key]), [
+                            'title' => Yii::t('app', 'Imprimer la liste des participants'),
+                            'target' => '_blank',
+                        ]);
+                    },
+                ],
             ],
         ],
     ]); ?>

@@ -14,11 +14,15 @@ $this->title = Yii::t('app', 'Update {modelClass}: ', [
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Cours'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->cours_id, 'url' => ['view', 'id' => $model->cours_id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Participants');
+
+$this->registerJsFile(
+    '@web/js/vh-script.js',
+    ['depends' => [\yii\web\JqueryAsset::class]]
+);
 ?>
 
 <style>
 .flyover {
-   /*left: 150%;*/
    overflow: hidden;
    position: fixed;
    width: 20%;
@@ -66,7 +70,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Participants');
             </div>
         </div>
         
-        <?php echo '<table class="table table-striped table-bordered"><tr><td></td>';
+        <?php echo '<table id="array-check-all" class="table table-striped table-bordered"><tr><td></td>';
         foreach ($arrayData as $data) {
             echo '<th>'.$data['model']->date.'</th>';
         }
@@ -74,15 +78,20 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Participants');
         
         // ligne pour chaque participants
         foreach ($arrayParticipants as $key => $participant) {
-            echo '<tr><td>'.$participant->fkPersonne->nom.' '.$participant->fkPersonne->prenom.'</td>';
+            echo '<tr><td>' . $participant->fkPersonne->nom . ' ' . $participant->fkPersonne->prenom . ' ';
+            $allChecked = true;
+            $myCell = '';
             foreach ($arrayData as $data) {
                 $dateCours = date('Ymd', strtotime($data['model']->date));
-                $isChecked = false;
-                if (isset($data['participants']) && array_key_exists($key, $data['participants'])) {
-                    $isChecked = true;   
-                }
-                echo '<td>'.yii\bootstrap\BaseHtml::checkbox('dateparticipant['.$dateCours.']['.$data['model']->cours_date_id.'|'.$key.']', $isChecked, ['value' => $data['model']->cours_date_id.'|'.$key]).'</td>';
+                $isChecked = (isset($data['participants']) && array_key_exists($key, $data['participants']) ? true : false);
+                $allChecked = $allChecked && $isChecked;
+                $myCell .= '<td>' . yii\bootstrap\BaseHtml::checkbox('dateparticipant[' . $dateCours . '][' . $data['model']->cours_date_id . '|' . $key . ']', $isChecked, ['value' => $data['model']->cours_date_id . '|' . $key]).'</td>';
             }
+            echo '<div class="pull-right">' . Html::checkbox(null, $allChecked, [
+                    'class' => 'check-all-line',
+                ]) . ' ' . Yii::t('app', 'Tous/aucun') . '</div>';
+            echo  '</td>';
+            echo $myCell;
             echo '</tr>';
         }
         echo '</table>';

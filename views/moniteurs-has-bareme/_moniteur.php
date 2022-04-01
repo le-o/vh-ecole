@@ -37,18 +37,19 @@ use webvimark\modules\UserManagement\models\User;
             'date_fin',
 
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{update}',
+                'template'=>'{update} {delete}',
                 'visibleButtons'=>[
                     'update' => User::canRoute(['/moniteurs-has-bareme/update']),
+                    'delete' => function ($model, $key, $index) {
+                        return ($index == 0 && User::canRoute(['/moniteurs-has-bareme/delete']) ? true : false);
+                    },
                 ],
-                'urlCreator' => function ($action, $model) {
+                'urlCreator' => function ($action, $model, $data, $index) {
                     if ($action === 'update') {
-                        $data = [
-                            'fk_personne' => $model->fk_personne,
-                            'fk_bareme' => $model->fk_bareme,
-                            'date_debut' => date('Y-m-d', strtotime($model->date_debut)),
-                        ];
                         return Url::to(['/moniteurs-has-bareme/update', 'jsonData' => json_encode($data)]);
+                    }
+                    if ($action === 'delete') {
+                        return Url::to(['/moniteurs-has-bareme/delete', 'jsonData' => json_encode($data)]);
                     }
                 }
             ],

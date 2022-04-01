@@ -95,7 +95,7 @@ class MoniteursHasBaremeController extends Controller
     public function actionUpdate($jsonData)
     {
         $jsonData = json_decode($jsonData, true);
-        $model = $this->findModel($jsonData['fk_personne'], $jsonData['fk_bareme'], $jsonData['date_debut']);
+        $model = $this->findModel($jsonData['fk_personne'], $jsonData['fk_bareme'], date('Y-m-d', strtotime($jsonData['date_debut'])));
 
         if ($model->load(Yii::$app->request->post())) {
             // on modifie la date de fin du barème précédent et la date de début du suivant
@@ -115,17 +115,16 @@ class MoniteursHasBaremeController extends Controller
     /**
      * Deletes an existing MoniteursHasBareme model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $fk_personne
-     * @param integer $fk_bareme
-     * @param string $date_debut
+     * @param json $jsonData
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($fk_personne, $fk_bareme, $date_debut)
+    public function actionDelete($jsonData)
     {
-        $this->findModel($fk_personne, $fk_bareme, $date_debut)->delete();
+        $jsonData = json_decode($jsonData, true);
+        $this->findModel($jsonData['fk_personne'], $jsonData['fk_bareme'], date('Y-m-d', strtotime($jsonData['date_debut'])))->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['/personnes/view', 'id' => $jsonData['fk_personne']]);
     }
 
     /**

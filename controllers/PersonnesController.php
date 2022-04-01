@@ -424,18 +424,6 @@ class PersonnesController extends CommonController
         $moniteursHasBaremeDataProvider = [];
         if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
             // on retrouve les barèmes
-//            foreach ($model->moniteursHasBareme as $mb) {
-//                echo '<pre>';
-//                print_r($mb);
-//                echo '</pre>';
-//                exit;
-////            }
-//            echo '<pre>';
-//            print_r($model->moniteursHasBareme);
-//            echo '</pre>';
-//            exit;
-
-
             $moniteursHasBaremeDataProvider = new ActiveDataProvider([
                 'query' => $model->getMoniteursHasBareme()
             ]);
@@ -479,6 +467,11 @@ class PersonnesController extends CommonController
             $dataCoursDate[$cle]['session'] = $clientCoursDate->fkCoursDate->fkCours->session;
             $dataCoursDate[$cle]['annee'] = $clientCoursDate->fkCoursDate->fkCours->annee;
             $dataCoursDate[$cle]['fkSaison.nom'] = isset($clientCoursDate->fkCoursDate->fkCours->fkSaison) ? $clientCoursDate->fkCoursDate->fkCours->fkSaison->nom : '';
+
+            $isInscrit = ClientsHasCours::findOne(['fk_personne' => $model->personne_id, 'fk_cours' => $clientCoursDate->fkCoursDate->fk_cours]);
+            if (isset($isInscrit->fk_statut)) {
+                $dataCoursDate[$cle]['statutPartID'] = $isInscrit->fk_statut;
+            }
         }
         $coursDataProvider = new ArrayDataProvider([
 		    'allModels' => $dataCoursDate,

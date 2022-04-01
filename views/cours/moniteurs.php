@@ -14,6 +14,11 @@ $this->title = Yii::t('app', 'Update {modelClass}: ', [
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Cours'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->cours_id, 'url' => ['view', 'id' => $model->cours_id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Moniteurs');
+
+$this->registerJsFile(
+    '@web/js/vh-script.js',
+    ['depends' => [\yii\web\JqueryAsset::class]]
+);
 ?>
 <div class="cours-moniteurs">
 
@@ -50,7 +55,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Moniteurs');
             </div>
         </div>
         
-        <?php echo '<table class="table table-striped table-bordered"><tr><td></td>';
+        <?php echo '<table id="array-check-all" class="table table-striped table-bordered"><tr><td></td>';
         foreach ($arrayData as $data) {
             echo '<th>'.$data['model']->date.'</th>';
         }
@@ -58,13 +63,20 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Moniteurs');
 
         // ligne pour chaque moniteurs
         foreach ($arrayMoniteurs as $key => $moniteur) {
-            echo '<tr><td>'.$moniteur->fkMoniteur->nom.' '.$moniteur->fkMoniteur->prenom.'</td>';
+            echo '<tr><td>' . $moniteur->fkMoniteur->nom . ' ' . $moniteur->fkMoniteur->prenom . ' ';
+            $allChecked = true;
+            $myCell = '';
             foreach ($arrayData as $data) {
                 $dateCours = date('Ymd', strtotime($data['model']->date));
-                if (isset($data['moniteurs']) && array_key_exists($key, $data['moniteurs'])) {
-                    echo '<td>'.yii\bootstrap\BaseHtml::checkbox('datemoniteur['.$dateCours.']['.$data['model']->cours_date_id.'|'.$key.']', true).'</td>';
-                } else echo '<td>'.yii\bootstrap\BaseHtml::checkbox('datemoniteur['.$dateCours.']['.$data['model']->cours_date_id.'|'.$key.']', false).'</td>';
+                $isChecked = (isset($data['moniteurs']) && array_key_exists($key, $data['moniteurs']) ? true : false);
+                $allChecked = $allChecked && $isChecked;
+                $myCell .= '<td>'.yii\bootstrap\BaseHtml::checkbox('datemoniteur[' . $dateCours . '][' . $data['model']->cours_date_id . '|' . $key . ']', $isChecked).'</td>';
             }
+            echo '<div class="pull-right">' . Html::checkbox(null, $allChecked, [
+                    'class' => 'check-all-line',
+                ]) . ' ' . Yii::t('app', 'Tous/aucun') . '</div>';
+            echo  '</td>';
+            echo $myCell;
             echo '</tr>';
         }
         echo '</table>';
