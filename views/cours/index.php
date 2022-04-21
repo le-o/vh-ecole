@@ -86,6 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'template'=>'{view} {printParticipant} {delete}',
                 'visibleButtons'=>[
                     'printParticipant' => User::canRoute(['/cours/presence']),
+                    'delete' => User::canRoute(['/cours/delete']),
                 ],
                 'buttons'=>[
                     'printParticipant' => function ($url, $model, $key) {

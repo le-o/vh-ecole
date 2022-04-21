@@ -94,8 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
     
     <?php
-    $actionButtons = '';
-    $actionButtons .= (User::canRoute(['cours-date/create'])) ? Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary']) : '';
+    $actionButtons = (User::canRoute(['cours-date/create'])) ? Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary']) : '';
     $actionButtons .= (User::canRoute(['cours-date/recursive'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Create Cours Date Multiple'), ['cours-date/recursive', 'cours_id' => $model->cours_id], ['class' => 'btn btn-info']) : '';
     $actionButtons .= (User::canRoute(['cours/gestionmoniteurs'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Gestion moniteurs'), ['cours/gestionmoniteurs', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default']) : '';
     $actionButtons .= (User::canRoute(['cours/gestionpresences'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Gestion présences'), ['cours/gestionpresences', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default']) : '';
