@@ -47,7 +47,7 @@ class ClientsOnlineSearch extends ClientsOnline
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['date_inscription'=>SORT_DESC]]
+            'sort'=> ['defaultOrder' => ['is_actif'=>SORT_DESC, 'date_inscription'=>SORT_DESC]]
         ]);
 
         $this->load($params);

@@ -392,8 +392,7 @@ class ClientsOnlineController extends CommonController
                 $clientDirect = [];
 
                 $inscriptionAuto = !$free
-                    && $model->inscriptionRules[$model->agemoyen][$modelCours->fk_salle][$model->nbparticipant]
-                    && Yii::$app->params['monthey'] !== $modelCours->fk_salle;
+                    && $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
 
                 if ($inscriptionAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
@@ -725,8 +724,9 @@ class ClientsOnlineController extends CommonController
         return $p;
     }
 
-    public function actionDepnbparticipants() {
+    public function actionDepnbparticipants($lang_interface = 'fr-CH') {
         if (isset($_POST['depdrop_parents'])) {
+            Yii::$app->language = $lang_interface;
             $parents = $_POST['depdrop_parents'];
             if ($parents != null && is_array($parents)) {
                 $model = new ClientsOnline();
@@ -738,9 +738,6 @@ class ClientsOnlineController extends CommonController
             }
         }
         return Json::encode(['output'=>'', 'selected'=>'']);
-
-
-
     }
 
 }

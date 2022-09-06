@@ -7,10 +7,22 @@ use kartik\time\TimePicker;
 use kartik\select2\Select2;
 use kartik\depdrop\DepDrop;
 use yii\helpers\Url;
+use yii\bootstrap\Alert;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ClientsOnline */
 /* @var $form yii\widgets\ActiveForm */
+
+$this->registerJs('
+    jQuery(document).ready(function() {
+        jQuery("#nb-participant").change(function() {
+            jQuery("#warning-12").hide();
+            if ("12+" == jQuery("#nb-participant").val()) {
+                jQuery("#warning-12").show();
+            }
+        });
+    });'
+    , \yii\web\View::POS_END);
 
 ?>
 
@@ -87,8 +99,16 @@ use yii\helpers\Url;
                 'pluginOptions'=>[
                     'depends'=>['age-moyen'],
                     'placeholder'=>Yii::t('app', 'Choisir un nombre de participant (enfants et adultes)'),
-                    'url'=> Url::to(['depnbparticipants']),
+                    'url'=> Url::to(['depnbparticipants', 'lang_interface' => Yii::$app->language]),
                 ],
+            ]) ?>
+            <?= Alert::widget([
+            'options' => [
+                'id' => 'warning-12',
+                'class' => 'alert-warning',
+                'style' => 'display:none;',
+            ],
+            'body' => Yii::t('app', 'warning12+'),
             ]) ?>
         </div>
     </div>
