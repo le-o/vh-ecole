@@ -666,6 +666,7 @@ class CoursController extends CommonController
                     $dateCours = date('Ymd', strtotime($coursDate->date));
                     foreach ($coursDate->coursHasMoniteurs as $moniteur) {
                         $arrayBefore[$dateCours][$moniteur->fk_cours_date.'|'.$moniteur->fk_moniteur] = true;
+                        $arrayClone[$moniteur->fk_cours_date.'|'.$moniteur->fk_moniteur] = clone($moniteur);
                     }
                 }
             
@@ -687,7 +688,12 @@ class CoursController extends CommonController
                             $addMoniteur->fk_cours_date = $ids[0];
                             $addMoniteur->fk_moniteur = $ids[1];
                             $addMoniteur->is_responsable = 0;
-                            if (!$addMoniteur->save(false)) {
+
+                            if (isset($arrayClone[$key])) {
+                                $addMoniteur->fk_bareme = $arrayClone[$key]->fk_bareme;
+                            }
+
+                            if (!$addMoniteur->save()) {
                                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
                             }
                             if ($withNotification) {

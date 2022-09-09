@@ -49,7 +49,7 @@ class CommonController extends Controller
 //            $addMoniteur->fk_bareme = (null != $setBareme) ? $setBareme : Personnes::findOne($moniteur_id)->fk_formation;
             $addMoniteur->fk_bareme = $setBareme;
 
-            if (!$addMoniteur->save(false)) {
+            if (!$addMoniteur->save()) {
                 throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
             }
             $emails[] = $addMoniteur->fkMoniteur->email;

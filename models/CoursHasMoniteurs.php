@@ -34,7 +34,6 @@ class CoursHasMoniteurs extends \yii\db\ActiveRecord
         return [
             [['fk_cours_date', 'fk_moniteur', 'is_responsable'], 'required'],
             [['fk_cours_date', 'fk_moniteur', 'is_responsable'], 'integer'],
-            [['fk_bareme'], 'default', 'setOnEmpty'=>true, 'value'=>null],
         ];
     }
 

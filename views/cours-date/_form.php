@@ -5,7 +5,6 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use kartik\time\TimePicker;
-use yii\bootstrap\Alert;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
@@ -76,7 +75,11 @@ use yii\bootstrap\Alert;
 			]); ?>
         </div>
         <div class="col-sm-2">
-            <?= $form->field($model, 'baremeMoniteur')->dropDownList($modelParams->optsNiveauFormation(), ['prompt'=>Yii::t('app', 'Barème non fixé')]) ?>
+            <?php
+            $option = ['reinit' => Yii::t('app', 'Supprimer le barème fixe')];
+            $formations = $option + $modelParams->optsNiveauFormation();
+            ?>
+            <?= $form->field($model, 'baremeMoniteur')->dropDownList($formations, ['prompt'=>Yii::t('app', 'Fixer la barème')]) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu($model->fk_lieu)) ?>

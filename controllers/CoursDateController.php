@@ -108,6 +108,10 @@ class CoursDateController extends CommonController
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
                     }
 
+                    if ('reinit' == $model->baremeMoniteur) {
+                        $model->baremeMoniteur = null;
+                    }
+
                     $infosEmail = $this->saveMoniteur($model->cours_date_id, $moniteurs, $model->baremeMoniteur, true);
                     // on envoi l'email à tous les moniteurs
                     if ($mailToMoniteurs) {
@@ -183,12 +187,16 @@ class CoursDateController extends CommonController
         $myCours = Cours::findOne($model->fk_cours);
         $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
         $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
-        $setBareme = (1 == count($myMoniteurs) ? true : false);
+        $baremeValue = [];
         foreach ($myMoniteurs as $moniteur) {
             $selectedMoniteurs[] = $moniteur->fk_moniteur;
-            if ($setBareme) {
-                $model->baremeMoniteur = $moniteur->fk_bareme;
-            }
+            $model->baremeMoniteur = $moniteur->fk_bareme;
+            $baremeValue[$moniteur->fk_bareme] = $moniteur->fk_bareme;
+        }
+        if (1 < count($baremeValue)) {
+            $model->baremeMoniteur = null;
+            $alerte['class'] = 'warning';
+            $alerte['message'] = Yii::t('app', 'Barèmes fixés incohérents : à controller !');
         }
         $dataMoniteurs = $this->getDataMoniteurs();
         
