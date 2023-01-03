@@ -165,6 +165,9 @@ class CoursController extends CommonController
         } elseif ($msg === 'clone') {
             $alerte['class'] = 'success';
             $alerte['message'] = Yii::t('app', 'Le cours a été dupliqué avec succès.');
+        } elseif ($msg === 'mailKo') {
+            $alerte['class'] = 'warning';
+            $alerte['message'] = Yii::t('app', 'Cours sauvé, mais problème lors de l\'envoi du mail au moniteur.');
         } elseif ($msg !== '') {
             $alerte['class'] = 'danger';
             $alerte['message'] = $msg;

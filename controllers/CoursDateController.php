@@ -72,6 +72,9 @@ class CoursDateController extends CommonController
         if ($msg === 'supp') {
             $alerte['class'] = 'success';
             $alerte['message'] = Yii::t('app', 'La personne a bien été supprimée du cours !');
+        } elseif ($msg === 'mailKo') {
+            $alerte['class'] = 'warning';
+            $alerte['message'] = Yii::t('app', 'Cours sauvé, mais problème lors de l\'envoi du mail au moniteur.');
         }
         
         if ($post = Yii::$app->request->post()) {
@@ -387,6 +390,8 @@ class CoursDateController extends CommonController
 	        
             $post = Yii::$app->request->post();
             $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
+            $contenu = [];
+            $isSaveOk = false;
 
             $transaction = \Yii::$app->db->beginTransaction();
             try {
@@ -398,7 +403,6 @@ class CoursDateController extends CommonController
                 // on envoi l'email à tous les moniteurs
                 if (!empty($infosEmail['emails'])) {
                     $contenu = $this->generateMoniteurEmail($model, $infosEmail['noms'], 'create');
-                    $this->actionEmail($contenu, $infosEmail['emails']);
                 }
                 
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
@@ -417,15 +421,28 @@ class CoursDateController extends CommonController
                 }
 		        
                 $transaction->commit();
-                if (in_array($myCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
-                    return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
-                } else {
-                    return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
-                }
+                $isSaveOk = true;
             } catch (Exception $e) {
                 $alerte['class'] = 'danger';
                 $alerte['message'] = $e->getMessage();
                 $transaction->rollBack();
+            }
+
+            if (!empty($contenu) && $isSaveOk) {
+                $isEmailSend = $this->actionEmail($contenu, $infosEmail['emails']);
+                if (in_array($myCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
+                    return $this->redirect([
+                        'cours-date/view',
+                        'id' => $model->cours_date_id,
+                        'msg' => (!$isEmailSend ? 'mailKo' : '')
+                    ]);
+                } else {
+                    return $this->redirect([
+                        'cours/view',
+                        'id' => $model->fk_cours,
+                        'msg' => (!$isEmailSend ? 'mailKo' : '')
+                    ]);
+                }
             }
         }
         
