@@ -52,7 +52,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             '12+' => false,
         ],
         // anniversaire avec moniteur
-        '5-6' => [
+        '5-7' => [
             1 => true,
             2 => true,
             3 => true,
@@ -67,7 +67,22 @@ class ClientsOnline extends \yii\db\ActiveRecord
             12 => false,
             '12+' => false,
         ],
-        '7-12' => [
+        '8-11' => [
+            1 => true,
+            2 => true,
+            3 => true,
+            4 => true,
+            5 => true,
+            6 => true,
+            7 => true,
+            8 => true,
+            9 => true,
+            10 => false,
+            11 => false,
+            12 => false,
+            '12+' => false,
+        ],
+        '12+' => [
             1 => true,
             2 => true,
             3 => true,
@@ -78,12 +93,9 @@ class ClientsOnline extends \yii\db\ActiveRecord
             8 => true,
             9 => true,
             10 => true,
-            11 => false,
-            12 => false,
+            11 => true,
+            12 => true,
             '12+' => false,
-        ],
-        '12+' => [
-            'contact' => false,
         ]
     ];
     
@@ -198,25 +210,18 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public function optsPartByAge($agemoyen)
     {
         $out = [];
-        $arrayAge = ['2-12', '5-6', '7-12', '12+'];
+        $arrayAge = ['2-12', '5-7', '8-11', '12+'];
         if (!in_array($agemoyen, $arrayAge)) {
             return $out;
         }
 
         $selected = '';
-        if ('12+' == $agemoyen) {
-            $out = [
-                ['id' => 'contact', 'name' => Yii::t('app', 'Choix du nombre sans importance')],
-            ];
-            $selected = 'contact';
-        } else {
-            $min = 1;
-            $max = 12;
-            for ($i = $min; $i <= $max; $i++) {
-                $out[] = ['id' => $i, 'name' => $i];
-            }
-            $out[] = ['id' => $max . '+', 'name' => Yii::t('app', 'plus de {nombre} personnes', ['nombre' => $max])];
+        $min = 1;
+        $max = 12;
+        for ($i = $min; $i <= $max; $i++) {
+            $out[] = ['id' => $i, 'name' => $i];
         }
+        $out[] = ['id' => $max . '+', 'name' => Yii::t('app', 'plus de {nombre} personnes', ['nombre' => $max])];
 
         return ['output'=>$out, 'selected'=>$selected];
     }

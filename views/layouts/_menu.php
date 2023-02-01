@@ -44,6 +44,7 @@ use webvimark\modules\UserManagement\models\User;
                          ['label' => Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres'], 'visible' => User::canRoute(['/parametres/index'])],
                          ['label' => Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore'], 'visible' => User::canRoute(['/backuprestore/index'])],
                          ['label' => Yii::t('app', 'Synchro calendrier'), 'url' => ['/site/calendarsync'], 'visible' => User::canRoute(['//site/calendarsync'])],
+                         ['label' => Yii::t('app', 'Emails envoyés'), 'url' => ['/sent-email'], 'visible' => User::canRoute(['/sent-email/index'])],
                     ],
                 ],
             ['label' => Yii::t('app', 'Gestion des droits'), 'visible' => !Yii::$app->user->isGuest && User::canRoute(['/user-management/user/index']),

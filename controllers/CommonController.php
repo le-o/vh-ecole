@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\SentEmail;
 use Yii;
 use app\models\CoursDate;
 use app\models\CoursDateSearch;
@@ -277,6 +278,7 @@ class CommonController extends Controller
                     ->setTo($emails)
                     ->setSubject($mail['nom'])
                     ->setHtmlBody($content);
+                $bcc = '';
             } else {
                 $message = Yii::$app->mailer->compose()
                     ->setFrom(Yii::$app->params['adminEmails'][Yii::$app->language])
@@ -284,23 +286,20 @@ class CommonController extends Controller
                     ->setBcc($emails)
                     ->setSubject($mail['nom'])
                     ->setHtmlBody($content);
+                $bcc = implode(', ', $emails);
             }
 
             // we send the message !
             if ($message->send()) {
-                if (YII_ENV != 'dev') {
-                    //  (this creates the full MIME message required for imap_append()
-                    $msg = $message->toString();
-                    $mailbox = ('de-CH' == Yii::$app->language) ? "{mail.infomaniak.ch:143/imap}Sent App DE" : "{mail.infomaniak.ch:143/imap}Sent App FR";
-
-                    //  After this you can call imap_append like this:
-                    // connect to IMAP (port 143)
-                    $stream = imap_open($mailbox, Yii::$app->params['adminEmails']['fr-CH'], "V-HSaxon2012");
-                    // Saves message to Sent folder and marks it as read
-                    imap_append($stream, $mailbox, $msg . "\r\n", "\\Seen");
-                    // Close connection to the server when you're done
-                    imap_close($stream);
-                }
+                $modelSentEmail = new SentEmail();
+                $modelSentEmail->from = Yii::$app->params['adminEmails'][Yii::$app->language];
+                $modelSentEmail->to = implode(', ', $emails);
+                $modelSentEmail->bcc = $bcc;
+                $modelSentEmail->sent_date = date('Y-m-d H:i:s');
+                $modelSentEmail->subject = $mail['nom'];
+                $modelSentEmail->body = $content;
+                $modelSentEmail->email_params = json_encode($mail);
+                $modelSentEmail->save(false);
                 return true;
             } else {
                 return false;
