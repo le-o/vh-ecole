@@ -288,27 +288,26 @@ class PersonnesController extends CommonController
             ->where(['in', 'cours_date_id', $listeCoursDate])
             ->andWhere(['between', 'date', $fromData['searchFrom'], $fromData['searchTo']])
             ->orderBy(['date' => SORT_DESC]);
+        $arrayCoursDate = [];
+        foreach($coursDate->all() as $cd) {
+            $arrayCoursDate[] = [
+                'date' => $cd->date,
+                'nom' => $cd->fkCours->fkNom->nom,
+                'heure_debut' => $cd->heure_debut,
+                'heure_fin' => $cd->heureFin,
+                'lieu' => $cd->fkLieu->nom,
+                'duree' => $cd->duree,
+                'bareme' => $baremeCours[$cd->cours_date_id],
+            ];
+        }
+        $coursDateDataProvider = new ArrayDataProvider([
+            'allModels' => $arrayCoursDate,
+            'pagination' => [
+                'pageSize' => false,
+            ],
+        ]);
 
         if (!$print) {
-            $arrayCoursDate = [];
-            foreach($coursDate->all() as $cd) {
-                $arrayCoursDate[] = [
-                    'date' => $cd->date,
-                    'nom' => $cd->fkCours->fkNom->nom,
-                    'heure_debut' => $cd->heure_debut,
-                    'heure_fin' => $cd->heureFin,
-                    'lieu' => $cd->fkLieu->nom,
-                    'duree' => $cd->duree,
-                    'bareme' => $baremeCours[$cd->cours_date_id],
-                ];
-            }
-            $coursDateDataProvider = new ArrayDataProvider([
-                'allModels' => $arrayCoursDate,
-                'pagination' => [
-                    'pageSize' => false,
-                ],
-            ]);
-
             return $this->render('viewmoniteur', [
                 'model' => $model,
                 'coursDateDataProvider' => $coursDateDataProvider,
@@ -317,13 +316,6 @@ class PersonnesController extends CommonController
             ]);
         }
 
-        $coursDateDataProvider = new ActiveDataProvider([
-            'query' => $coursDate,
-            'pagination' => [
-                'pageSize' => false,
-            ],
-        ]);
-        
         $content = $this->renderPartial('viewmoniteur', [
             'model' => $model,
             'coursDateDataProvider' => $coursDateDataProvider,
