@@ -191,7 +191,7 @@ return [
     'Liste clients actifs' => 'Liste der aktiven Kunden',
     'Liste des participants' => 'Teilnehmerliste',
     'Localite' => 'Ortschaft',
-    'Merci pour votre commande.<br>Une confirmation d\'inscription vous a été envoyée par e-mail.' => 'Vielen Dank für deine Bestellung.<br>Eine Anmeldungsbestätigung wurde per Mail zugesendet',
+    'Nous avons bien reçu votre commande.<br>Un mail de confirmation de réception de celle-ci vous a été envoyé par e-mail.' => 'Wir haben Ihre Anfrage erhalten.<br>Eine Empfangsbestätigung wurde Ihnen per E-Mail zugesandt.',
     'Mes cours comme moniteurs' => 'Meine Kurse als Leiter',
     'Mes cours comme participants' => 'Meine Kurse als Teilnehmer',
     'Modification enregistrée' => 'Gespeicherte Änderungen',

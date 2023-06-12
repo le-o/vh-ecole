@@ -185,7 +185,7 @@ return [
     'Liste des participants' => 'Liste des participants',
     'Liste des présences cours' => '@@Liste des présences cours@@',
     'Localite' => 'Localité',
-    'Merci pour votre commande.<br>Une confirmation d\'inscription vous a été envoyée par e-mail.' => 'Merci pour votre commande.<br>Une confirmation d\'inscription vous a été envoyée par e-mail.',
+    'Nous avons bien reçu votre commande.<br>Un mail de confirmation de réception de celle-ci vous a été envoyé par e-mail.' => 'Nous avons bien reçu votre commande.<br>Un mail de confirmation de réception de celle-ci vous a été envoyé par e-mail.',
     'Mes cours comme moniteurs' => 'Mes cours comme moniteurs',
     'Mes cours comme participants' => 'Mes cours comme participants',
     'Modification enregistrée' => 'Modification enregistrée',

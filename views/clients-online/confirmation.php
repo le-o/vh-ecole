@@ -17,7 +17,7 @@ $this->registerJs($script, View::POS_END);
 <div class="clients-online-view">
 
     <div class="no-print">
-        <?php echo '<div class="alert alert-success">'.Yii::t('app', 'Merci pour votre commande.<br>Une confirmation d\'inscription vous a été envoyée par e-mail.').'</div>'; ?>
+        <?php echo '<div class="alert alert-success">'.Yii::t('app', 'Nous avons bien reçu votre commande.<br>Un mail de confirmation de réception de celle-ci vous a été envoyé par e-mail.').'</div>'; ?>
     </div>
     
 </div>
