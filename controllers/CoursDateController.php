@@ -42,7 +42,10 @@ class CoursDateController extends CommonController
     }
     
     // for route purpose only
-    public function actionAdvanced() {}
+    public function actionAdvanced()
+    {
+
+    }
 
     /**
      * Lists all CoursDate models.
@@ -75,6 +78,9 @@ class CoursDateController extends CommonController
         } elseif ($msg === 'mailKo') {
             $alerte['class'] = 'warning';
             $alerte['message'] = Yii::t('app', 'Cours sauvé, mais problème lors de l\'envoi du mail au moniteur.');
+        } elseif ($msg === 'nombreAnni') {
+            $alerte['class'] = 'warning';
+            $alerte['message'] = Yii::t('app', 'Attention, 3 anniversaires sont déjà réservés, voulez-vous vraiment enregistrer une inscription ?');
         }
         
         if ($post = Yii::$app->request->post()) {
@@ -88,7 +94,7 @@ class CoursDateController extends CommonController
                 }
                 $this->sendMoniteurEmail($model, $moniteursForMail);
             } elseif (!empty($post['CoursDate'])) {
-                $clone = clone($model);
+                $clone = clone $model;
                 $model->load(Yii::$app->request->post());
                 $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
 
@@ -294,7 +300,7 @@ class CoursDateController extends CommonController
 
         $searchModel->withoutMoniteur = false;
         // on clone le searchModel pour la liste déroulante des cours actifs
-        $searchModelAllCours = clone($searchModel);
+        $searchModelAllCours = clone $searchModel;
 
         $searchModel->listCours = (isset(Yii::$app->request->queryParams['list_cours'])) ? Yii::$app->request->queryParams['list_cours'] : [];
         $selectedCours = $searchModel->listCours;
@@ -387,7 +393,7 @@ class CoursDateController extends CommonController
         $myCours = Cours::findOne($cours_id);
 
         if ($model->load(Yii::$app->request->post())) {
-	        
+
             $post = Yii::$app->request->post();
             $moniteurs = (isset($post['list_moniteurs'])) ? $post['list_moniteurs'] : [];
             $contenu = [];
@@ -419,7 +425,7 @@ class CoursDateController extends CommonController
                     $myCours->fk_statut = Yii::$app->params['coursActif'];
                     $myCours->save();
                 }
-		        
+
                 $transaction->commit();
                 $isSaveOk = true;
             } catch (Exception $e) {
@@ -480,7 +486,7 @@ class CoursDateController extends CommonController
         $date_range = '';
 
         if ($model->load(Yii::$app->request->post())) {
-	        
+
             $post = Yii::$app->request->post();
             $date_range = $post['date_range_1'];
 
@@ -500,7 +506,7 @@ class CoursDateController extends CommonController
                 $date_exclude[$key] = date('Y-m-d', strtotime($date));
             }
             $transaction = \Yii::$app->db->beginTransaction();
-	        try {
+            try {
                 while ($date_debut <= $date_fin) {
                     if (in_array(date('N', strtotime($date_debut)), $post['jour_semaine']) && !in_array($date_debut, $date_exclude)) {
                         $modelDate = new CoursDate;
@@ -524,7 +530,7 @@ class CoursDateController extends CommonController
                     $date_debut = date('Y-m-d', strtotime('+ 1 day', strtotime($date_debut)));
                 }
                 $transaction->commit();
-		        return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
+                return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
             } catch (Exception $e) {
                 $alerte['class'] = 'danger';
                 $alerte['message'] = $e->getMessage();
@@ -619,7 +625,8 @@ class CoursDateController extends CommonController
      * @param null $for
      * @return array
      */
-    public function actionJsoncalendar($start=NULL,$end=NULL,$_=NULL,$for=NULL){
+    public function actionJsoncalendar($start=null, $end=null, $_=null, $for=null)
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $times = CoursDate::find()
             ->joinWith(['fkCours'])
@@ -642,59 +649,41 @@ class CoursDateController extends CommonController
      * @param null $for
      * @return array
      */
-    public function actionJsoncalanni($start=NULL,$end=NULL,$_=NULL,$for=NULL){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $times = CoursDate::find()
-            ->joinWith(['fkCours'])
-            ->where(['>=', 'date', $start])
-            ->andWhere(['<=', 'date', $end])
-            ->andWhere(['cours.fk_salle' => $for])
-            ->andWhere(['cours.fk_statut' => Yii::$app->params['coursActif']])
-            ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
-            ->all();
-
-        $sessionName = (null == $for) ? 'anni-cal-debut' : 'anni-cal-debut-' . $for;
-        Yii::$app->session->set($sessionName, $start);
-
-        return $this->getEvents($times, true);
-    }
-
-    /**
-     * Retourne un json avec les données à afficher dans le calendrier
-     * @param null $start
-     * @param null $end
-     * @param null $_
-     * @param null $for
-     * @return array
-     */
-    public function actionJsoncalannionline($start=NULL,$end=NULL,$_=NULL,$for=NULL){
-        // On calcule la date de début minimal : anniversaires light et autre 72h
-        $startFrom = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . ' + 3 days'));
-        if ($startFrom < $start) {
+    public function actionJsoncalanni($start=null, $end=null, $_=null, $for=null, $online=false)
+    {
+        if ($online) {
+            // On calcule la date de début minimal : anniversaires light et autre 72h
+            $startFrom = date('Y-m-d\T00:00:00', strtotime(date('Y-m-d') . ' + 3 days'));
+            if ($startFrom < $start) {
+                $startFrom = $start;
+            }
+        } else {
             $startFrom = $start;
         }
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $times =  CoursDate::find()
+        $times = CoursDate::find()
             ->joinWith(['fkCours'])
             ->where(['>=', 'date', $startFrom])
             ->andWhere(['<=', 'date', $end])
-            ->andWhere(['cours.fk_nom' => $for])
+            ->andWhere(['cours.fk_salle' => $for])
             ->andWhere(['cours.fk_statut' => Yii::$app->params['coursActif']])
             ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
+            ->orderBy('date, heure_debut')
             ->all();
 
         $sessionName = (null == $for) ? 'anni-cal-debut' : 'anni-cal-debut-' . $for;
         Yii::$app->session->set($sessionName, $start);
 
-        return $this->getEvents($times, true, true);
+        return $this->getEvents($times, true, $online);
     }
     
     /**
      * Gestion des présences pour une date de cours
      * @return json
      */
-    public function actionPresence() {
+    public function actionPresence()
+    {
         if (isset($_POST['personne']) && isset($_POST['coursdate'])) {
             $myClientsHasCoursDate = ClientsHasCoursDate::findOne(['fk_personne' => $_POST['personne'], 'fk_cours_date' => $_POST['coursdate']]);
             $myClientsHasCoursDate->is_present = !$myClientsHasCoursDate->is_present;
@@ -713,6 +702,7 @@ class CoursDateController extends CommonController
     private function getEvents(array $times, $checkEmpty = false, $online = false)
     {
         $events = [];
+        $display = [];
         foreach ($times as $time) {
             if (!$checkEmpty && $time->fkCours->fk_type == Yii::$app->params['coursUnique'] && empty($time->clientsHasCoursDate)) {
                 continue;
@@ -750,8 +740,26 @@ class CoursDateController extends CommonController
             if ($time->fkCours->fkNom->info_couleur != '' && in_array($time->fkCours->fk_nom, Yii::$app->params['coursModificationCouleur'])) {
                 $Event->color = Parametres::changerTonCouleur($time->fkCours->fkNom->info_couleur, Yii::$app->params['nuanceSelonNiveau'][$time->fkCours->fkNiveau->tri]);
             } elseif ($checkEmpty && !$online) {
+                if (!isset($display[$time->date][$time->heure_debut]['nbDisplayed'])) {
+                    $display[$time->date][$time->heure_debut]['nbDisplayed'] = 0;
+                }
+
                 if (empty($time->clientsHasCoursDate)) {
                     $Event->color = '#ff0000';
+                    if (!isset($display[$time->date][$time->heure_debut][$time->fkCours->fk_nom])) {
+                        $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom] = false;
+                    }
+
+                    // pas plus de trois cours à la fois à Monthey
+                    if ($display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]) {
+                        $Event->url = '';
+                    } elseif (isset(Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu])
+                        && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] == $display[$time->date][$time->heure_debut]['nbDisplayed']
+                    ) {
+                        $Event->url .= '&msg=nombreAnni';
+                    }
+
+                    $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom] = true;
                 } else {
                     if (empty($time->coursHasMoniteurs) || $noMoniteur) {
                         $Event->color = '#ff9900';
@@ -759,14 +767,35 @@ class CoursDateController extends CommonController
                         $Event->color = '#27db39';
                     }
                 }
+                $display[$time->date][$time->heure_debut]['nbDisplayed']++;
             } elseif ($checkEmpty && $online) {
+                if (!isset($display[$time->date][$time->heure_debut]['nbDisplayed'])) {
+                    $display[$time->date][$time->heure_debut]['nbDisplayed'] = 0;
+                }
+                if (!isset($display[$time->date][$time->heure_debut][$time->fkCours->fk_nom])) {
+                    $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom] = 0;
+                }
+                $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]++;
+
+                // pas plus de trois cours à la fois à Monthey
+                if (isset(Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu])
+                    && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] == $display[$time->date][$time->heure_debut]['nbDisplayed']
+                ) {
+                    continue;
+                }
+                
                 if (!empty($time->clientsHasCoursDate)) {
+                    $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]--;
                     $Event->title .= ' RESERVE';
                     $Event->color = '#ff0000';
                     $Event->url = '';
                 } else {
+                    if (1 < $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]) {
+                        continue;
+                    }
                     $Event->color = '#27db39';
                 }
+                $display[$time->date][$time->heure_debut]['nbDisplayed']++;
             } else {
                 $Event->color = $time->fkCours->fkNom->info_couleur;
             }

@@ -44,7 +44,8 @@ class ClientsOnlineController extends CommonController
         ];
     }
 
-    public function beforeAction($action) {
+    public function beforeAction($action)
+    {
         $this->enableCsrfValidation = ($action->id !== "findanniversaire"); // <-- here
         return parent::beforeAction($action);
     }
@@ -209,11 +210,14 @@ class ClientsOnlineController extends CommonController
                                     Yii::$app->params['persStatutStandby'],
                                 ])) {
                                     $oldStatut = Parametres::findOne($isPersonne->getOldAttribute('fk_statut'));
-                                    $isPersonne->suivi_client .= "\n" . Yii::t('app', 'Attention, statut du client avant fusion du {date} : {oldStatut}.',
-                                    [
-                                        'date' => date('d.m.Y'),
-                                        'oldStatut' => $oldStatut->nom,
-                                    ]);
+                                    $isPersonne->suivi_client .= "\n" . Yii::t(
+                                        'app',
+                                        'Attention, statut du client avant fusion du {date} : {oldStatut}.',
+                                        [
+                                            'date' => date('d.m.Y'),
+                                            'oldStatut' => $oldStatut->nom,
+                                        ]
+                                    );
                                 }
 
                                 $newInfos = $cd->informations;
@@ -302,16 +306,18 @@ class ClientsOnlineController extends CommonController
      * @param string $lang_interface
      * @return string
      */
-    public function actionFindanniversaire($lang_interface = 'fr-CH', $nomCoursID = 29, $ident = null, $goodlooking = false) {
+    public function actionFindanniversaire($lang_interface = 'fr-CH', $salleID = 214, $ident = null, $goodlooking = false)
+    {
         $this->layout = (!$goodlooking) ? "main_1" : "main_1_logo";
         Yii::$app->language = $lang_interface;
 
         if (!is_null($ident)) {
             $modelCours = Cours::findOne($ident);
-            $nomCoursID = $modelCours->fk_nom;
+            $salleID = $modelCours->fk_salle;
         }
-        $nomCoursID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : $nomCoursID;
-        $model = Parametres::findOne($nomCoursID);
+
+        $salleID = (Yii::$app->request->post()) ? Yii::$app->request->post()['Parametres']['parametre_id'] : $salleID;
+        $model = Parametres::findOne($salleID);
         Yii::$app->language = (isset(Yii::$app->params['interface_language_label'][$model->fk_langue]) ?
             Yii::$app->params['interface_language_label'][$model->fk_langue] :
             $lang_interface);
@@ -331,7 +337,7 @@ class ClientsOnlineController extends CommonController
 
         return $this->render('anniversaire', [
             'model' => $model,
-            'nomCoursID' => $nomCoursID,
+            'salleID' => $salleID,
             'ident' => $ident,
         ]);
     }
@@ -388,7 +394,7 @@ class ClientsOnlineController extends CommonController
 *
 * ' . Yii::t('app', 'Date choisie') . ' : ' . $date . ' ' . $heure;
 
-            if ($model->validate()) {
+            if ($model->validate() && isset($model->inscriptionRules[$model->agemoyen][$model->nbparticipant])) {
                 $clientDirect = [];
 
                 $inscriptionAuto = !$free
@@ -421,11 +427,14 @@ class ClientsOnlineController extends CommonController
                                     Yii::$app->params['persStatutStandby'],
                                 ])) {
                                     $oldStatut = Parametres::findOne($isPersonne->getOldAttribute('fk_statut'));
-                                    $isPersonne->suivi_client .= "\n" . Yii::t('app', 'Attention, statut du client avant fusion du {date} : {oldStatut}.',
-                                    [
-                                        'date' => date('d.m.Y'),
-                                        'oldStatut' => $oldStatut->nom,
-                                    ]);
+                                    $isPersonne->suivi_client .= "\n" . Yii::t(
+                                        'app',
+                                        'Attention, statut du client avant fusion du {date} : {oldStatut}.',
+                                        [
+                                            'date' => date('d.m.Y'),
+                                            'oldStatut' => $oldStatut->nom,
+                                        ]
+                                    );
                                 }
                                 $isPersonne->save();
                             }
@@ -611,7 +620,8 @@ class ClientsOnlineController extends CommonController
         }
     }
     
-    public function actionFusionclient($idClientOnline, $idPersonne) {
+    public function actionFusionclient($idClientOnline, $idPersonne)
+    {
         $clientOnline = $this->findModel($idClientOnline);
         $personne = Personnes::findOne($idPersonne);
         
@@ -724,7 +734,8 @@ class ClientsOnlineController extends CommonController
         return $p;
     }
 
-    public function actionDepnbparticipants($lang_interface = 'fr-CH') {
+    public function actionDepnbparticipants($lang_interface = 'fr-CH')
+    {
         if (isset($_POST['depdrop_parents'])) {
             Yii::$app->language = $lang_interface;
             $parents = $_POST['depdrop_parents'];

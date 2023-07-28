@@ -21,7 +21,7 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
                 'options'=>[
                     'multiple' => false,
                 ],
-                'data' => (new Parametres())->optsNomCoursAnniversaire($model->parametre_id),
+                'data' => (new Parametres())->optsSalle($model->parametre_id),
                 'pluginOptions'=>[
                     'initialize' => true,
                     'allowClear' => false,
@@ -69,12 +69,18 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
                     $.ajax({
                             type: "POST",
                             cache: false,
-                            url: "'.Url::toRoute(['/site/setcalendarview', 'for' => 'null', 'name' => 'anni', 'open' => true]).'",
+                            url: "'.Url::toRoute(
+                                    ['/site/setcalendarview', 'for' => 'null', 'name' => 'anni', 'open' => true]
+                                ).'",
                             data: {view: event.name, start: moment.format()},
                             dataType: "json",
                         });
                 } ',
-                'ajaxEvents' => yii\helpers\Url::to(['/cours-date/jsoncalannionline', 'for' => $model->parametre_id])
+                'ajaxEvents' => yii\helpers\Url::to(
+                        ['/cours-date/jsoncalanni',
+                        'for' => $model->parametre_id,
+                        'online' => true]
+                )
             ]); ?>
         </div>
     </div>

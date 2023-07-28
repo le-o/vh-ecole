@@ -77,7 +77,7 @@ $this->registerJs('
     </div>
     <div class="row" id="infoanni">
         <div class="col-sm-6">
-            <?= $form->field($model, 'agemoyen')->widget(Select2::classname(), [
+            <?= $form->field($model, 'agemoyen')->widget(Select2::class, [
                 'options'=>[
                     'id' => 'age-moyen',
                     'placeholder'=>Yii::t('app', 'Choisir un âge moyen'),
@@ -89,15 +89,16 @@ $this->registerJs('
                     'allowClear' => false,
                     'tags' => false,
                 ],
-            ]); ?>
+            ]) ?>
         </div>
         <div class="col-sm-6">
-            <?= $form->field($model, 'nbparticipant')->widget(DepDrop::classname(), [
+            <?= $form->field($model, 'nbparticipant')->widget(DepDrop::class, [
                 'options'=>['id'=>'nb-participant'],
                 'type' => DepDrop::TYPE_SELECT2,
                 'data' => $model->optsPartByAge($model->agemoyen),
                 'pluginOptions'=>[
                     'depends'=>['age-moyen'],
+                    'initialize' => true,
                     'placeholder'=>Yii::t('app', 'Choisir un nombre de participant (enfants et adultes)'),
                     'url'=> Url::to(['depnbparticipants', 'lang_interface' => Yii::$app->language]),
                 ],
