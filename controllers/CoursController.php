@@ -447,7 +447,9 @@ class CoursController extends CommonController
                 $clientHasCoursDate = ClientsHasCoursDate::findOne(['fk_personne' => $personne_id, 'fk_cours_date' => $cours_ou_date_id]);
                 if (Yii::$app->params['coursUnique'] == $clientHasCoursDate->fkCoursDate->fkCours->fk_type) {
                     $clientsHasCours = ClientsHasCours::findOne(['fk_cours' => $clientHasCoursDate->fkCoursDate->fk_cours, 'fk_personne' => $personne_id]);
-                    $clientsHasCours->delete();
+                    if (!empty($clientsHasCours)) {
+                        $clientsHasCours->delete();
+                    }
                 }
                 $clientHasCoursDate->delete();
             } else {
