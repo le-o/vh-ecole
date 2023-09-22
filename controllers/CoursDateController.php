@@ -11,6 +11,7 @@ use app\models\Cours;
 use app\models\CoursHasMoniteurs;
 use app\models\Personnes;
 use app\models\Parametres;
+use yii\data\Sort;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
@@ -669,13 +670,23 @@ class CoursDateController extends CommonController
             ->andWhere(['cours.fk_salle' => $for])
             ->andWhere(['cours.fk_statut' => Yii::$app->params['coursActif']])
             ->andWhere(['cours.fk_type' => Yii::$app->params['coursUnique']])
-            ->orderBy('date, heure_debut')
+            ->orderBy('date, heure_debut, cours.fk_nom')
             ->all();
 
         $sessionName = (null == $for) ? 'anni-cal-debut' : 'anni-cal-debut-' . $for;
         Yii::$app->session->set($sessionName, $start);
 
-        return $this->getEvents($times, true, $online);
+        $avecClients = $sansClients = [];
+        foreach ($times as $time) {
+            if (!empty($time->clientsHasCoursDate)) {
+                $avecClients[] = $time;
+            } else {
+                $sansClients[] = $time;
+            }
+        }
+        $timesSort = array_merge($avecClients, $sansClients);
+
+        return $this->getEvents($timesSort, true, $online);
     }
     
     /**
@@ -754,7 +765,7 @@ class CoursDateController extends CommonController
                     if ($display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]) {
                         $Event->url = '';
                     } elseif (isset(Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu])
-                        && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] == $display[$time->date][$time->heure_debut]['nbDisplayed']
+                        && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] <= $display[$time->date][$time->heure_debut]['nbDisplayed']
                     ) {
                         $Event->url .= '&msg=nombreAnni';
                     }
@@ -777,7 +788,7 @@ class CoursDateController extends CommonController
                 }
                 $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]++;
 
-                // pas plus de trois cours à la fois à Monthey
+                // pas plus de 3 cours à la fois à Monthey
                 if (isset(Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu])
                     && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] == $display[$time->date][$time->heure_debut]['nbDisplayed']
                 ) {
@@ -793,7 +804,7 @@ class CoursDateController extends CommonController
                     if (1 < $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]) {
                         continue;
                     }
-                    $Event->color = '#27db39';
+                    $Event->color = $time->fkCours->fkNom->info_couleur;
                 }
                 $display[$time->date][$time->heure_debut]['nbDisplayed']++;
             } else {

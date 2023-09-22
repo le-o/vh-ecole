@@ -106,6 +106,8 @@ class PersonnesController extends CommonController
         // si profil moniteur, accès uniquement à ses données
         if ($isMoniteur) {
             $searchModel->personne_id = Yii::$app->user->fkpersonne;
+        } elseif (!isset(Yii::$app->request->queryParams['PersonnesSearch'])) {
+            $searchModel->personne_id = -1;
         }
         $dataProvider = $searchModel->searchMoniteurs(Yii::$app->request->queryParams, false);
         
@@ -140,7 +142,7 @@ class PersonnesController extends CommonController
                                 if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) {
                                     $heures += $coursDate->duree;
                                     // total par barème
-                                    $key = $this->getBaremeID($mcd);
+                                    $key = $this->getBaremeID($mcd, $moniteur->fk_formation);
                                     if (!isset($heuresBareme[$key])) {
                                         $heuresBareme[$key] = 0;
                                     }
@@ -149,7 +151,7 @@ class PersonnesController extends CommonController
                             } else {
                                 $heures += $coursDate->duree;
                                 // total par barème
-                                $key = $this->getBaremeID($mcd);
+                                $key = $this->getBaremeID($mcd, $moniteur->fk_formation);
 
                                 if (!isset($heuresBareme[$key])) {
                                     $heuresBareme[$key] = 0;
@@ -280,7 +282,7 @@ class PersonnesController extends CommonController
                     $baremeCours[$mcd->fk_cours_date] = '*' . $mcd->fkBareme->nom;
                 } else {
                     $isBaremeSet = $mcd->fkMoniteur->getMoniteursHasBaremeFromDate(date('Y-m-d', strtotime($mcd->fkCoursDate->date)));
-                    $baremeCours[$mcd->fk_cours_date] = (null != $isBaremeSet ? $isBaremeSet->fkBareme->nom : 'Paramétrage inexistant');
+                    $baremeCours[$mcd->fk_cours_date] = (null != $isBaremeSet ? $isBaremeSet->fkBareme->nom : $model->fkFormation->nom);
                 }
             }
         }
@@ -693,14 +695,14 @@ class PersonnesController extends CommonController
      * @param $mcd
      * @return array
      */
-    private function getBaremeID($mcd): int
+    private function getBaremeID($mcd, $default): int
     {
         if (null != $mcd->fk_bareme) {
             $key = $mcd->fk_bareme;
         } else {
             $isBaremeSet = $mcd->fkMoniteur->getMoniteursHasBaremeFromDate(date('Y-m-d', strtotime($mcd->fkCoursDate->date)));
-            $key = (!is_null($isBaremeSet) ? $isBaremeSet->fk_bareme : -1);
+            $key = (!is_null($isBaremeSet) ? $isBaremeSet->fk_bareme : $default);
         }
-        return $key;
+        return (!is_null($key) ? $key : -1);
     }
 }
