@@ -52,7 +52,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             '12+' => false,
         ],
         // anniversaire avec moniteur
-        '5-7' => [
+        '5-6' => [
             1 => true,
             2 => true,
             3 => true,
@@ -67,7 +67,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             12 => false,
             '12+' => false,
         ],
-        '8-11' => [
+        '7-11' => [
             1 => true,
             2 => true,
             3 => true,
@@ -210,7 +210,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public function optsPartByAge($agemoyen)
     {
         $out = [];
-        $arrayAge = ['2-12', '5-7', '8-11', '12+'];
+        $arrayAge = ['2-12', '5-6', '7-11', '12+'];
         if (!in_array($agemoyen, $arrayAge)) {
             return $out;
         }

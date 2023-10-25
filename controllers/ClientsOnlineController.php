@@ -497,8 +497,8 @@ class ClientsOnlineController extends CommonController
             ];
         } else {
             $choixAge = [
-                '5-7' => Yii::t('app', '{nombre} ans', ['nombre' => '5-7']),
-                '8-11' => Yii::t('app', '{nombre} ans', ['nombre' => '8-11']),
+                '5-6' => Yii::t('app', '{nombre} ans', ['nombre' => '5-6']),
+                '7-11' => Yii::t('app', '{nombre} ans', ['nombre' => '7-11']),
                 '12+' => Yii::t('app', '{nombre} ans et +', ['nombre' => '12']),
             ];
         }
