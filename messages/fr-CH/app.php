@@ -32,7 +32,6 @@ return [
     'Ajouter participant ...' => 'Ajouter participant ....',
     'Annee' => 'Annee',
     'Are you sure you want to delete this item?' => 'Etes-vous sûr de vouloir supprimer cet enregistrement ?',
-    'Attention : pour les inscriptions à - de 72h , merci de nous contacter par téléphone' => '',
     'Carte client CASHFLOW' => 'Carte client CASHFLOW',
     'Catégorie CASHFLOW' => 'Catégorie CASHFLOW',
     'Champs dynamiques disponibles' => '',
