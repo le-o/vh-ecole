@@ -78,7 +78,7 @@ class PersonnesController extends CommonController
         $parametre = new Parametres();
         $statutFilter = $parametre->optsStatut();
         $salleFilter = $parametre->optsSalle();
-        $typeFilter = $parametre->optsType();
+        $financeFilter = $parametre->optsFinance();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
 
         return $this->render('index', [
@@ -87,7 +87,7 @@ class PersonnesController extends CommonController
             'dataProvider' => $dataProvider,
             'statutFilter' => $statutFilter,
             'salleFilter' => $salleFilter,
-            'typeFilter' => $typeFilter,
+            'financeFilter' => $financeFilter,
             'parametre' => $parametre,
             'emails' => $emails,
             'listeEmails' => $listeEmails,
@@ -561,9 +561,10 @@ class PersonnesController extends CommonController
      * Updates an existing Personnes model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
+     * @param string $from
      * @return mixed
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $from = '')
     {
         $model = $this->findModel($id);
 
@@ -591,6 +592,11 @@ class PersonnesController extends CommonController
                 }
 
                 $transaction->commit();
+
+                $url = json_decode($from);
+                if (is_object($url)) {
+                    return $this->redirect([$url->url]);
+                }
                 return $this->redirect(['view', 'id' => $model->personne_id]);
             } catch (Exception $e) {
                 $transaction->rollBack();
@@ -603,7 +609,7 @@ class PersonnesController extends CommonController
         }
         $modelInterlocuteurs = Personnes::find()->where(['!=', 'personne_id', $model->personne_id])->orderBy('nom, prenom')->all();
         foreach ($modelInterlocuteurs as $interlocuteur) {
-            $dataInterlocuteurs[$interlocuteur->fkStatut->nom][$interlocuteur->personne_id] = $interlocuteur->NomPrenom;
+            $dataInterlocuteurs[$interlocuteur->personne_id] = $interlocuteur->NomPrenom;
         }
         
         return $this->render('update', [

@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property integer $personne_id
  * @property integer $fk_statut
+ * @property integer $fk_finance
  * @property integer $fk_type
  * @property integer $fk_formation
  * @property integer $fk_langues
@@ -29,6 +30,7 @@ use yii\helpers\ArrayHelper;
  * @property string $email
  * @property string $email2
  * @property string $date_naissance
+ * @property string $no_avs
  * @property string $informations
  * @property string $carteclient_cf
  * @property string $categorie3_cf
@@ -37,6 +39,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $fk_salle_admin
  *
  * @property Parametres $fkStatut
+ * @property Parametres $fkFinance
  * @property Parametres $fkType
  * @property Parametres $fkFormation
  * @property MoniteursHasBareme $moniteursHasBareme
@@ -65,10 +68,12 @@ class Personnes extends \yii\db\ActiveRecord
     {
         return [
             [['fk_statut', 'fk_type', 'nom', 'prenom', 'telephone', 'email'], 'required'],
-            [['fk_statut', 'fk_type', 'fk_formation', 'fk_salle_admin'], 'integer'],
+            [['fk_statut', 'fk_finance', 'fk_type', 'fk_formation', 'fk_salle_admin'], 'integer'],
             [['date_naissance'], 'safe'],
             [['informations'], 'string'],
             [['noclient_cf'], 'string', 'max' => 10],
+            [['no_avs'], 'string', 'max' => 16],
+            [['no_avs'], 'match', 'pattern' => '/[7][5][6]\\.[\d]{4}[.][\d]{4}[.][\d]{2}$/'],
             [['societe', 'nom', 'prenom'], 'string', 'max' => 60],
             [['suivi_client', 'complement_langue'], 'string', 'max' => 250],
             [['adresse1', 'adresse2', 'localite', 'email', 'email2'], 'string', 'max' => 100],
@@ -86,6 +91,7 @@ class Personnes extends \yii\db\ActiveRecord
         return [
             'personne_id' => Yii::t('app', 'Personne ID'),
             'fk_statut' => Yii::t('app', 'Statut'),
+            'fk_finance' => Yii::t('app', 'Finances'),
             'fk_type' => Yii::t('app', 'Type'),
             'fk_formation' => Yii::t('app', 'Niveau formation'),
             'fk_langues' => Yii::t('app', 'Langues parlées'),
@@ -103,6 +109,7 @@ class Personnes extends \yii\db\ActiveRecord
             'email' => Yii::t('app', 'Email'),
             'email2' => Yii::t('app', 'Email 2'),
             'date_naissance' => Yii::t('app', 'Date Naissance'),
+            'no_avs' => Yii::t('app', 'No AVS'),
             'informations' => Yii::t('app', 'Informations'),
             'carteclient_cf' => Yii::t('app', 'Carte client CASHFLOW'),
             'categorie3_cf' => Yii::t('app', 'Catégorie CASHFLOW'),
@@ -179,6 +186,14 @@ class Personnes extends \yii\db\ActiveRecord
     public function getFkStatut()
     {
         return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_statut']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkFinance()
+    {
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_finance']);
     }
 
     /**

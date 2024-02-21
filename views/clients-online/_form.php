@@ -81,7 +81,7 @@ $this->registerJs('
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-3">
             <?= $form->field($model, 'date_naissance')->widget(DatePicker::classname(), [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
                 'removeButton' => false,
@@ -90,7 +90,9 @@ $this->registerJs('
                     'format' => 'dd.mm.yyyy',
                     'defaultViewDate' => ['year' => 1980]
                 ]
-            ]); ?>
+            ])->label(Yii::t('app', 'Date de naissance (du représentant légal si mineur)')); ?>
+        </div><div class="col-sm-3">
+            <?= $form->field($model, "no_avs")->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'fk_cours')->widget(Select2::classname(), [
@@ -129,7 +131,7 @@ $this->registerJs('
     </div>
     
     <div class="panel panel-default">
-        <div class="panel-heading"><h4><i class="glyphicon glyphicon-plus"></i> <?= Yii::t('app', 'Inscrire un/des enfant/s sous mon nom:') ?></h4></div>
+        <div class="panel-heading"><h4><i class="glyphicon glyphicon-plus"></i> <?= Yii::t('app', 'Coordonnées du/des enfant/s inscrit/s sous mon nom:') ?></h4></div>
         <div class="panel-body">
              <?php DynamicFormWidget::begin([
                 'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
@@ -145,6 +147,7 @@ $this->registerJs('
                     'nom',
                     'prenom',
                     'date_naissance',
+                    'no_avs',
                 ],
             ]); ?>
 
@@ -167,13 +170,13 @@ $this->registerJs('
                             }
                         ?>
                         <div class="row">
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <?= $form->field($modelClient, "[{$i}]nom")->textInput(['maxlength' => true]) ?>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <?= $form->field($modelClient, "[{$i}]prenom")->textInput(['maxlength' => true]) ?>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <?= $form->field($modelClient, "[{$i}]date_naissance")->widget(DatePicker::classname(), [
                                     'options' => ['placeholder' => 'jj.mm.aaaa'],
                                     'removeButton' => false,
@@ -183,6 +186,9 @@ $this->registerJs('
                                         'defaultViewDate' => ['year' => 1980]
                                     ]
                                 ]); ?>
+                            </div>
+                            <div class="col-sm-3">
+                                <?= $form->field($modelClient, "[{$i}]no_avs")->textInput(['maxlength' => true]) ?>
                             </div>
                         </div>
                     </div>

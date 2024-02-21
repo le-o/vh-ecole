@@ -307,6 +307,8 @@ class CoursDateController extends CommonController
         $selectedCours = $searchModel->listCours;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $selectedFinance = (isset(Yii::$app->request->queryParams['list_finance'])) ? Yii::$app->request->queryParams['list_finance'] : '';
+
         $dataProviderAllCours = $searchModelAllCours->search(Yii::$app->request->queryParams, false);
         
         if (!empty(Yii::$app->request->post()) && isset(Yii::$app->request->post()['checkedEmails'])) {
@@ -321,17 +323,16 @@ class CoursDateController extends CommonController
         $listeEmails = [];
         foreach ($dataProvider->models as $data) {
             foreach ($data->clientsHasCoursDate as $client) {
-                if (!isset($arrayParticipants[$client->fk_personne])) {
+                if (!isset($arrayParticipants[$client->fk_personne]) && (empty($selectedFinance) || $selectedFinance == $client->fkPersonne->fk_finance)) {
                     $arrayParticipants[$client->fk_personne]['nom'] = $client->fkPersonne->nom;
                     $arrayParticipants[$client->fk_personne]['prenom'] = $client->fkPersonne->prenom;
+                    $arrayParticipants[$client->fk_personne]['finance'] = (isset($client->fkPersonne->fkFinance) ?
+                        $client->fkPersonne->fkFinance->nom : '');
                     $arrayParticipants[$client->fk_personne]['suivi_client'] = $client->fkPersonne->suivi_client;
-                    $arrayParticipants[$client->fk_personne]['age'] = $client->fkPersonne->age;
+                    $arrayParticipants[$client->fk_personne]['date_naissance'] = $client->fkPersonne->date_naissance;
                     $arrayParticipants[$client->fk_personne]['cours_id'] = $data->fk_cours;
                     $arrayParticipants[$client->fk_personne]['personne_id'] = $client->fk_personne;
-                    $arrayParticipants[$client->fk_personne]['adresse1'] = $client->fkPersonne->adresse1;
-                    $arrayParticipants[$client->fk_personne]['adresse2'] = $client->fkPersonne->adresse2;
-                    $arrayParticipants[$client->fk_personne]['npa'] = $client->fkPersonne->npa;
-                    $arrayParticipants[$client->fk_personne]['localite'] = $client->fkPersonne->localite;
+                    $arrayParticipants[$client->fk_personne]['avs'] = $client->fkPersonne->no_avs;
                     $arrayParticipants[$client->fk_personne]['email'] =
                         ('interloc.' == $client->fkPersonne->email) ?
                             $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->email :
@@ -369,12 +370,15 @@ class CoursDateController extends CommonController
         
         $parametre = new Parametres();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
+        $dataFinance = $parametre->optsFinance();
         
         return $this->render('actif', [
             'dataProvider' => $participantDataProvider,
             'searchModel' => $searchModel,
             'selectedCours' => $selectedCours,
             'dataCours' => $dataCours,
+            'selectedFinance' => $selectedFinance,
+            'dataFinance' => $dataFinance,
             'parametre' => $parametre,
             'emails' => $emails,
             'listeEmails' => $listeEmails,

@@ -116,9 +116,9 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 'filter' => $salleFilter,
             ],
             [
-                'attribute' => 'fk_type',
-                'value' => 'fkType.nom',
-                'filter' => $typeFilter,
+                'attribute' => 'fk_finance',
+                'value' => 'fkFinance.nom',
+                'filter' => $financeFilter,
             ],
             'informations',
             'societe',

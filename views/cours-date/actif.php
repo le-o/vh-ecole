@@ -41,19 +41,23 @@ $gridColumns = [
     ['class' => 'kartik\grid\CheckboxColumn'],
     ['class' => 'kartik\grid\SerialColumn'],
 
-    'personne_id',
-    'cours_info',
+//    'personne_id',
+    [
+        'label' => Yii::t('app', 'Finances'),
+        'attribute' => 'finance',
+    ],
     'nom',
     'prenom',
     [
         'label' => Yii::t('app', 'Suivi client'),
         'attribute' => 'suivi_client',
     ],
-    'age',
-    'adresse1',
-    'adresse2',
-    'npa',
-    'localite',
+    'cours_info',
+    'date_naissance',
+    [
+        'label' => Yii::t('app', 'No AVS'),
+        'attribute' => 'avs',
+    ],
     'email',
     'telephone',
 
@@ -71,7 +75,7 @@ $gridColumns = [
                     $from['page'] = $_GET['page'];
                 }
                 $from = json_encode($from);
-                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours-date/update', 'fk_personne' => $data['personne_id'], 'fk_cours' => $data['cours_id'], 'from' => $from]), [
+                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/personnes/update', 'id' => $data['personne_id'], 'from' => $from]), [
                     'title' => Yii::t('app', 'Modifier statut'),
                 ]);
             },
@@ -151,7 +155,19 @@ $gridColumns = [
                 ],
             ]); ?>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-2">
+            <?= Select2::widget([
+                'name' => 'list_finance',
+                'value' => $selectedFinance, // initial value
+                'data' => $dataFinance,
+                'options' => ['placeholder' => Yii::t('app', 'Finances')],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'tags' => true,
+                ],
+            ]); ?>
+        </div>
+        <div class="col-sm-2">
             <?php echo DatePicker::widget([
                 'model' => $searchModel,
                 'attribute' => 'depuis',

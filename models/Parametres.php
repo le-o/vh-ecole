@@ -272,6 +272,14 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array options finance for drop-down
+     */
+    public function optsFinance($selectedParam = null)
+    {
+        return $this->optsDropDown(19, $selectedParam);
+    }
+
+    /**
      * @return array options from classkey for drop-down
      */
     public function optsDropDown($classKey, $selectedParam, $queryWhere = null, $restrictLangue = true)
@@ -312,7 +320,6 @@ class Parametres extends \yii\db\ActiveRecord
             '5' => 'Paramètres généraux',
             '6' => 'Type de cours',
             '7' => 'Nom de cours',
-            '18' => 'Statut de cours',
             '8' => 'Niveau de formation',
             '9' => 'Statut de participation',
             '10' => 'Tranche d\'âge',
@@ -323,6 +330,8 @@ class Parametres extends \yii\db\ActiveRecord
             '15' => 'Langue',
             '16' => 'Salle',
             '17' => 'Lieu',
+            '18' => 'Statut de cours',
+            '19' => 'Finances',
         );
     }
     

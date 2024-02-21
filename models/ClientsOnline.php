@@ -20,6 +20,7 @@ use yii\helpers\Json;
  * @property string $telephone
  * @property string $email
  * @property string $date_naissance
+ * @property string $no_avs
  * @property string $informations
  * @property string $date_inscription
  * @property integer $is_actif
@@ -121,10 +122,36 @@ class ClientsOnline extends \yii\db\ActiveRecord
             [['adresse', 'localite', 'email'], 'string', 'max' => 100],
             [['npa'], 'string', 'max' => 5],
             [['telephone'], 'string', 'max' => 20],
+            [['no_avs'], 'string', 'max' => 16],
+            [['no_avs'], 'match', 'pattern' => '/[7][5][6]\\.[\d]{4}[.][\d]{4}[.][\d]{2}$/'],
+//            [
+//                'prenom', 'required',
+//                'message' => 'Either email or phone is required.',
+//                'when' => function($model) { return !empty($model->nom); }
+//            ],
+//            [
+//                ['no_avs'],
+//                'required',
+//                'when' => function ($model) {
+//                    return !empty($model->date_naissance);
+//                }
+//            ],
+            ['no_avs', 'makeAVSMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance'],
             ['iagree', 'compare', 'operator' => '==', 'compareValue' => true, 'message' => Yii::t('app', 'Vous devez accepter les conditions générales')],
 
             [['nom', 'prenom', 'prenom_enfant', 'agemoyen', 'nbparticipant'], 'required', 'on' => ['anniversaire']],
         ];
+    }
+
+    public function makeAVSMandatory($attribute_name, $params)
+    {
+        if (empty($this->$attribute_name) &&  !empty($this->$params)) {
+            $from = new \DateTime($this->$params);
+            $to   = new \DateTime('today');
+            if (20 > $from->diff($to)->y) {
+                $this->addError($attribute_name, Yii::t('app', "Le no AVS est obligatoire."));
+            }
+        }
     }
 
     /**
@@ -145,6 +172,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
             'telephone' => Yii::t('app', 'Telephone'),
             'email' => Yii::t('app', 'Email'),
             'date_naissance' => Yii::t('app', 'Date Naissance'),
+            'no_avs' => Yii::t('app', 'No AVS'),
             'informations' => Yii::t('app', 'Informations'),
             'date_inscription' => Yii::t('app', 'Date Inscription'),
             'is_actif' => Yii::t('app', 'Transformé en client?'),

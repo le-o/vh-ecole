@@ -149,14 +149,16 @@ class ClientsOnlineController extends CommonController
             if ($model->validate()) {
                 $clientDirect = [];
 
-                $modelDate = CoursDate::find()
-                    ->where(['=', 'fk_cours', $modelCours->cours_id])
-                    ->andWhere(['>=', 'date', date('Y-m-d')])
-                    ->all();
-                // si pas de cours pour l'inscription, on reste en inscription standard
-                // si max du nombre de participants atteint, on reste en inscription standard
-                if (0 == count($modelDate) || $modelCours->getNombreClientsInscrits() >= $modelCours->participant_max) {
-                    $clientAuto = false;
+                if (isset($modelCours)) {
+                    $modelDate = CoursDate::find()
+                        ->where(['=', 'fk_cours', $modelCours->cours_id])
+                        ->andWhere(['>=', 'date', date('Y-m-d')])
+                        ->all();
+                    // si pas de cours pour l'inscription, on reste en inscription standard
+                    // si max du nombre de participants atteint, on reste en inscription standard
+                    if (0 == count($modelDate) || $modelCours->getNombreClientsInscrits() >= $modelCours->participant_max) {
+                        $clientAuto = false;
+                    }
                 }
                 if ($clientAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
@@ -171,6 +173,10 @@ class ClientsOnlineController extends CommonController
                     // tout est ok pour le client principal, on sauve les clients liés
                     foreach ($modelsClient as $client) {
                         if ($client->nom != '' && $client->prenom != '') {
+                            if (empty($client->no_avs)) {
+                                throw new \Exception(Yii::t('app', 'Le no AVS des enfants est obligatoire.'));
+                            }
+
                             $client->fk_cours_nom = $model->fk_cours_nom;
                             $client->fk_cours = $model->fk_cours;
                             $client->fk_parent = $model->client_online_id;
@@ -595,6 +601,7 @@ class ClientsOnlineController extends CommonController
                     $c->telephone = $client->telephone;
                     $c->email = $client->email;
                     $c->date_naissance = $client->date_naissance;
+                    $c->no_avs = $client->no_avs;
                     $c->informations = $p->informations;
                     $c->fk_salle_admin = $p->fk_salle_admin;
                     $c->save();
@@ -632,6 +639,9 @@ class ClientsOnlineController extends CommonController
         $personne->telephone = $clientOnline->telephone;
         $personne->email = $clientOnline->email;
         $personne->date_naissance = $clientOnline->date_naissance;
+        if ($personne->no_avs == '') {
+            $personne->no_avs = $clientOnline->no_avs;
+        }
         $newInfos = Yii::t('app', 'Intéressé par le cours') . ' ' . $clientOnline->fkCoursNom->nom;
         $newInfos .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $clientOnline->date_inscription;
         if ($clientOnline->informations != '') {
@@ -666,6 +676,7 @@ class ClientsOnlineController extends CommonController
                         $c->telephone = $client->telephone;
                         $c->email = $client->email;
                         $c->date_naissance = $client->date_naissance;
+                        $c->no_avs = $client->no_avs;
                         $c->informations = $personne->informations;
                         $c->save();
 
@@ -725,6 +736,7 @@ class ClientsOnlineController extends CommonController
         $p->telephone = $model->telephone;
         $p->email = $model->email;
         $p->date_naissance = (isset($model->date_naissance)) ? $model->date_naissance : null;
+        $p->no_avs = $model->no_avs;
         $p->informations = Yii::t('app', 'Intéressé par le cours') . ' ' . $model->fkCoursNom->nom;
         $p->informations .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $model->date_inscription;
         if ($model->informations != '') {

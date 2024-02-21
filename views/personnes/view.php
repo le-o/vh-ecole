@@ -48,8 +48,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->fkStatut->nom,
             ],
             [
+                'label' => Yii::t('app', 'Finances'),
+                'value' => (isset($model->fkFinance) ? $model->fkFinance->nom : ''),
+            ],
+            [
                 'attribute' => 'fk_salle_admin',
-                'value' => (isset($model->fkSalleadmin)) ? $model->fkSalleadmin->nom : '',
+                'value' => (isset($model->fkSalleadmin) ? $model->fkSalleadmin->nom : ''),
             ],
             [
                 'label' => Yii::t('app', 'Type'),
@@ -57,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => Yii::t('app', 'Niveau formation'),
-                'value' => (isset($model->fkFormation)) ? $model->fkFormation->nom : '',
+                'value' => (isset($model->fkFormation) ? $model->fkFormation->nom : ''),
             ],
             'noclient_cf',
             'societe',
@@ -72,6 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'email:email',
             'email2:email',
             'date_naissance',
+            'no_avs',
             [
                 'label' => Yii::t('app', 'interlocuteur'),
                 'format' => 'html',

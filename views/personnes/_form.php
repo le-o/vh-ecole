@@ -16,10 +16,13 @@ use yii\bootstrap\Alert;
 
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <?= $form->field($model, 'fk_statut')->dropDownList($modelParams->optsStatut($model->fk_statut),['prompt'=>Yii::t('app', 'Choisir un statut')]) ?>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_finance')->dropDownList($modelParams->optsFinance($model->fk_finance),['prompt'=>Yii::t('app', 'Choisir un financement')]) ?>
+        </div>
+        <div class="col-sm-2">
             <?= $form->field($model, 'fk_salle_admin')->dropDownList($modelParams->optsSalle($model->fk_salle_admin),['prompt'=>Yii::t('app', 'Choisir une salle')]) ?>
         </div>
         <div class="col-sm-3">
@@ -72,7 +75,7 @@ use yii\bootstrap\Alert;
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-3">
             <?= $form->field($model, 'date_naissance')->widget(DatePicker::classname(), [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
                 'removeButton' => false,
@@ -82,6 +85,9 @@ use yii\bootstrap\Alert;
                     'defaultViewDate' => ['year' => 1980]
                 ]
             ]); ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'no_avs')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-sm-6">
 	        <label class="control-label" for="w1"><?= Yii::t('app', 'Fk Interlocuteur'); ?></label>
