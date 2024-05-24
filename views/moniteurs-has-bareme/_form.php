@@ -15,7 +15,7 @@ use kartik\date\DatePicker;
 
     <div class="row">
         <div class="col-sm-4">
-            <?= $form->field($model, 'fk_bareme')->dropDownList($modelParams->optsNiveauFormation($model->fk_bareme),['prompt'=>Yii::t('app', 'Choisir un barème')]) ?>
+            <?= $form->field($model, 'fk_bareme')->dropDownList($modelParams->optsBaremeMoniteur($model->fk_bareme),['prompt'=>Yii::t('app', 'Choisir un barème')]) ?>
         </div>
         <div class="col-sm-4">
             <?= $form->field($model, 'date_debut')->widget(DatePicker::classname(), [

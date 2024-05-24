@@ -105,7 +105,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]); ?>
             </div>
             <div class="col-sm-2">
-                <?= $form->field($model, 'baremeMoniteur')->dropDownList($modelParams->optsNiveauFormation(), ['prompt'=>'Fixer un barème']) ?>
+                <?= $form->field($model, 'baremeMoniteur')->dropDownList($modelParams->optsBaremeMoniteur(), ['prompt'=>'Fixer un barème']) ?>
             </div>
             <div class="col-sm-6">
                 <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu($model->fk_lieu)) ?>

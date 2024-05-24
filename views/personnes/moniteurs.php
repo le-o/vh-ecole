@@ -39,7 +39,7 @@ $gridColumnsMiddle = [
     'telephone',
     [
         'attribute' => 'fk_formation',
-        'label' => Yii::t('app', 'Formation'),
+        'label' => Yii::t('app', 'Barème par défaut'),
     ]
 ];
 foreach ($baremes as $key => $bareme) {

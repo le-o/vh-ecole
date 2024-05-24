@@ -124,7 +124,7 @@ class PersonnesController extends CommonController
         
         $dataMoniteurs = [];
         $heuresTotal = 0;
-        $baremes = (new Parametres())->optsNiveauFormation();
+        $baremes = (new Parametres())->optsBaremeMoniteur();
         $baremes[-1] = 'Non défini'; // pour reprendre les heures si paramétrage inexistant
         if (!$isMoniteur || !is_null($searchModel->personne_id)) {
             foreach ($dataProvider->models as $moniteur) {
@@ -176,7 +176,11 @@ class PersonnesController extends CommonController
                     $dataMoniteurs[$moniteur->personne_id]['fk_langues'] = $moniteur->fkLanguesNoms;
                     $dataMoniteurs[$moniteur->personne_id]['email'] = $moniteur->email;
                     $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;
-                    $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = ($moniteur->fk_formation == 0 || is_null($moniteur->fk_formation) || !isset($moniteur->fkFormation)) ? '' : $moniteur->fkFormation->nom;
+                    if (empty($moniteur->currentBareme)) {
+                        $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = ($moniteur->fk_formation == 0 || is_null($moniteur->fk_formation) || !isset($moniteur->fkFormation)) ? 'Non défini' : '**Ancienne configuration : ' . $moniteur->fkFormation->nom;
+                    } else {
+                        $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = $moniteur->currentBareme->fkBareme->nom;
+                    }
                     $dataMoniteurs[$moniteur->personne_id]['heures'] = number_format($heures, 2, '.', '\'');
                     foreach ($baremes as $key => $bareme) {
                         $dataMoniteurs[$moniteur->personne_id][$bareme] = number_format($heuresBareme[$key], 2, '.', '\'');

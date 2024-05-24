@@ -150,7 +150,7 @@ $this->registerJs($script, View::POS_END);
             <label for="editBareme"><?= Yii::t('app', 'Changer le barème pour toutes les dates') ?></label>
             <?php
             $option = ['reinit' => Yii::t('app', 'Supprimer le barème fixe')];
-            $formations = $option + $modelParams->optsNiveauFormation();
+            $formations = $option + $modelParams->optsBaremeMoniteur();
             ?>
             <?= Html::dropDownList('editBareme', null, $formations, ['class' => 'form-control', 'prompt'=>Yii::t('app', 'Fixer la barème')]) ?>
         </div>

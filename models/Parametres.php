@@ -175,9 +175,9 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return array options niveau formation for drop-down
+     * @return array options barème moniteur for drop-down
      */
-    public function optsNiveauFormation($selectedParam = null)
+    public function optsBaremeMoniteur($selectedParam = null)
     {
         return $this->optsDropDown(8, $selectedParam);
     }
@@ -280,10 +280,26 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array options pays for drop-down
+     */
+    public function optsPays($selectedParam = null)
+    {
+        return $this->optsDropDown(20, $selectedParam, null, false);
+    }
+
+    /**
+     * @return array options pays for drop-down
+     */
+    public function optsSexe($selectedParam = null)
+    {
+        return $this->optsDropDown(21, $selectedParam, null, false);
+    }
+
+    /**
      * @return array options from classkey for drop-down
      */
     public function optsDropDown($classKey, $selectedParam, $queryWhere = null, $restrictLangue = true)
-    {   
+    {
         $query = self::find()->where(['class_key' => $classKey])->orderBy('tri');
         
         $withId = (null !== $selectedParam && '' !== $selectedParam) ? 'parametre_id = '.$selectedParam : '';
@@ -320,7 +336,7 @@ class Parametres extends \yii\db\ActiveRecord
             '5' => 'Paramètres généraux',
             '6' => 'Type de cours',
             '7' => 'Nom de cours',
-            '8' => 'Niveau de formation',
+            '8' => 'Barème moniteur',
             '9' => 'Statut de participation',
             '10' => 'Tranche d\'âge',
             '11' => 'Année de cours',
@@ -332,6 +348,8 @@ class Parametres extends \yii\db\ActiveRecord
             '17' => 'Lieu',
             '18' => 'Statut de cours',
             '19' => 'Finances',
+            '20' => 'Pays',
+            '21' => 'Sexe',
         );
     }
     

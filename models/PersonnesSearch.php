@@ -22,8 +22,8 @@ class PersonnesSearch extends Personnes
     {
         return [
             [['personne_id', 'fk_statut', 'fk_finance', 'fk_type', 'fk_formation', 'fk_salle_admin'], 'integer'],
-            [['noclient_cf', 'suivi_client', 'societe', 'nom', 'prenom', 'adresse1', 'adresse2', 'npa', 'localite', 'telephone', 'telephone2',
-                'email', 'email2', 'date_naissance', 'informations', 'carteclient_cf', 'categorie3_cf', 'soldefacture_cf', 'list_langues'], 'safe'],
+            [['suivi_client', 'societe', 'nom', 'prenom', 'adresse1', 'adresse2', 'npa', 'localite', 'telephone', 'telephone2',
+                'email', 'date_naissance', 'informations', 'list_langues'], 'safe'],
         ];
     }
 
@@ -71,8 +71,7 @@ class PersonnesSearch extends Personnes
             'fk_salle_admin' => $this->fk_salle_admin,
         ]);
 
-        $query->andFilterWhere(['like', 'noclient_cf', $this->noclient_cf])
-            ->andFilterWhere(['like', 'suivi_client', $this->suivi_client])
+        $query->andFilterWhere(['like', 'suivi_client', $this->suivi_client])
             ->andFilterWhere(['like', 'societe', $this->societe])
             ->andFilterWhere(['like', 'nom', $this->nom])
             ->andFilterWhere(['like', 'prenom', $this->prenom])
@@ -83,11 +82,7 @@ class PersonnesSearch extends Personnes
             ->andFilterWhere(['like', 'telephone', $this->telephone])
             ->andFilterWhere(['like', 'telephone2', $this->telephone2])
             ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'email2', $this->email2])
-            ->andFilterWhere(['like', 'informations', $this->informations])
-            ->andFilterWhere(['like', 'carteclient_cf', $this->carteclient_cf])
-            ->andFilterWhere(['like', 'categorie3_cf', $this->categorie3_cf])
-            ->andFilterWhere(['like', 'soldefacture_cf', $this->soldefacture_cf]);
+            ->andFilterWhere(['like', 'informations', $this->informations]);
 
         return $dataProvider;
     }

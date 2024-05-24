@@ -77,7 +77,7 @@ use kartik\time\TimePicker;
         <div class="col-sm-2">
             <?php
             $option = ['reinit' => Yii::t('app', 'Supprimer le barème fixe')];
-            $formations = $option + $modelParams->optsNiveauFormation();
+            $formations = $option + $modelParams->optsBaremeMoniteur();
             ?>
             <?= $form->field($model, 'baremeMoniteur')->dropDownList($formations, ['prompt'=>Yii::t('app', 'Fixer la barème')]) ?>
         </div>

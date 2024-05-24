@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'personne_id',
+            'nopersonnel',
             [
                 'label' => Yii::t('app', 'Statut'),
                 'value' => $model->fkStatut->nom,
@@ -59,23 +59,34 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => Yii::t('app', 'Type'),
                 'value' => $model->fkType->nom,
             ],
-            [
-                'label' => Yii::t('app', 'Niveau formation'),
-                'value' => (isset($model->fkFormation) ? $model->fkFormation->nom : ''),
-            ],
-            'noclient_cf',
             'societe',
             'nom',
             'prenom',
+            [
+                'attribute' => 'fk_sexe',
+                'value' => (isset($model->fkSexe) ? $model->fkSexe->nom : ''),
+            ],
             'adresse1',
+            'numeroRue',
             'adresse2',
             'npa',
             'localite',
+            [
+                'attribute' => 'fk_pays',
+                'value' => (isset($model->fkPays) ? $model->fkPays->nom : ''),
+            ],
             'telephone',
             'telephone2',
+            [
+                'attribute' => 'fk_langue_mat',
+                'value' => (isset($model->fkLangueMat) ? $model->fkLangueMat->nom : ''),
+            ],
             'email:email',
-            'email2:email',
             'date_naissance',
+            [
+                'attribute' => 'fk_nationalite',
+                'value' => (isset($model->fkNationalite) ? $model->fkNationalite->nom : ''),
+            ],
             'no_avs',
             [
                 'label' => Yii::t('app', 'interlocuteur'),
@@ -89,9 +100,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'informations:ntext',
             'suivi_client:ntext',
-            'carteclient_cf',
-            'categorie3_cf',
-            'soldefacture_cf',
             [
                 'attribute' => 'fkLanguesNoms',
                 'label' => Yii::t('app', 'Langues parlées'),
