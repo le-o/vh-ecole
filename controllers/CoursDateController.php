@@ -305,7 +305,7 @@ class CoursDateController extends CommonController
 
         $searchModel->listCours = (isset(Yii::$app->request->queryParams['list_cours'])) ? Yii::$app->request->queryParams['list_cours'] : [];
         $selectedCours = $searchModel->listCours;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false);
 
         $selectedFinance = (isset(Yii::$app->request->queryParams['list_finance'])) ? Yii::$app->request->queryParams['list_finance'] : '';
 
@@ -334,11 +334,11 @@ class CoursDateController extends CommonController
                     $arrayParticipants[$client->fk_personne]['personne_id'] = $client->fk_personne;
                     $arrayParticipants[$client->fk_personne]['avs'] = $client->fkPersonne->no_avs;
                     $arrayParticipants[$client->fk_personne]['email'] =
-                        ('interloc.' == $client->fkPersonne->email) ?
+                        ('interloc.' == $client->fkPersonne->email && isset($client->fkPersonne->personneHasInterlocuteurs[0])) ?
                             $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->email :
                             $client->fkPersonne->email;
                     $arrayParticipants[$client->fk_personne]['telephone'] =
-                        ('interloc.' == $client->fkPersonne->telephone) ?
+                        ('interloc.' == $client->fkPersonne->telephone && isset($client->fkPersonne->personneHasInterlocuteurs[0])) ?
                             $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->telephone :
                             $client->fkPersonne->telephone;
 
@@ -348,7 +348,11 @@ class CoursDateController extends CommonController
                     foreach ($client->fkPersonne->personneHasInterlocuteurs as $pi) {
                         $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
                     }
-                    $arrayParticipants[$client->fk_personne]['cours_info'] = $data->fkCours->fkNom->nom . ' ' . $data->fkCours->session . ' ' . $data->fkCours->fkSaison->nom . ' ' . $data->fkCours->fkSalle->nom;
+                    $arrayParticipants[$client->fk_personne]['cours_info'] =
+                        (isset($data->fkCours->fk_nom) ? $data->fkCours->fkNom->nom : '') . ' ' .
+                        $data->fkCours->session . ' ' .
+                        (isset($data->fkCours->fk_saison) ? $data->fkCours->fkSaison->nom : '') . ' ' .
+                        (isset($data->fkCours->fk_salle) ? $data->fkCours->fkSalle->nom : '');
                 }
             }
         }
