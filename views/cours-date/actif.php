@@ -41,7 +41,6 @@ $gridColumns = [
     ['class' => 'kartik\grid\CheckboxColumn'],
     ['class' => 'kartik\grid\SerialColumn'],
 
-//    'personne_id',
     [
         'label' => Yii::t('app', 'Finances'),
         'attribute' => 'finance',
@@ -62,12 +61,12 @@ $gridColumns = [
     'telephone',
 
     ['class' => 'yii\grid\ActionColumn',
-        'template'=>'{partView} {partUpdate}',
-        'buttons'=>[
+        'template' => '{partView} {partUpdate}',
+        'buttons' => [
             'partView' => function ($url, $data) {
                 return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/personnes/view', 'id' => $data['personne_id']]), [
-                        'title' => Yii::t('app', 'Voir la personne'),
-                    ]);
+                    'title' => Yii::t('app', 'Voir la personne'),
+                ]);
             },
             'partUpdate' => function ($url, $data) {
                 $from['url'] = 'cours-date/actif';
@@ -90,7 +89,7 @@ $gridColumns = [
             'class' => 'alert-'.$alerte['class'],
         ],
         'body' => $alerte['message'],
-    ]); 
+    ]);
 } ?>
 
 <div class="cours-date-index">
@@ -206,6 +205,7 @@ $gridColumns = [
                 'columnBatchToggleSettings' => [
                     'label' => Yii::t('app', 'Tous/aucun'),
                 ],
+                'filename' => 'client-actif-' . date('Y-m-d_H-i-s'),
                 'noExportColumns' => [12],
                 'dropdownOptions' => [
                     'class' => 'btn btn-default',

@@ -295,6 +295,19 @@ class CoursDateController extends CommonController
      */
     public function actionActif()
     {
+        return $this->renderView('actif');
+    }
+
+    /**
+     * Lists all CoursDate models with participants in the futur.
+     * @return mixed
+     */
+    public function actionExportjs()
+    {
+        return $this->renderView('exportjs', true);
+    }
+
+    private function renderView($view, $forExport = false) {
         $this->layout = 'main_full.php';
         $searchModel = new CoursDateSearch();
         $searchModel->depuis = date('d.m.Y');
@@ -310,7 +323,7 @@ class CoursDateController extends CommonController
         $selectedFinance = (isset(Yii::$app->request->queryParams['list_finance'])) ? Yii::$app->request->queryParams['list_finance'] : '';
 
         $dataProviderAllCours = $searchModelAllCours->search(Yii::$app->request->queryParams, false);
-        
+
         if (!empty(Yii::$app->request->post()) && isset(Yii::$app->request->post()['checkedEmails'])) {
             $mail = Yii::$app->request->post();
             $this->actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
@@ -318,7 +331,7 @@ class CoursDateController extends CommonController
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à toutes les personnes sélectionnées');
         }
-        
+
         $arrayParticipants = [];
         $listeEmails = [];
         foreach ($dataProvider->models as $data) {
@@ -341,6 +354,20 @@ class CoursDateController extends CommonController
                         ('interloc.' == $client->fkPersonne->telephone && isset($client->fkPersonne->personneHasInterlocuteurs[0])) ?
                             $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->telephone :
                             $client->fkPersonne->telephone;
+
+                    // pour export JS
+                    if ($forExport) {
+                        $arrayParticipants[$client->fk_personne]['nopersonnel'] = $client->fkPersonne->nopersonnel;
+                        $arrayParticipants[$client->fk_personne]['fkSexe'] = $client->fkPersonne->fkSexe;
+                        $arrayParticipants[$client->fk_personne]['no_avs'] = $client->fkPersonne->no_avs;
+                        $arrayParticipants[$client->fk_personne]['fkNationalite'] = $client->fkPersonne->fkNationalite;
+                        $arrayParticipants[$client->fk_personne]['fkLangueMat'] = $client->fkPersonne->fkLangueMat;
+                        $arrayParticipants[$client->fk_personne]['rue'] = $client->fkPersonne->adresse1;
+                        $arrayParticipants[$client->fk_personne]['numero'] = $client->fkPersonne->numeroRue;
+                        $arrayParticipants[$client->fk_personne]['npa'] = $client->fkPersonne->npa;
+                        $arrayParticipants[$client->fk_personne]['localite'] = $client->fkPersonne->localite;
+                        $arrayParticipants[$client->fk_personne]['fkPays'] = $client->fkPersonne->fkPays;
+                    }
 
                     if (strpos($client->fkPersonne->email, '@') !== false) {
                         $listeEmails[$client->fkPersonne->email] = trim($client->fkPersonne->email);
@@ -368,25 +395,33 @@ class CoursDateController extends CommonController
 
         $dataCours = [];
         foreach ($dataProviderAllCours->models as $data) {
-            $dataCours[$data->fk_cours] = $data->fkCours->fkNom->nom . ' ' . $data->fkCours->session;
+            if (!$forExport || ($forExport && in_array($data->fkCours->fkNom->info_special, Yii::$app->params["coursPlanifieS"]))) {
+                $dataCours[$data->fk_cours] = $data->fkCours->fkNom->nom . ' ' . $data->fkCours->session;
+            }
         }
         asort($dataCours);
-        
-        $parametre = new Parametres();
-        $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
-        $dataFinance = $parametre->optsFinance();
-        
-        return $this->render('actif', [
+
+        $params = [];
+        if (!$forExport) {
+            $parametre = new Parametres();
+            $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
+            $dataFinance = $parametre->optsFinance();
+            $params = [
+                'selectedFinance' => $selectedFinance,
+                'dataFinance' => $dataFinance,
+                'parametre' => $parametre,
+                'emails' => $emails,
+                'listeEmails' => $listeEmails,
+            ];
+        }
+
+        return $this->render($view, array_merge([
             'dataProvider' => $participantDataProvider,
             'searchModel' => $searchModel,
             'selectedCours' => $selectedCours,
             'dataCours' => $dataCours,
-            'selectedFinance' => $selectedFinance,
-            'dataFinance' => $dataFinance,
-            'parametre' => $parametre,
-            'emails' => $emails,
-            'listeEmails' => $listeEmails,
-        ]);
+            'view' => $view,
+        ], $params));
     }
 
     /**

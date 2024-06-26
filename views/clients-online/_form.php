@@ -62,22 +62,23 @@ $this->registerJs('
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <?= $form->field($model, 'adresse')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-1">
+            <?= $form->field($model, 'numeroRue')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-1">
             <?= $form->field($model, 'npa')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <?= $form->field($model, 'localite')->textInput(['maxlength' => true]) ?>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <?= $form->field($model, 'telephone')->textInput(['maxlength' => true]) ?>
-        </div>
-        <div class="col-sm-6">
-            <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_pays')->dropDownList(
+                $params->optsPays($model->fk_pays),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
         </div>
     </div>
     <div class="row">
@@ -93,6 +94,32 @@ $this->registerJs('
             ])->label(Yii::t('app', 'Date de naissance (du représentant légal si mineur)')); ?>
         </div><div class="col-sm-3">
             <?= $form->field($model, "no_avs")->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_sexe')->dropDownList(
+                $params->optsSexe($model->fk_sexe),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_nationalite')->dropDownList(
+                $params->optsPays($model->fk_nationalite),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_langue_mat')->dropDownList(
+                $params->optsLangue($model->fk_langue_mat),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <?= $form->field($model, 'telephone')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'fk_cours')->widget(Select2::classname(), [
@@ -170,13 +197,13 @@ $this->registerJs('
                             }
                         ?>
                         <div class="row">
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <?= $form->field($modelClient, "[{$i}]nom")->textInput(['maxlength' => true]) ?>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <?= $form->field($modelClient, "[{$i}]prenom")->textInput(['maxlength' => true]) ?>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <?= $form->field($modelClient, "[{$i}]date_naissance")->widget(DatePicker::classname(), [
                                     'options' => ['placeholder' => 'jj.mm.aaaa'],
                                     'removeButton' => false,
@@ -187,8 +214,26 @@ $this->registerJs('
                                     ]
                                 ]); ?>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <?= $form->field($modelClient, "[{$i}]no_avs")->textInput(['maxlength' => true]) ?>
+                            </div>
+                            <div class="col-sm-1">
+                                <?= $form->field($modelClient, "[{$i}]fk_sexe")->dropDownList(
+                                    $params->optsSexe(),
+                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+                                ) ?>
+                            </div>
+                            <div class="col-sm-1">
+                                <?= $form->field($modelClient, "[{$i}]fk_nationalite")->dropDownList(
+                                    $params->optsPays(),
+                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+                                ) ?>
+                            </div>
+                            <div class="col-sm-2">
+                                <?= $form->field($modelClient, "[{$i}]fk_langue_mat")->dropDownList(
+                                    $params->optsLangue(),
+                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+                                ) ?>
                             </div>
                         </div>
                     </div>

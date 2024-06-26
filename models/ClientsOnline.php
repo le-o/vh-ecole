@@ -15,12 +15,17 @@ use yii\helpers\Json;
  * @property string $nom
  * @property string $prenom
  * @property string $adresse
+ * @property string $numeroRue
  * @property string $npa
  * @property string $localite
+ * @property integer $fk_pays
+ * @property integer $fk_nationalite
  * @property string $telephone
  * @property string $email
  * @property string $date_naissance
  * @property string $no_avs
+ * @property integer $fk_sexe
+ * @property integer $fk_langue_mat
  * @property string $informations
  * @property string $date_inscription
  * @property integer $is_actif
@@ -114,8 +119,8 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fk_parent', 'fk_cours_nom', 'fk_cours', 'is_actif'], 'integer'],
-            [['fk_cours_nom', 'adresse', 'npa', 'localite', 'telephone', 'email'], 'required'],
+            [['fk_parent', 'fk_cours_nom', 'fk_cours', 'fk_pays', 'fk_nationalite', 'fk_sexe', 'is_actif'], 'integer'],
+            [['fk_cours_nom', 'adresse', 'numeroRue', 'npa', 'localite', 'fk_pays', 'telephone', 'email'], 'required'],
             [['date_naissance', 'date_naissance_enfant', 'date_inscription'], 'safe'],
             [['informations', 'agemoyen', 'nbparticipant'], 'string'],
             [['nom', 'prenom', 'prenom_enfant'], 'string', 'max' => 60],
@@ -124,22 +129,54 @@ class ClientsOnline extends \yii\db\ActiveRecord
             [['telephone'], 'string', 'max' => 20],
             [['no_avs'], 'string', 'max' => 16],
             [['no_avs'], 'match', 'pattern' => '/[7][5][6]\\.[\d]{4}[.][\d]{4}[.][\d]{2}$/'],
-//            [
-//                'prenom', 'required',
-//                'message' => 'Either email or phone is required.',
-//                'when' => function($model) { return !empty($model->nom); }
-//            ],
-//            [
-//                ['no_avs'],
-//                'required',
-//                'when' => function ($model) {
-//                    return !empty($model->date_naissance);
-//                }
-//            ],
             ['no_avs', 'makeAVSMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance'],
             ['iagree', 'compare', 'operator' => '==', 'compareValue' => true, 'message' => Yii::t('app', 'Vous devez accepter les conditions générales')],
 
             [['nom', 'prenom', 'prenom_enfant', 'agemoyen', 'nbparticipant'], 'required', 'on' => ['anniversaire']],
+
+            ['fk_sexe', 'required', 'when' => function ($model) {
+                    return $model->nom != '';
+                }, 'whenClient' => "function (attribute, value) {
+                    if (attribute.name.indexOf('[') == -1) {
+                       index = '';
+                    } else {
+                        if (attribute.name.charAt(0) === '[') { //when dynamic form is not activated and name of inputs is like [0]fk_sexe
+                            index = '-' + attribute.name.charAt(1); //I get the array index
+                        } else {
+                            index = '-' + attribute.name.charAt(14); //dynamic form activated the name of inputs changed like this ClientsOnline[0][fk_sexe].
+                        }
+                    }
+                    return '' != $('[id$=' + index + '-nom]').val();
+            }"],
+            ['fk_nationalite', 'required', 'when' => function ($model) {
+                return $model->nom != '';
+            }, 'whenClient' => "function (attribute, value) {
+                    if (attribute.name.indexOf('[') == -1) {
+                       index = '';
+                    } else {
+                        if (attribute.name.charAt(0) === '[') { //when dynamic form is not activated and name of inputs is like [0]fk_sexe
+                            index = '-' + attribute.name.charAt(1); //I get the array index
+                        } else {
+                            index = '-' + attribute.name.charAt(14); //dynamic form activated the name of inputs changed like this ClientsOnline[0][fk_sexe].
+                        }
+                    }
+                    console.log($('[id$=' + index + '-nom]').val());
+                    return '' != $('[id$=' + index + '-nom]').val();
+            }"],
+            ['fk_langue_mat', 'required', 'when' => function ($model) {
+                return $model->nom != '';
+            }, 'whenClient' => "function (attribute, value) {
+                    if (attribute.name.indexOf('[') == -1) {
+                       index = '';
+                    } else {
+                        if (attribute.name.charAt(0) === '[') { //when dynamic form is not activated and name of inputs is like [0]fk_sexe
+                            index = '-' + attribute.name.charAt(1); //I get the array index
+                        } else {
+                            index = '-' + attribute.name.charAt(14); //dynamic form activated the name of inputs changed like this ClientsOnline[0][fk_sexe].
+                        }
+                    }
+                    return '' != $('[id$=' + index + '-nom]').val();
+            }"]
         ];
     }
 
@@ -167,12 +204,21 @@ class ClientsOnline extends \yii\db\ActiveRecord
             'nom' => Yii::t('app', 'Nom'),
             'prenom' => Yii::t('app', 'Prenom'),
             'adresse' => Yii::t('app', 'Adresse'),
+            'numeroRue' => Yii::t('app', 'Numéro'),
             'npa' => Yii::t('app', 'Npa'),
             'localite' => Yii::t('app', 'Localite'),
+            'fk_pays' => Yii::t('app', 'Pays'),
+            'fkPays.nom' => Yii::t('app', 'Pays'),
+            'fk_nationalite' => Yii::t('app', 'Nationalité'),
+            'fkNationalite.nom' => Yii::t('app', 'Nationalité'),
             'telephone' => Yii::t('app', 'Telephone'),
             'email' => Yii::t('app', 'Email'),
             'date_naissance' => Yii::t('app', 'Date Naissance'),
             'no_avs' => Yii::t('app', 'No AVS'),
+            'fk_sexe' => Yii::t('app', 'Sexe'),
+            'fkSexe.nom' => Yii::t('app', 'Sexe'),
+            'fk_langue_mat' => Yii::t('app', 'Langue maternelle'),
+            'fkLangueMat.nom' => Yii::t('app', 'Langue maternelle'),
             'informations' => Yii::t('app', 'Informations'),
             'date_inscription' => Yii::t('app', 'Date Inscription'),
             'is_actif' => Yii::t('app', 'Transformé en client?'),
@@ -209,11 +255,43 @@ class ClientsOnline extends \yii\db\ActiveRecord
     }
     
     /**
-	 * @return Personne nom prénom
-	 */
-	public function getNomPrenom()
+     * @return Personne nom prénom
+     */
+    public function getNomPrenom()
     {
         return $this->nom.' '.$this->prenom;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkPays()
+    {
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_pays']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkSexe()
+    {
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_sexe']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkNationalite()
+    {
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_nationalite']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkLangueMat()
+    {
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_langue_mat']);
     }
 
     /**

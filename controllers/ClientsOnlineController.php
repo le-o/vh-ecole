@@ -181,8 +181,10 @@ class ClientsOnlineController extends CommonController
                             $client->fk_cours = $model->fk_cours;
                             $client->fk_parent = $model->client_online_id;
                             $client->adresse = $model->adresse;
+                            $client->numeroRue = $model->numeroRue;
                             $client->npa = $model->npa;
                             $client->localite = $model->localite;
+                            $client->fk_pays = $model->fk_pays;
                             $client->telephone = $model->telephone;
                             $client->email = $model->email;
                             $client->is_actif = 1;
@@ -596,12 +598,16 @@ class ClientsOnlineController extends CommonController
                     $c->nom = $client->nom;
                     $c->prenom = $client->prenom;
                     $c->adresse1 = $client->adresse;
+                    $c->numeroRue = $client->numeroRue;
                     $c->npa = $client->npa;
                     $c->localite = $client->localite;
+                    $c->fk_pays = $client->fk_pays;
                     $c->telephone = $client->telephone;
                     $c->email = $client->email;
                     $c->date_naissance = $client->date_naissance;
                     $c->no_avs = $client->no_avs;
+                    $c->fk_sexe = $client->fk_sexe;
+                    $c->fk_langue_mat = $client->fk_langue_mat;
                     $c->informations = $p->informations;
                     $c->fk_salle_admin = $p->fk_salle_admin;
                     $c->save();
@@ -634,14 +640,18 @@ class ClientsOnlineController extends CommonController
         
         $personne->fk_statut = Yii::$app->params['persStatutStandby'];
         $personne->adresse1 = $clientOnline->adresse;
+        $personne->numeroRue = $clientOnline->numeroRue;
         $personne->npa = $clientOnline->npa;
         $personne->localite = $clientOnline->localite;
+        $personne->fk_pays = $clientOnline->fk_pays;
         $personne->telephone = $clientOnline->telephone;
         $personne->email = $clientOnline->email;
         $personne->date_naissance = $clientOnline->date_naissance;
         if ($personne->no_avs == '') {
             $personne->no_avs = $clientOnline->no_avs;
         }
+        $personne->fk_sexe = $clientOnline->fk_sexe;
+        $personne->fk_langue_mat = $clientOnline->fk_langue_mat;
         $newInfos = Yii::t('app', 'Intéressé par le cours') . ' ' . $clientOnline->fkCoursNom->nom;
         $newInfos .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $clientOnline->date_inscription;
         if ($clientOnline->informations != '') {
@@ -671,12 +681,16 @@ class ClientsOnlineController extends CommonController
                         $c->nom = $client->nom;
                         $c->prenom = $client->prenom;
                         $c->adresse1 = $client->adresse;
+                        $c->numeroRue = $client->numeroRue;
                         $c->npa = $client->npa;
                         $c->localite = $client->localite;
+                        $c->fk_pays = $client->fk_pays;
                         $c->telephone = $client->telephone;
                         $c->email = $client->email;
                         $c->date_naissance = $client->date_naissance;
                         $c->no_avs = $client->no_avs;
+                        $c->fk_sexe = $client->fk_sexe;
+                        $c->fk_langue_mat = $client->fk_langue_mat;
                         $c->informations = $personne->informations;
                         $c->save();
 
@@ -731,12 +745,16 @@ class ClientsOnlineController extends CommonController
         $p->nom = $model->nom;
         $p->prenom = ($model->prenom != '') ? $model->prenom : 'non renseigné';
         $p->adresse1 = $model->adresse;
+        $p->numeroRue = $model->numeroRue;
         $p->npa = $model->npa;
         $p->localite = $model->localite;
+        $p->fk_pays = $model->fk_pays;
         $p->telephone = $model->telephone;
         $p->email = $model->email;
         $p->date_naissance = (isset($model->date_naissance)) ? $model->date_naissance : null;
+        $p->fk_sexe = $model->fk_sexe;
         $p->no_avs = $model->no_avs;
+        $p->fk_langue_mat = $model->fk_langue_mat;
         $p->informations = Yii::t('app', 'Intéressé par le cours') . ' ' . $model->fkCoursNom->nom;
         $p->informations .= "\r\n" . Yii::t('app', 'Date d\'inscription') . ': ' . $model->date_inscription;
         if ($model->informations != '') {

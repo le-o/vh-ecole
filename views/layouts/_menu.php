@@ -41,10 +41,13 @@ use webvimark\modules\UserManagement\models\User;
                          ['label' => Yii::t('app', 'Inscription online'), 'url' => ['/clients-online'], 'visible' => User::canRoute(['/clients-online/index'])],
                          ['label' => Yii::t('app', 'Inscription anniversaire'), 'url' => ['/clients-online/createanniversaire', 'free' => true], 'linkOptions' => ['target'=>'_blank'], 'visible' => User::canRoute(['/clients-online/index'])],
                          ['label' => Yii::t('app', 'Clients actifs'), 'url' => ['/cours-date/actif'], 'visible' => User::canRoute(['/cours-date/actif'])],
-                         ['label' => Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres'], 'visible' => User::canRoute(['/parametres/index'])],
-                         ['label' => Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore'], 'visible' => User::canRoute(['/backuprestore/index'])],
-                         ['label' => Yii::t('app', 'Synchro calendrier'), 'url' => ['/site/calendarsync'], 'visible' => User::canRoute(['//site/calendarsync'])],
-                         ['label' => Yii::t('app', 'Emails envoyés'), 'url' => ['/sent-email'], 'visible' => User::canRoute(['/sent-email/index'])],
+                         ['label' => '<strong>ADMIN TASKS</strong>', 'visible' => User::canRoute(['/parametres/index'])],
+                         ['label' => '&nbsp;' . Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres'], 'visible' => User::canRoute(['/parametres/index'])],
+                         ['label' => '&nbsp;' . Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore'], 'visible' => User::canRoute(['/backuprestore/index'])],
+                         ['label' => '&nbsp;' . Yii::t('app', 'Synchro calendrier'), 'url' => ['/site/calendarsync'], 'visible' => User::canRoute(['//site/calendarsync'])],
+                         ['label' => '&nbsp;' . Yii::t('app', 'Emails envoyés'), 'url' => ['/sent-email'], 'visible' => User::canRoute(['/sent-email/index'])],
+                         ['label' => '<strong>EXPORTATION</strong>', 'visible' => User::canRoute(['/cours-date/actif'])],
+                         ['label' => '&nbsp;' . Yii::t('app', 'Exportation JS'), 'url' => ['/cours-date/exportjs'], 'visible' => User::canRoute(['/cours-date/actif'])],
                     ],
                 ],
             ['label' => Yii::t('app', 'Gestion des droits'), 'visible' => !Yii::$app->user->isGuest && User::canRoute(['/user-management/user/index']),
@@ -75,5 +78,3 @@ use webvimark\modules\UserManagement\models\User;
         ],
     ]);
     NavBar::end();
-    
-    ?>
