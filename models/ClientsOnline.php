@@ -120,7 +120,8 @@ class ClientsOnline extends \yii\db\ActiveRecord
     {
         return [
             [['fk_parent', 'fk_cours_nom', 'fk_cours', 'fk_pays', 'fk_nationalite', 'fk_sexe', 'is_actif'], 'integer'],
-            [['fk_cours_nom', 'adresse', 'numeroRue', 'npa', 'localite', 'fk_pays', 'telephone', 'email'], 'required'],
+            [['fk_cours_nom', 'adresse', 'npa', 'localite', 'telephone', 'email'], 'required'],
+            [['numeroRue', 'fk_pays'], 'required', 'except' => 'anniversaire'],
             [['date_naissance', 'date_naissance_enfant', 'date_inscription'], 'safe'],
             [['informations', 'agemoyen', 'nbparticipant'], 'string'],
             [['nom', 'prenom', 'prenom_enfant'], 'string', 'max' => 60],
@@ -147,7 +148,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
                         }
                     }
                     return '' != $('[id$=' + index + '-nom]').val();
-            }"],
+            }", 'except' => 'anniversaire'],
             ['fk_nationalite', 'required', 'when' => function ($model) {
                 return $model->nom != '';
             }, 'whenClient' => "function (attribute, value) {
@@ -162,7 +163,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
                     }
                     console.log($('[id$=' + index + '-nom]').val());
                     return '' != $('[id$=' + index + '-nom]').val();
-            }"],
+            }", 'except' => 'anniversaire'],
             ['fk_langue_mat', 'required', 'when' => function ($model) {
                 return $model->nom != '';
             }, 'whenClient' => "function (attribute, value) {
@@ -176,7 +177,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
                         }
                     }
                     return '' != $('[id$=' + index + '-nom]').val();
-            }"]
+            }", 'except' => 'anniversaire']
         ];
     }
 
