@@ -286,7 +286,7 @@ class ClientsOnlineController extends CommonController
         }
         
         if (isset($modelCours)) {
-            $dataCours[$modelCours->cours_id] = $modelCours->fkNom->nom . ' ' . $modelCours->fkNiveau->nom . ' ' . $modelCours->session . ' ' . $modelCours->fkSalle->nom;
+            $dataCours[$modelCours->cours_id] = $modelCours->fkNom->nom . ' ' . Yii::t('app', $modelCours->fkNiveau->nom) . ' ' . $modelCours->session . ' ' . $modelCours->fkSalle->nom;
             $dataCours[$modelCours->cours_id] .= (isset($modelCours->fkSemestre)) ? ' - '.$modelCours->fkSemestre->nom : '';
             $model->fk_cours = $cours_id;
             $selectedCours = [$cours_id];
