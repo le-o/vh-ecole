@@ -228,6 +228,19 @@ class ClientsOnlineController extends CommonController
                                     );
                                 }
 
+                                // on profite de traiter l'adresse si pas en 2 parties ou si modification
+                                if ($cd->adresse1 != $isPersonne->adresse1) {
+                                    $isPersonne->adresse1 = $cd->adresse1;
+                                    $isPersonne->numeroRue = $cd->numeroRue;
+                                    $isPersonne->npa = $cd->npa;
+                                    $isPersonne->localite = $cd->localite;
+                                }
+                                $isPersonne->fk_pays = $cd->fk_pays;
+                                $isPersonne->no_avs = $cd->no_avs;
+                                $isPersonne->fk_nationalite = $cd->fk_nationalite;
+                                $isPersonne->fk_sexe = $cd->fk_sexe;
+                                $isPersonne->fk_langue_mat = $cd->fk_langue_mat;
+
                                 $newInfos = $cd->informations;
                                 $newInfos .= "\r\n\r\n" . $isPersonne->informations;
                                 $isPersonne->informations = $newInfos;

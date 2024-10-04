@@ -281,6 +281,14 @@ class Cours extends \yii\db\ActiveRecord
     {
         return ClientsHasCours::find()->where(['fk_cours' => $this->cours_id])->andWhere(['fk_statut' => Yii::$app->params['partInscrit']])->count();
     }
+
+    /**
+     * @return int Number of clients 2 cours essai
+     */
+    public function getNombreClients()
+    {
+        return ClientsHasCours::find()->where(['fk_cours' => $this->cours_id])->andWhere(['IN', 'fk_statut', [Yii::$app->params['partInscrit'], Yii::$app->params['part2Essai']]])->count();
+    }
     
     /**
      * @return string Nombre clients inscrits (Nombre clients 2 cours à l'essai)
