@@ -796,6 +796,7 @@ class CoursDateController extends CommonController
             } elseif ($checkEmpty && !$online) {
                 if (!isset($display[$time->date][$time->heure_debut]['nbDisplayed'])) {
                     $display[$time->date][$time->heure_debut]['nbDisplayed'] = 0;
+                    $display[$time->date][$time->heure_debut]['nbWithClient'] = 0;
                 }
 
                 if (empty($time->clientsHasCoursDate)) {
@@ -809,6 +810,7 @@ class CoursDateController extends CommonController
                         $Event->url = '';
                     } elseif (isset(Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu])
                         && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] <= $display[$time->date][$time->heure_debut]['nbDisplayed']
+                        && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] <= $display[$time->date][$time->heure_debut]['nbWithClient']
                     ) {
                         $Event->url .= '&msg=nombreAnni';
                     }
@@ -820,6 +822,7 @@ class CoursDateController extends CommonController
                     } else {
                         $Event->color = '#27db39';
                     }
+                    $display[$time->date][$time->heure_debut]['nbWithClient']++;
                 }
                 $display[$time->date][$time->heure_debut]['nbDisplayed']++;
             } elseif ($checkEmpty && $online) {
