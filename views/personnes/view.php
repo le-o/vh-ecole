@@ -4,12 +4,13 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap\Alert;
 use webvimark\modules\UserManagement\models\User;
+use yii\bootstrap\Tabs;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Personnes */
 
 $this->title = $model->nom.' '.$model->prenom;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Client'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Personnes'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -26,20 +27,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php if (User::canRoute(['personnes/update']) || User::canRoute(['personnes/delete'])) { ?>
-    <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->personne_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->personne_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-    <?php } ?>
-
-    <?= DetailView::widget([
+    <?php
+    $tabClient = '';
+    if (User::canRoute(['personnes/update']) || User::canRoute(['personnes/delete'])) {
+        $tabClient .= '<p>' . Html::a(Yii::t('app', 'Modifier données client'), ['update', 'id' => $model->personne_id], ['class' => 'btn btn-primary']);
+        $tabClient .= '&nbsp;' . Html::a(Yii::t('app', 'Supprimer données client'), ['delete', 'id' => $model->personne_id], [
+                'class' => 'btn btn-danger' . (!empty($model->moniteurInfo) ? ' disabled' : ''),
+                'data' => [
+                    'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                    'method' => 'post',
+                ],
+            ]) . '</p>';
+    }
+    $tabClient .= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'nopersonnel',
@@ -110,31 +110,42 @@ $this->params['breadcrumbs'][] = $this->title;
                 'visible' => in_array($model->fk_type, Yii::$app->params['typeEncadrant']),
             ],
         ],
-    ]) ?>
-    
-    <?php if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
-        if (User::canRoute(['/moniteurs-has-bareme/index'])) {
-            echo $this->render('/moniteurs-has-bareme/_moniteur', [
-                'model' => $model,
-                'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
-            ]);
-        }
-
-        echo '<br /><h3>'.Yii::t('app', 'Mes cours comme moniteurs').'</h3>';
-        echo $this->render('/cours-date/_moniteur', [
-            'coursDateDataProvider' => $coursDateDataProvider,
-            'withSum' => false,
-            'sum' => 0,
-        ]);
-    } ?>
-    
-    <br /><h3><?= Yii::t('app', 'Mes cours comme participants') ?></h3>
-    <?= $this->render('/cours/_inscription', [
+    ]);
+    $tabClient .= '<br /><h3>' . Yii::t('app', 'Mes cours comme participants') . '</h3>';
+    $tabClient .= $this->render('/cours/_inscription', [
         'dataCours' => $dataCours,
         'personneModel' => $model,
         'coursDataProvider' => $coursDataProvider,
         'parametre' => $parametre,
         'emails' => $emails,
-    ]) ?>
+    ]);
+
+    $tabMoniteur = $this->render('/moniteurs/view', [
+        'model' => $model,
+        'modelMoniteur' => $model->moniteurInfo,
+        'personne_id' => $model->personne_id,
+        'type' => $model->fk_type,
+        'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
+        'coursDateDataProvider' => $coursDateDataProvider,
+    ]);
+    ?>
+
+    <?= Tabs::widget([
+        'navType' => 'nav-tabs',
+        'items' => [
+            [
+                'label' => Yii::t('app', 'Données client'),
+                'content' => '<br />' . $tabClient,
+                'active' => $activeTab == 'client',
+            ],
+            [
+                'label' => Yii::t('app', 'Données moniteur'),
+                'content' => '<br />' . $tabMoniteur,
+                'active' => $activeTab == 'moniteur',
+                'visible' => in_array($model->fk_type, Yii::$app->params['typeEncadrant']),
+            ],
+        ]
+    ])
+    ?>
 
 </div>

@@ -19,24 +19,13 @@ $this->params['breadcrumbs'][] = $this->title;
 // On créé les colonnes ici, comme ca réutilisable dans l'export et la gridview
 $gridColumnsBegin = [
     ['class' => 'kartik\grid\SerialColumn'],
-    
-    'statut',
+
     'type',
-    [
-        'attribute' => 'societe',
-        'format' => 'html',
-    ],
+    'no_cresus',
     'nom',
     'prenom',
-    'localite',
 ];
 $gridColumnsMiddle = [
-    [
-        'attribute' => 'fk_langues',
-        'label' => Yii::t('app', 'Langues parlées'),
-    ],
-    'email:email',
-    'telephone',
     [
         'attribute' => 'fk_formation',
         'label' => Yii::t('app', 'Barème par défaut'),
@@ -63,7 +52,13 @@ $gridColumnsEnd = [
             'update' => User::canRoute(['/personnes/update']),
             'listeHeures' => User::canRoute(['/personnes/viewmoniteur']),
         ],
-        'buttons'=>[
+        'buttons'=> [
+            'view' => function ($url) {
+                $url .= '&tab=moniteur';
+                return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, [
+                    'title' => Yii::t('app', 'Voir'),
+                ]);
+            },
             'listeHeures' => function ($url, $model, $key) use ($fromData) {
                 return Html::a('<span class="glyphicon glyphicon-calendar"></span>', Url::to(['viewmoniteur', 'id' => $key, 'fromData' => $fromData]), [
                     'title' => Yii::t('app', 'Voir les heures'),
@@ -73,7 +68,15 @@ $gridColumnsEnd = [
     ],
 ];
 $gridColumns = array_merge ($gridColumnsBegin, $gridColumnsMiddle, $gridColumnsHours, $gridColumnsEnd);
-$gridColumnsExport = array_merge($gridColumnsBegin, ['adresse1', 'adresse2', 'npa', 'date_naissance'], $gridColumnsMiddle, $gridColumnsHours, $gridColumnsEnd);
+$gridColumnsExport = array_merge(
+    $gridColumnsBegin,
+    ['adresse1', 'adresse2', 'npa', 'date_naissance', [
+            'attribute' => 'fk_langues', 'label' => Yii::t('app', 'Langues parlées')
+    ], 'email:email', 'telephone'],
+    $gridColumnsMiddle,
+    $gridColumnsHours,
+    $gridColumnsEnd
+);
 ?>
 
 <div class="personnes-moniteurs">

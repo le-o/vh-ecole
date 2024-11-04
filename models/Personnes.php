@@ -160,6 +160,16 @@ class Personnes extends \yii\db\ActiveRecord
         $this->fk_langues = json_decode($this->fk_langues);
         parent::afterSave($insert, $changedAttributes);
     }
+
+    /**
+     * Gets query for [[Moniteur]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMoniteurInfo()
+    {
+        return $this->hasOne(Moniteurs::class, ['fk_personne' => 'personne_id']);
+    }
     
     /**
      * @return Personne nom prénom

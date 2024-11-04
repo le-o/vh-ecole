@@ -13,8 +13,7 @@ use webvimark\modules\UserManagement\models\User;
 /* @var $searchModel app\models\PersonnesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Clients');
-$this->params['breadcrumbs'][] = Yii::t('app', 'Personnes');
+$this->title = Yii::t('app', 'Personnes');
 $this->params['breadcrumbs'][] = $this->title;
 
 $script = "$(document).on('click', '.showModalButton', function(){
@@ -48,11 +47,15 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 <div class="personnes-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <div class="row">
-        <div class="col-sm-6">
-            <?= Html::a(Yii::t('app', 'Create Client'), ['create'], ['class' => 'btn btn-success']) ?>
+        <div class="col-sm-12">
+            <?= Html::a(Yii::t('app', 'Créer personne'), ['create'], ['class' => 'btn btn-success']) ?>
+            <div class="btn-group">
+                <?php foreach ($buttonFilter as $f) { ?>
+                    <?= Html::a(Yii::t('app', $f['label']), ['index', 'filtre' => $f['filtre']], ['class' => 'btn btn-default' . $f['class']]) ?>
+                <?php } ?>
+            </div>
 
             <?php $form = ActiveForm::begin(['options' => ['style' => 'display:inline;']]); ?>
             <?php Modal::begin([

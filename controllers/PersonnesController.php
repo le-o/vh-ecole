@@ -27,6 +27,9 @@ use kartik\mpdf\Pdf;
  */
 class PersonnesController extends CommonController
 {
+
+    private $filtres = [];
+
     public function behaviors()
     {
         return [
@@ -41,6 +44,16 @@ class PersonnesController extends CommonController
             ],
         ];
     }
+
+    public function __construct($id, $module)
+    {
+        $this->filtres = [
+            'moniteursActifs' => Yii::$app->params['typeEncadrantActif'],
+            'moniteurs' => Yii::$app->params['typeEncadrant'],
+            'personnes' => false,
+        ];
+        parent::__construct($id, $module);
+    }
     
     // for route purpose only
     public function actionAdvanced() {}
@@ -49,10 +62,12 @@ class PersonnesController extends CommonController
      * Lists all Personnes models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($filtre = 'personnes')
     {
         $alerte = [];
         $searchModel = new PersonnesSearch();
+        $searchModel->fk_type = $this->filtres[$filtre];
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProviderAll = $searchModel->search(Yii::$app->request->queryParams, false);
         
@@ -67,7 +82,7 @@ class PersonnesController extends CommonController
             }
         }
 
-        if (!empty(Yii::$app->request->post())) {
+        if (!empty(Yii::$app->request->post()) && isset(Yii::$app->request->post()['checkedEmails'])) {
             $mail = Yii::$app->request->post();
             $this->actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
 
@@ -81,6 +96,24 @@ class PersonnesController extends CommonController
         $financeFilter = $parametre->optsFinance();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
 
+        $buttonFilter = [
+            [
+                'label' => 'Personnes',
+                'filtre' => 'personnes',
+                'class' => ($filtre == 'personnes') ? ' btn-info' : '',
+            ],
+            [
+                'label' => 'Moniteurs actifs',
+                'filtre' => 'moniteursActifs',
+                'class' => ($filtre == 'moniteursActifs') ? ' btn-info' : '',
+            ],
+            [
+                'label' => 'Tous les moniteurs',
+                'filtre' => 'moniteurs',
+                'class' => ($filtre == 'moniteurs') ? ' btn-info' : '',
+            ],
+        ];
+
         return $this->render('index', [
             'alerte' => $alerte,
             'searchModel' => $searchModel,
@@ -88,6 +121,7 @@ class PersonnesController extends CommonController
             'statutFilter' => $statutFilter,
             'salleFilter' => $salleFilter,
             'financeFilter' => $financeFilter,
+            'buttonFilter' => $buttonFilter,
             'parametre' => $parametre,
             'emails' => $emails,
             'listeEmails' => $listeEmails,
@@ -163,9 +197,8 @@ class PersonnesController extends CommonController
                 }
                 if (!$searchParCours || ($searchParCours && $heures !== 0)) {
                     $dataMoniteurs[$moniteur->personne_id]['personne_id'] = $moniteur->personne_id;
-                    $dataMoniteurs[$moniteur->personne_id]['statut'] = $moniteur->fkStatut->nom;
+                    $dataMoniteurs[$moniteur->personne_id]['no_cresus'] = (isset($moniteur->moniteurInfo) ? $moniteur->moniteurInfo->no_cresus : '');
                     $dataMoniteurs[$moniteur->personne_id]['type'] = $moniteur->fkType->nom;
-                    $dataMoniteurs[$moniteur->personne_id]['societe'] = $moniteur->societe;
                     $dataMoniteurs[$moniteur->personne_id]['nom'] = $moniteur->nom;
                     $dataMoniteurs[$moniteur->personne_id]['prenom'] = $moniteur->prenom;
                     $dataMoniteurs[$moniteur->personne_id]['adresse1'] = $moniteur->adresse1;
@@ -200,18 +233,18 @@ class PersonnesController extends CommonController
         // gestion du tri ici, car on a reconstruit le dataprovider manuellement
         $moniteursProvider->setSort([
             'attributes' => [
-                'statut' => [
-                    'asc' => ['statut' => SORT_ASC],
-                    'desc' => ['statut' => SORT_DESC],
-                ],
+//                'statut' => [
+//                    'asc' => ['statut' => SORT_ASC],
+//                    'desc' => ['statut' => SORT_DESC],
+//                ],
                 'type' => [
                     'asc' => ['type' => SORT_ASC],
                     'desc' => ['type' => SORT_DESC],
                 ],
-                'societe' => [
-                    'asc' => ['societe' => SORT_ASC],
-                    'desc' => ['societe' => SORT_DESC],
-                ],
+//                'societe' => [
+//                    'asc' => ['societe' => SORT_ASC],
+//                    'desc' => ['societe' => SORT_DESC],
+//                ],
                 'nom' => [
                     'asc' => ['nom' => SORT_ASC],
                     'desc' => ['nom' => SORT_DESC],
@@ -220,10 +253,10 @@ class PersonnesController extends CommonController
                     'asc' => ['prenom' => SORT_ASC],
                     'desc' => ['prenom' => SORT_DESC],
                 ],
-                'localite' => [
-                    'asc' => ['localite' => SORT_ASC],
-                    'desc' => ['localite' => SORT_DESC],
-                ],
+//                'localite' => [
+//                    'asc' => ['localite' => SORT_ASC],
+//                    'desc' => ['localite' => SORT_DESC],
+//                ],
             ],
             'defaultOrder' => [
                 'type' => SORT_ASC,
@@ -369,9 +402,10 @@ class PersonnesController extends CommonController
     /**
      * Displays a single Personnes model.
      * @param integer $id
+     * @param string $tab active tab
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($id, $tab = 'client')
     {
         $alerte = [];
         $model = $this->findModel($id);
@@ -472,11 +506,11 @@ class PersonnesController extends CommonController
             }
         }
         $coursDataProvider = new ArrayDataProvider([
-		    'allModels' => $dataCoursDate,
-		    'pagination' => [
-		        'pageSize' => 20,
-		    ],
-		]);
+            'allModels' => $dataCoursDate,
+            'pagination' => [
+                'pageSize' => 20,
+            ],
+        ]);
         
         $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['fk_statut' => [Yii::$app->params['coursActif']]])->all();
         $dataCours = [];
@@ -485,7 +519,7 @@ class PersonnesController extends CommonController
                 $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->session.' '.$c->fkSaison->nom.' '.$c->fkSalle->nom;
             } else {
                 foreach ($c->coursDates as $coursDate) {
-                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] = 
+                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] =
                             $c->fkNom->nom.' '.
                             $c->fkNiveau->nom.' '.
                             $c->session.' '.
@@ -500,13 +534,14 @@ class PersonnesController extends CommonController
         
         return $this->render('view', [
             'alerte' => $alerte,
-            'model' => $this->findModel($id),
+            'model' => $model,
             'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
             'coursDateDataProvider' => $coursDateDataProvider,
             'dataCours' => $dataCours,
             'coursDataProvider' => $coursDataProvider,
             'parametre' => $parametre,
             'emails' => $emails,
+            'activeTab' => $tab,
         ]);
     }
 
@@ -609,7 +644,7 @@ class PersonnesController extends CommonController
         
         $myInterlocuteurs = PersonnesHasInterlocuteurs::find()->where(['fk_personne' => $model->personne_id])->all();
         foreach ($myInterlocuteurs as $interlocuteur) {
-	        $selectedInterlocuteurs[] = $interlocuteur->fk_interlocuteur;
+            $selectedInterlocuteurs[] = $interlocuteur->fk_interlocuteur;
         }
         $modelInterlocuteurs = Personnes::find()->where(['!=', 'personne_id', $model->personne_id])->orderBy('nom, prenom')->all();
         foreach ($modelInterlocuteurs as $interlocuteur) {

@@ -75,7 +75,7 @@ class MoniteursHasBaremeController extends Controller
             $saveOtherOk = $this->editOtherBaremeDate($model);
 
             if ($saveOtherOk && $model->save()) {
-                return $this->redirect(['/personnes/view', 'id' => $model->fk_personne]);
+                return $this->redirect(['/personnes/view', 'id' => $model->fk_personne, 'tab' => 'moniteur']);
             }
         }
 
@@ -102,7 +102,7 @@ class MoniteursHasBaremeController extends Controller
             $saveOtherOk = $this->editOtherBaremeDate($model);
 
             if ($saveOtherOk && $model->save()) {
-                return $this->redirect(['/personnes/view', 'id' => $model->fk_personne]);
+                return $this->redirect(['/personnes/view', 'id' => $model->fk_personne, 'tab' => 'moniteur']);
             }
         }
 
@@ -124,7 +124,7 @@ class MoniteursHasBaremeController extends Controller
         $jsonData = json_decode($jsonData, true);
         $this->findModel($jsonData['fk_personne'], $jsonData['fk_bareme'], date('Y-m-d', strtotime($jsonData['date_debut'])))->delete();
 
-        return $this->redirect(['/personnes/view', 'id' => $jsonData['fk_personne']]);
+        return $this->redirect(['/personnes/view', 'id' => $jsonData['fk_personne'], 'tab' => 'moniteur']);
     }
 
     /**

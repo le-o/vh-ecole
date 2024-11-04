@@ -296,6 +296,14 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array options pays for drop-down
+     */
+    public function optsFormation($selectedParam = null)
+    {
+        return $this->optsDropDown(22, $selectedParam, null, false);
+    }
+
+    /**
      * @return array options from classkey for drop-down
      */
     public function optsDropDown($classKey, $selectedParam, $queryWhere = null, $restrictLangue = true)
@@ -350,6 +358,7 @@ class Parametres extends \yii\db\ActiveRecord
             '19' => 'Finances',
             '20' => 'Pays',
             '21' => 'Sexe',
+            '22' => 'Formation ASSE',
         );
     }
     
@@ -375,6 +384,6 @@ class Parametres extends \yii\db\ActiveRecord
             if($cl[$i]>255) $cl[$i]=255;
             $couleur.=StrToUpper(substr('0'.dechex($cl[$i]),-2));
         }
-        return '#'.$couleur; 
+        return '#'.$couleur;
     }
 }
