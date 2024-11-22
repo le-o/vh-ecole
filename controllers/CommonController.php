@@ -115,7 +115,7 @@ class CommonController extends Controller
             $dateheure .= 'Heure : '.substr($model->heure_debut, 0, 5) . '<br />';
         }
 
-        $baremePrestation = (!is_null($model->coursHasMoniteurs[0]->fk_bareme) ? $model->coursHasMoniteurs[0]->fkBareme->nom : 'barème par défaut');
+        $baremePrestation = (isset($model->coursHasMoniteurs[0]) && !is_null($model->coursHasMoniteurs[0]->fk_bareme) ? $model->coursHasMoniteurs[0]->fkBareme->nom : 'barème par défaut');
         
         // on génère l'email à envoyer
         return ['nom' => Yii::t('app', $model->fkCours->fkNom->nom).' - '.$cudObjet,

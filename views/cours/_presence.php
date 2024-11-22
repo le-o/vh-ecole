@@ -48,7 +48,7 @@ $this->title = Yii::t('app', 'Cours').' '.$model->fkNom->nom.' '.$model->fkNivea
                 
                 foreach ($coursDate as $pos => $date) {
                     $pres = $date->getForPresence($part->personne_id);
-                    if (date('Y-m-d', strtotime($date->date)) <= date('Y-m-d')) {
+                    if (!is_null($date->date) && date('Y-m-d', strtotime($date->date)) <= date('Y-m-d')) {
                         if ($pres == false) {
                             echo '<td style="background-color:gray; background-image: repeating-linear-gradient(315deg, transparent, transparent 3px, rgba(255,255,255,.5) 3px, rgba(255,255,255,.5) 6px);"></td>';
                         } elseif (!empty($pres)) {

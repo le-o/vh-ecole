@@ -14,10 +14,10 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.4.0",
-        "yiisoft/yii2": "~2.0.15",
+        "php": ">=8.2.0",
+        "yiisoft/yii2": "~2.0.51",
         "yiisoft/yii2-bootstrap": "*",
-        "yiisoft/yii2-swiftmailer": "*",
+        "yiisoft/yii2-symfonymailer": "~3.0.0",
         "kartik-v/yii2-widget-activeform": "@dev",
         "kartik-v/yii2-widget-datepicker": "@dev",
         "kartik-v/yii2-date-range": "*",
@@ -27,7 +27,7 @@
         "kartik-v/yii2-helpers": "dev-master",
         "kartik-v/yii2-grid": "@dev",
         "kartik-v/yii2-widget-fileinput": "@dev",
-        "kartik-v/yii2-export": "1.4.0",
+        "kartik-v/yii2-export": "1.4.3",
         "kartik-v/yii2-widget-colorinput": "*",
         "kartik-v/yii2-mpdf": "*",
         "kartik-v/yii2-widget-depdrop": "*",
@@ -41,7 +41,6 @@
         "xstreamka/yii2-mobile-detect": "*"
     },
     "require-dev": {
-        "codeception/codeception": "*",
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*"
@@ -59,6 +58,12 @@
                 "url": "https://github.com/twitter/typeahead.js.git"
                 }
             }
+        },
+        "allow-plugins": {
+            "composer/installers": true,
+            "yiisoft/yii2-composer": true,
+            "oomphinc/composer-installers-extender": true,
+            "robloach/component-installer": true
         }
     },
     "scripts": {
@@ -84,6 +89,10 @@
         {
             "type": "git",
             "url": "https://github.com/le-o/yii2fullcalendar.git"
+        },
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
         }
     ]
 }

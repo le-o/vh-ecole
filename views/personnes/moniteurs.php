@@ -6,6 +6,8 @@ use kartik\grid\GridView;
 use yii\helpers\Url;
 use kartik\export\ExportMenu;
 
+ini_set('memory_limit', '-1');
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PersonnesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -20,8 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
 $gridColumnsBegin = [
     ['class' => 'kartik\grid\SerialColumn'],
 
-    'type',
-    'no_cresus',
+    [
+        'attribute' => 'no_cresus',
+        'format' => 'raw',
+    ],
     'nom',
     'prenom',
 ];
@@ -46,10 +50,9 @@ $gridColumnsEnd = [
     ],
 
     ['class' => 'yii\grid\ActionColumn',
-        'template'=>'{view} {update} {listeHeures}',
+        'template'=>'{view} {listeHeures}',
         'visibleButtons'=>[
             'view' => User::canRoute(['/personnes/view']),
-            'update' => User::canRoute(['/personnes/update']),
             'listeHeures' => User::canRoute(['/personnes/viewmoniteur']),
         ],
         'buttons'=> [
@@ -100,13 +103,13 @@ $gridColumnsExport = array_merge(
             echo ExportMenu::widget([
                 'dataProvider' => $moniteursProvider,
                 'columns' => $gridColumnsExport,
+                'batchSize' => 50,
                 'target' => ExportMenu::TARGET_SELF,
                 'showConfirmAlert' => false,
                 'showColumnSelector' => true,
                 'columnBatchToggleSettings' => [
                     'label' => Yii::t('app', 'Tous/aucun'),
                 ],
-                'noExportColumns' => [12],
                 'dropdownOptions' => [
                     'class' => 'btn btn-default',
                     'label' => Yii::t('app', 'Exporter tous'),

@@ -78,8 +78,8 @@ class CoursDate extends \yii\db\ActiveRecord
      */
     public function afterFind()
     {
-        $this->date = date('d.m.Y', strtotime($this->date));
-        $this->heure_debut = substr($this->heure_debut, 0, 5);
+        $this->date = date('d.m.Y', strtotime($this->date ?? ''));
+        $this->heure_debut = substr($this->heure_debut ?? '', 0, 5);
         parent::afterFind();
     }
     

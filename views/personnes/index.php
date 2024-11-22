@@ -114,7 +114,7 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             [
                 'attribute' => 'fk_salle_admin',
                 'value' => function ($model) {
-                    return ('' != $model->fk_salle_admin) ? $model->fkSalleadmin->nom : '';
+                    return ('' != $model->fk_salle_admin) ? $model->fkSalleadmin->nom ?? '' : '';
                 },
                 'filter' => $salleFilter,
             ],

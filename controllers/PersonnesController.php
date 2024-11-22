@@ -137,6 +137,8 @@ class PersonnesController extends CommonController
         $this->layout = 'main_full';
         $searchModel = new PersonnesSearch();
 
+        ini_set('memory_limit', -1);
+
         // si profil moniteur, accès uniquement à ses données
         if ($isMoniteur) {
             $searchModel->personne_id = Yii::$app->user->fkpersonne;
@@ -197,8 +199,7 @@ class PersonnesController extends CommonController
                 }
                 if (!$searchParCours || ($searchParCours && $heures !== 0)) {
                     $dataMoniteurs[$moniteur->personne_id]['personne_id'] = $moniteur->personne_id;
-                    $dataMoniteurs[$moniteur->personne_id]['no_cresus'] = (isset($moniteur->moniteurInfo) ? $moniteur->moniteurInfo->no_cresus : '');
-                    $dataMoniteurs[$moniteur->personne_id]['type'] = $moniteur->fkType->nom;
+                    $dataMoniteurs[$moniteur->personne_id]['no_cresus'] = (isset($moniteur->moniteurInfo) ? $moniteur->moniteurInfo->no_cresus : '<!--n/a-->');
                     $dataMoniteurs[$moniteur->personne_id]['nom'] = $moniteur->nom;
                     $dataMoniteurs[$moniteur->personne_id]['prenom'] = $moniteur->prenom;
                     $dataMoniteurs[$moniteur->personne_id]['adresse1'] = $moniteur->adresse1;
@@ -233,18 +234,14 @@ class PersonnesController extends CommonController
         // gestion du tri ici, car on a reconstruit le dataprovider manuellement
         $moniteursProvider->setSort([
             'attributes' => [
-//                'statut' => [
-//                    'asc' => ['statut' => SORT_ASC],
-//                    'desc' => ['statut' => SORT_DESC],
-//                ],
                 'type' => [
                     'asc' => ['type' => SORT_ASC],
                     'desc' => ['type' => SORT_DESC],
                 ],
-//                'societe' => [
-//                    'asc' => ['societe' => SORT_ASC],
-//                    'desc' => ['societe' => SORT_DESC],
-//                ],
+                'no_cresus' => [
+                    'asc' => ['no_cresus' => SORT_ASC],
+                    'desc' => ['no_cresus' => SORT_DESC],
+                ],
                 'nom' => [
                     'asc' => ['nom' => SORT_ASC],
                     'desc' => ['nom' => SORT_DESC],
@@ -253,14 +250,9 @@ class PersonnesController extends CommonController
                     'asc' => ['prenom' => SORT_ASC],
                     'desc' => ['prenom' => SORT_DESC],
                 ],
-//                'localite' => [
-//                    'asc' => ['localite' => SORT_ASC],
-//                    'desc' => ['localite' => SORT_DESC],
-//                ],
             ],
             'defaultOrder' => [
-                'type' => SORT_ASC,
-                'nom' => SORT_ASC
+                'no_cresus' => SORT_ASC
             ]
         ]);
         

@@ -129,8 +129,8 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function afterFind()
     {
-        $this->date_naissance = ($this->date_naissance == '0000-00-00') ? '' : date('d.m.Y', strtotime($this->date_naissance));
-        $this->fk_langues = json_decode($this->fk_langues);
+        $this->date_naissance = (is_null($this->date_naissance) || $this->date_naissance == '0000-00-00') ? '' : date('d.m.Y', strtotime($this->date_naissance));
+        $this->fk_langues = json_decode($this->fk_langues ?? '');
 
         $this->setNopersonnel();
 
