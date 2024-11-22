@@ -31,7 +31,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'fkCours',
                 'value' => 'fkCours.fkNom.nom',
             ],
-            'lieu',
+            [
+                'attribute' => 'fkLieu',
+                'value' => 'fkLieu.nom',
+            ],
             [
                 'attribute' => 'participantMin',
                 'value' => 'fkCours.participant_min',

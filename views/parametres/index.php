@@ -41,6 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'html',
             ],
             'info_special',
+            'date_fin_validite',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

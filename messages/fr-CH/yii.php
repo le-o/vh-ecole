@@ -18,6 +18,7 @@
  */
 return [
     'Delete' => 'Supprimer',
+    'Imprimer' => 'Imprimer',
     'Update' => 'Modifier',
     'View' => 'Voir',
 ];

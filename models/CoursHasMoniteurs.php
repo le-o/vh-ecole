@@ -9,10 +9,12 @@ use Yii;
  *
  * @property integer $fk_cours_date
  * @property integer $fk_moniteur
+ * @property integer $fk_bareme
  * @property integer $is_responsable
  *
  * @property Personnes $fkMoniteur
  * @property CoursDate $fkCoursDate
+ * @property Parametres $fkBareme
  */
 class CoursHasMoniteurs extends \yii\db\ActiveRecord
 {
@@ -31,7 +33,7 @@ class CoursHasMoniteurs extends \yii\db\ActiveRecord
     {
         return [
             [['fk_cours_date', 'fk_moniteur', 'is_responsable'], 'required'],
-            [['fk_cours_date', 'fk_moniteur', 'is_responsable'], 'integer']
+            [['fk_cours_date', 'fk_moniteur', 'is_responsable'], 'integer'],
         ];
     }
 
@@ -43,6 +45,7 @@ class CoursHasMoniteurs extends \yii\db\ActiveRecord
         return [
             'fk_cours_date' => Yii::t('app', 'Fk Cours Date'),
             'fk_moniteur' => Yii::t('app', 'Fk Moniteur'),
+            'fk_bareme' => Yii::t('app', 'Barème'),
             'is_responsable' => Yii::t('app', 'Is Responsable'),
         ];
     }
@@ -61,5 +64,28 @@ class CoursHasMoniteurs extends \yii\db\ActiveRecord
     public function getFkCoursDate()
     {
         return $this->hasOne(CoursDate::className(), ['cours_date_id' => 'fk_cours_date']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFkBareme()
+    {
+        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_bareme']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if (0 == $this->fk_bareme) {
+                $this->fk_bareme = null;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 }

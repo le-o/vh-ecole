@@ -6,7 +6,6 @@ use yii\grid\GridView;
 use kartik\select2\Select2;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
-use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
@@ -17,32 +16,45 @@ use yii\bootstrap\Modal;
     
     <?= GridView::widget([
         'dataProvider' => $coursDateDataProvider,
+        'showFooter' => $withSum,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             
             'date',
-            'fkCours.fkNom.nom',
+            [
+                'label' => Yii::t('app', 'Nom'),
+                'value' => function($data) {
+                    if (isset($data->fkCours)) return $data->fkCours->fkNom->nom;
+                    return $data['nom'];
+                },
+            ],
             'heure_debut',
             [
                 'label' => Yii::t('app', 'Heure Fin'),
                 'value' => function($data) {
-                    return $data->heureFin;
+                    return (isset($data->heureFin) ? $data->heureFin : $data['heure_fin']);
                 },
             ],
-            'lieu',
-            'duree',
-            'remarque',
-            
-//            ['class' => 'yii\grid\ActionColumn',
-//                'template'=>'{coursView}',
-//                'buttons'=>[
-//                    'coursView' => function ($model, $key, $index) {
-//                    	return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours/view', 'id' => $index]), [
-//							'title' => Yii::t('app', 'Voir'),
-//						]);
-//                    }
-//                ],
-//            ],
+            [
+                'label' => Yii::t('app', 'Lieu'),
+                'value' => function($data) {
+                    return (isset($data->fkLieu) ? $data->fkLieu->nom : $data['lieu']);
+                },
+                'footer' => '<strong>' . Yii::t('app', 'Total') . '</strong>',
+            ],
+            [
+                'attribute' => 'bareme',
+                'visible' => $withSum,
+            ],
+            [
+                'attribute' => 'duree',
+                'format' => ['decimal', 2],
+                'footer' => '<strong>' . $sum . '</strong>',
+            ],
+            [
+                'attribute' => 'remarque',
+                'visible' => !$withSum,
+            ],
         ],
     ]); ?>
 

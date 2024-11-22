@@ -8,18 +8,22 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model app\models\Cours */
 
-$this->title = Yii::t('app', 'Liste des présences cours').' '.$model->fkNom->nom;
+$this->title = Yii::t('app', 'Cours').' '.$model->fkNom->nom.' '.$model->fkNiveau->nom.' - '.
+        $model->fkJoursNoms.' '.$model->firstCoursDate->heure_debut.' '. (isset($model->fk_saison) ? $model->fkSaison->nom : '');
+
 ?>
 
 <div class="cours-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 
     <?php foreach ($decoupage as $coursDate) { ?>
         <table>
             <tr class="entete">
-                <td colspan="4" class="titre">
-                    <?= $model->fkNom->nom.' Session '.$model->session.'.'.$model->annee.' / '.$model->prix.'.-' ?>
+                <td colspan="5" style="text-align: left;">
+                    <span style="font-weight: normal;">
+                        <?= (isset($model->nextCoursDate)) ? $model->nextCoursDate->getCoursHasMoniteursListe($model->nextCoursDate->coursHasMoniteurs, '<br />') : '' ?>
+                    </span>
                 </td>
                 <?php
                 foreach ($coursDate as $date) {
@@ -39,21 +43,33 @@ $this->title = Yii::t('app', 'Liste des présences cours').' '.$model->fkNom->no
                 echo '<td class="num">'.$i.'</td>';
                 echo '<td>'.$part->nom.'</td>';
                 echo '<td>'.$part->prenom.'</td>';
-                echo '<td class="num"></td>';
+                echo '<td class="num" style="text-align:right;">'.$part->age.'</td>';
+                echo '<td nowrap="nowrap">'.$part->statutPart.'</td>';
+                
                 foreach ($coursDate as $pos => $date) {
-                    if (date('Y-m-d', strtotime($date->date)) <= date('Y-m-d')) {
-                        $pres = $date->getForPresence($part->personne_id);
-                        if (!empty($pres)) {
+                    $pres = $date->getForPresence($part->personne_id);
+                    if (!is_null($date->date) && date('Y-m-d', strtotime($date->date)) <= date('Y-m-d')) {
+                        if ($pres == false) {
+                            echo '<td style="background-color:gray; background-image: repeating-linear-gradient(315deg, transparent, transparent 3px, rgba(255,255,255,.5) 3px, rgba(255,255,255,.5) 6px);"></td>';
+                        } elseif (!empty($pres)) {
                             if ($pres->is_present == true) {
                                 echo '<td style="text-align: center;">x</td>';
                             } else {
                                 echo '<td style="background-color: grey;"></td>';
                             }
                         } else {
-                            echo '<td></td>';
+                            echo '<td style="background-color: red;"></td>';
                         }
                     } else {
-                        echo '<td></td>';
+                        if ($pres == false) {
+                            echo '<td style="background-color:gray; background-image: repeating-linear-gradient(315deg, transparent, transparent 3px, rgba(255,255,255,.5) 3px, rgba(255,255,255,.5) 6px);"></td>';
+                        } elseif (!empty($pres)) {
+                            if ($pres->is_present == true) {
+                                echo '<td></td>';
+                            } else {
+                                echo '<td style="background-color: grey;"></td>';
+                            }
+                        } else echo '<td></td>';
                     }
                 }
                 echo '<td></td>';

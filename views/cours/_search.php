@@ -25,12 +25,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'annee') ?>
 
-    <?php // echo $form->field($model, 'participant_min') ?>
-
-    <?php // echo $form->field($model, 'participant_max') ?>
-
-    <?php // echo $form->field($model, 'is_actif') ?>
-
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
         <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>

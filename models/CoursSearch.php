@@ -15,6 +15,13 @@ class CoursSearch extends Cours
     public $fkNiveau;
     public $fkType;
     public $fkNom;
+    public $fkSaison;
+    public $fkSemestre;
+    public $fkStatut;
+    public $fkJours;
+    public $isPriorise;
+    
+    public $bySalle;
     
     /**
      * @inheritdoc
@@ -22,9 +29,9 @@ class CoursSearch extends Cours
     public function rules()
     {
         return [
-            [['cours_id', 'participant_min', 'participant_max', 'session', 'is_actif'], 'integer'],
+            [['cours_id', 'participant_min', 'participant_max'], 'integer'],
             [['duree', 'prix'], 'double'],
-            [['description', 'annee', 'fkNiveau', 'fkType', 'fkNom'], 'safe'],
+            [['description', 'annee', 'session', 'fkNiveau', 'fkType', 'fkNom', 'fkSaison', 'fkStatut'], 'safe'],
         ];
     }
 
@@ -44,16 +51,14 @@ class CoursSearch extends Cours
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $pageSize = 60)
     {
         $query = Cours::find();
-//        $query->joinWith(['fkNiveau', 'fkType', 'fkNom']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['is_actif'=>SORT_DESC, 'fkNom'=>SORT_ASC]],
             'pagination' => [
-                'pagesize' => 80,
+                'pagesize' => $pageSize,
             ],
         ]);
 
@@ -64,17 +69,34 @@ class CoursSearch extends Cours
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        
         $query->andFilterWhere([
             'cours_id' => $this->cours_id,
             'duree' => $this->duree,
-            'session' => $this->session,
             'annee' => $this->annee,
             'prix' => $this->prix,
             'participant_min' => $this->participant_min,
             'participant_max' => $this->participant_max,
-            'is_actif' => $this->is_actif,
-        ]);
+            'fk_statut' => $this->fkStatut,
+            'is_publie' => $this->is_publie,
+            'fk_saison' => $this->fkSaison,
+        ])
+        ->andFilterWhere(['IN', 'fk_salle', $this->bySalle])
+        ->andFilterWhere(['like', 'session', $this->session]);
+        
+//        $query->andWhere(['IN', 'fk_salle', $this->bySalle]);
+        
+        if ($this->isPriorise == true) {
+            $query->andWhere(['NOT', ['tri_internet' => null]]);
+            $query->orderBy('tri_internet');
+        }
+        
+        $query->joinWith(['fkLangue' => function($langue) {
+            $langue->alias('langue');
+        }]);
+        $query->joinWith(['fkAge' => function($age) {
+            $age->alias('age');
+        }]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);
         
@@ -103,11 +125,33 @@ class CoursSearch extends Cours
             $nom->where('nom.nom LIKE "%'.$this->fkNom.'%"');
         }]);
         $dataProvider->sort->attributes['fkNom'] = [
-            // The tables are the ones our relation are configured to
-            // in my case they are prefixed with "tbl_"
             'asc' => ['nom.nom' => SORT_ASC],
             'desc' => ['nom.nom' => SORT_DESC],
         ];
+        $query->joinWith(['fkSaison' => function ($nom) {
+            $nom->alias('saison');
+//            $nom->where('saison.nom LIKE "%'.$this->fkSaison.'%"');
+        }]);
+        $dataProvider->sort->attributes['fkSaison'] = [
+            'asc' => ['saison.nom' => SORT_ASC],
+            'desc' => ['saison.nom' => SORT_DESC],
+        ];
+        $query->joinWith(['fkStatut' => function ($nom) {
+            $nom->alias('statut');
+        }]);
+        $dataProvider->sort->attributes['fkStatut'] = [
+            'asc' => ['statut.nom' => SORT_ASC],
+            'desc' => ['statut.nom' => SORT_DESC],
+        ];
+        $query->joinWith(['fkSemestre' => function ($nom) {
+            $nom->alias('semestre');
+//            $nom->where('semestre.nom LIKE "%'.$this->fkSemestre.'%"');
+        }]);
+        $dataProvider->sort->attributes['fkSemestre'] = [
+            'asc' => ['semestre.nom' => SORT_ASC],
+            'desc' => ['semestre.nom' => SORT_DESC],
+        ];
+        $dataProvider->sort->defaultOrder = ['fk_statut'=>SORT_ASC, 'fkNom'=>SORT_ASC];
 
         return $dataProvider;
     }

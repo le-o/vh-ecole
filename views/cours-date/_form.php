@@ -5,21 +5,11 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use kartik\time\TimePicker;
-use yii\bootstrap\Alert;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-
-<?php if (!empty($alerte)) {
-    echo Alert::widget([
-        'options' => [
-            'class' => 'alert-'.$alerte['class'],
-        ],
-        'body' => $alerte['message'],
-    ]);
-} ?>
 
 <div class="cours-date-form">
 
@@ -34,6 +24,12 @@ use yii\bootstrap\Alert;
 			        'allowClear' => true
 			    ],
 			]) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model->fkCours, 'participant_min')->textInput(['disabled' => true]) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model->fkCours, 'participant_max')->textInput(['disabled' => true]) ?>
         </div>
     </div>
     <div class="row">
@@ -65,7 +61,7 @@ use yii\bootstrap\Alert;
     </div>
     
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
 	        <label class="control-label" for="w1"><?= Yii::t('app', 'Fk Moniteur'); ?></label>
 	        <?= Select2::widget([
 				'name' => 'list_moniteurs',
@@ -78,8 +74,15 @@ use yii\bootstrap\Alert;
 			    ],
 			]); ?>
         </div>
+        <div class="col-sm-2">
+            <?php
+            $option = ['reinit' => Yii::t('app', 'Supprimer le barème fixe')];
+            $formations = $option + $modelParams->optsBaremeMoniteur();
+            ?>
+            <?= $form->field($model, 'baremeMoniteur')->dropDownList($formations, ['prompt'=>Yii::t('app', 'Fixer la barème')]) ?>
+        </div>
         <div class="col-sm-6">
-			<?= $form->field($model, 'lieu')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu($model->fk_lieu)) ?>
         </div>
     </div>
     
@@ -89,16 +92,23 @@ use yii\bootstrap\Alert;
         </div>
     </div>
     
-    <?php if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel']) { ?>
     <div class="row">
         <div class="col-sm-3">
             <?= $form->field($model, 'nb_client_non_inscrit')->textInput(['type' => 'number', 'step' => '1']) ?>
         </div>
     </div>
-    <?php } ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?php if (!$model->isNewRecord) { ?>
+        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_date_id], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                'method' => 'post',
+            ],
+        ]) ?>
+        <?php } ?>
     </div>
 
     <?php ActiveForm::end(); ?>

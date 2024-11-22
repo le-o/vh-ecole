@@ -8,6 +8,7 @@ use yii\bootstrap\Alert;
 use yii\helpers\Url;
 use yii\web\View;
 use yii\bootstrap\Modal;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CoursDate */
@@ -40,9 +41,9 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
 <div class="cours-participant-form">
 
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if ((User::canRoute(['cours/gestionpresences']) || User::canRoute(['/cours/presence'])) && true == $hasPlanification) { ?>
         <div class="row">
-            <?php if ($isInscriptionOk) { ?>
+            <?php if ($isInscriptionOk && User::canRoute(['cours/gestioninscriptions'])) { ?>
 
                 <?php $form = ActiveForm::begin(); ?>
                     <div class="col-sm-4">
@@ -63,9 +64,10 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                 <?php ActiveForm::end(); ?>
             <?php } ?>
 
-            <?php if (!$forPresenceOnly) { ?>
-                <?php $form = ActiveForm::begin(); ?>
-                <div class="col-sm-4">
+            <?php $form = ActiveForm::begin(); ?>
+            <div class="col-sm-7">
+                <?php if (User::canRoute(['cours/gestioninscriptions'])) { ?>
+                    <?= Html::a(Yii::t('app', 'Gestion inscription'), ['cours/gestioninscriptions', 'cours_id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => ($model->getNombreClients() == 0) ? 'btn btn-default disabled' : 'btn btn-default']) ?>
                     <?php Modal::begin([
                         'header' => '<h3>'.Yii::t('app', 'Contenu du message à envoyer').'</h3>',
                         'toggleButton' => ['label' => Yii::t('app', 'Envoyer un email'), 'class' => 'btn btn-default'],
@@ -73,8 +75,13 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
 
                     echo '<a id="toggleEmail" href="#">'.Yii::t('app', 'Voir email(s)').'</a>';
                     echo '<div id="item" style="display:none;">';
-                    echo implode(', ', $listeEmails);
+                    echo $form->field($parametre, 'listeEmails')->textarea()->label(false);
                     echo '</div>';
+
+                    $parametre->keyForMail = $viewAndId[1];
+                    $parametre->listePersonneId = implode('|', $participantIDs);
+                    echo $form->field($parametre, 'keyForMail')->hiddenInput()->label(false);
+                    echo $form->field($parametre, 'listePersonneId')->hiddenInput()->label(false);
 
                     echo $form->field($parametre, 'parametre_id')->dropDownList(
                         $emails,
@@ -88,46 +95,56 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                                 $.each( response, function( key, val ) {
                                     $('#parametres-nom').attr('value', val.sujet);
                                     $('.redactor-editor').html(val.contenu);
+                                    $('#parametres-valeur').val(val.contenu);
                                 });
                             }
                         });return false;",
                         ])->label(Yii::t('app', 'Modèle'));
 
                     echo $form->field($parametre, 'nom')->textInput()->label(Yii::t('app', 'Sujet'));
+                    echo Yii::$app->view->renderFile('@app/views/site/dynamicFields.php');
                     echo $form->field($parametre, 'valeur')->widget(\yii\redactor\widgets\Redactor::className())->label(Yii::t('app', 'Texte'));
 
                     echo Html::submitButton(Yii::t('app', 'Envoyer'), ['class' => 'btn btn-primary']);
                     Modal::end(); ?>
-
-                    <?= Html::a(Yii::t('app', 'Imprimer'), ['/cours/presence', 'id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => 'btn btn-default']) ?>
-                </div>
-                <?php ActiveForm::end(); ?>
-            <?php } ?>
+                <?php } ?>
+                    
+                <?php if (!$forPresenceOnly || User::canRoute(['/cours/presence'])) { ?>
+                    <?php $nomBouton = (User::hasRole(['accueil', 'moniteurs'])) ? Yii::t('app', 'Imprimer la liste des participants') : Yii::t('app', 'Imprimer'); ?>
+                    <?= Html::a($nomBouton, ['/cours/presence', 'id' => (isset($model->cours_id) ? $model->cours_id : $model->fk_cours)], ['class' => 'btn btn-default']) ?>
+                <?php } ?>
+            </div>
+            <?php ActiveForm::end(); ?>
         </div>
     <?php } ?>
     
     <?= GridView::widget([
         'dataProvider' => $participantDataProvider,
         'id' => 'participantgrid',
+        'rowOptions' => function($model){
+            if(Yii::$app->params['partDesinscrit'] == $model->statutPartID){
+                return ['class' => 'danger'];
+            }
+        },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             
             [
-                'attribute' => 'fkStatut.nom',
+                'attribute' => 'statutPart',
                 'label' => 'Statut',
-                'visible' => (isset($model->fk_type) && $model->fk_type == Yii::$app->params['coursPlanifie']) ? true : false,
             ],
+            'suivi_client',
             'societe',
             'nom',
             'prenom',
             'age',
             [
                 'attribute' => 'email',
-                'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
+                'visible' => User::canRoute(['/personnes/advanced']),
             ],
             [
                 'attribute' => 'telephone',
-                'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
+                'visible' => User::canRoute(['/personnes/advanced']),
             ],
             [
                 'label' => Yii::t('app', 'interlocuteur'),
@@ -139,28 +156,38 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
             [
                 'class' => 'yii\grid\CheckboxColumn',
                 'header' => Yii::t('app', 'present?'),
-                'visible' => $forPresenceOnly,
+                'visible' => ($forPresenceOnly && User::canRoute(['/cours-date/presence'])),
                 'checkboxOptions' => function ($data, $key, $index, $column) use ($model, $forPresenceOnly) {
                     if ($forPresenceOnly) {
                         $bool = $data->getClientsHasOneCoursDate($model->cours_date_id);
-                        return ['value' => $key, 'checked' => $bool->is_present];
+                        return ['value' => $key, 'checked' => (isset($bool->is_present)) ? (bool)$bool->is_present : false];
                     }
                     return '';
                 }
             ],
             
             ['class' => 'yii\grid\ActionColumn',
-                'template'=>'{partView} {partDeleteFutur} {partDelete}',
+                'template'=>'{partView} {partUpdate} {partDeleteFutur} {partDelete}',
                 'visibleButtons'=>[
-                    'partView' => (Yii::$app->user->identity->id < 1100) ? true : false,
-                    'partDeleteFutur' => (Yii::$app->user->identity->id < 1000) ? (isset($model->fk_type) ? $model->fk_type == Yii::$app->params['coursPlanifie'] : $model->fkCours->fk_type  == Yii::$app->params['coursPlanifie']) : false,
-                    'partDelete' => (Yii::$app->user->identity->id < 1000) ? true : false,
+                    'partView' => User::canRoute(['/personnes/view']),
+                    'partUpdate' => (User::canRoute(['/clients-has-cours/update']) && $viewAndId[0] != 'cours-date') ? true : false,
+                    'partDeleteFutur' => (User::canRoute(['/cours/participant-delete']) && $model::className() == 'app\models\Cours') ? (isset($model->fk_type) ? in_array($model->fk_type, Yii::$app->params['coursPlanifieS']) : in_array($model->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) : false,
+                    'partDelete' => (User::canRoute(['/cours/participant-delete']) &&
+                                        ('app\models\Cours' == $model::className() || ('app\models\CoursDate' == $model::className() && Yii::$app->params['coursUnique'] == $model->fkCours->fk_type))
+                                    ) ? true : false,
                 ],
                 'buttons'=>[
                     'partView' => function ($model, $key, $index) {
                         if ($key->personne_id != '') {
                             return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/personnes/view', 'id' => $key->personne_id]), [
                                 'title' => Yii::t('app', 'Voir'),
+                            ]);
+                        }
+                    },
+                    'partUpdate' => function ($model, $key, $index) use ($viewAndId) {
+                        if ($key->personne_id != '') {
+                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/clients-has-cours/update', 'fk_personne' => $key->personne_id, 'fk_cours' => $viewAndId[1]]), [
+                                'title' => Yii::t('app', 'Modifier statut'),
                             ]);
                         }
                     },
@@ -176,14 +203,14 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                         if ($key->personne_id != '') {
                             return Html::a('<span class="glyphicon glyphicon-trash"></span>', Url::to(['/cours/participant-delete', 'personne_id' => $key->personne_id, 'cours_ou_date_id' => $viewAndId[1], 'from' => $viewAndId[0]]), [
                                 'title' => Yii::t('yii', 'Delete'),
-                                'data-confirm' => Yii::t('app', 'Vous allez supprimer le participant de toutes les planifications. OK?'),
+                                'data-confirm' => Yii::t('app', 'Vous allez supprimer le participant uniquement sur cette date. OK?'),
                             ]);
                         }
                     }
                 ],
             ],
         ],
-        'caption' => ($isInscriptionOk) ? (Yii::$app->user->identity->id < 1000) ? '' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Liste des participants').'</div></div>' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Nombre participant max atteint').'</div></div>',
+        'caption' => ($isInscriptionOk) ? (!User::hasRole(['accueil', 'moniteurs'])) ? '' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Liste des participants').'</div></div>' : '<div class="row"><div class="col-sm-3">'.Yii::t('app', 'Nombre participant max atteint').'</div></div>',
     ]); ?>
     
     <?php if ($forPresenceOnly) {
@@ -197,7 +224,6 @@ $this->registerJs('$("#toggleEmail").click(function() { $( "#item" ).toggle(); }
                     dataType: "json",
                     data: {"personne": key, "coursdate": "'.$model->cours_date_id.'"},
                     success: function(data) {
-                        console.log("Personne ID " + key + " - " + data.message);
                         $("#msg").html(data.message).toggle();
                         $("#msg").delay(600).fadeOut("slow");
                     },

@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 use yii\grid\GridView;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Cours */
@@ -27,26 +28,27 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
-    <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->cours_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->cours_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Vous allez supprimer le cours ainsi que tous les participants et toutes les planifications. OK?'),
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-    <?php } ?>
+    <?php if (User::canRoute(['cours/update'])) { ?>
+    
+     <?= $this->render('_form', [
+            'alerte' => '',
+            'model' => $model,
+            'modelParams' => $modelParams,
+    ]) ?>
+    
+    <?php } else { ?>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'cours_id',
             [
-                'label' => Yii::t('app', 'Is Actif'),
-                'value' => ($model->is_actif) ? 'Oui' : 'Non',
+                'label' => Yii::t('app', 'Statut'),
+                'attribute' => 'fkStatut.nom',
+            ],
+            [
+                'label' => Yii::t('app', 'Fk Salle'),
+                'attribute' => 'fkSalle.nom',
             ],
             [
                 'label' => Yii::t('app', 'Fk Niveau'),
@@ -63,32 +65,44 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'duree',
             'session',
             'annee',
+            [
+                'label' => Yii::t('app', 'Fk Saison'),
+                'attribute' => 'fkSaison.nom',
+            ],
 //            'prix',
             'participant_min',
             'participant_max',
             'description:ntext',
         ],
     ]) ?>
-
-    <?php if ($model->fk_type == Yii::$app->params['coursPlanifie']) { ?>
-        <?= $this->render('/personnes/_participant', [
-            'alerte' => '',
-            'model' => $model,
-            'viewAndId' => ['cours', $model->cours_id],
-            'isInscriptionOk' => ($participantDataProvider->totalCount < $model->participant_max) ? true : false,
-            'dataClients' => $dataClients,
-            'participantDataProvider' => $participantDataProvider,
-            'parametre' => $parametre,
-            'emails' => $emails,
-            'listeEmails' => $listeEmails,
-            'forPresenceOnly' => false,
-        ]) ?>
-    <?php } ?>
     
+    <?php } ?>
+
+    
+    <?= $this->render('/personnes/_participant', [
+        'alerte' => '',
+        'model' => $model,
+        'viewAndId' => ['cours', $model->cours_id],
+        'isInscriptionOk' => (User::hasRole('Admin') || $participantDataProvider->totalCount < $model->participant_max) ? true : false,
+        'dataClients' => $dataClients,
+        'participantDataProvider' => $participantDataProvider,
+        'participantIDs' => $participantIDs,
+        'parametre' => $parametre,
+        'emails' => $emails,
+        'forPresenceOnly' => false,
+        'hasPlanification' => (0 == $coursDateProvider->totalCount) ? false : true,
+    ]) ?>
+    
+    <?php
+    $actionButtons = (User::canRoute(['cours-date/create'])) ? Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary']) : '';
+    $actionButtons .= (User::canRoute(['cours-date/recursive'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Create Cours Date Multiple'), ['cours-date/recursive', 'cours_id' => $model->cours_id], ['class' => 'btn btn-info']) : '';
+    $actionButtons .= (User::canRoute(['cours/gestionmoniteurs'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Gestion moniteurs'), ['cours/gestionmoniteurs', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default']) : '';
+    $actionButtons .= (User::canRoute(['cours/gestionpresences'])) ? '&nbsp;'.Html::a(Yii::t('app', 'Gestion présences'), ['cours/gestionpresences', 'cours_id' => $model->cours_id], ['class' => 'btn btn-default']) : '';
+    ?>
     <?= GridView::widget([
         'dataProvider' => $coursDateProvider,
         'rowOptions' => function($model) {
-            if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel'] && $model->nombreClientsInscrits >= $model->fkCours->participant_max) return ['class' => 'warning'];
+            if ($model->fkCours->fk_type == Yii::$app->params['coursPonctuel'] && $model->getNombreClientsInscrits() >= $model->fkCours->participant_max) return ['class' => 'warning'];
             return [];
         },
         'columns' => [
@@ -103,9 +117,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'duree',
             [
                 'attribute' => 'prix',
-                'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
+                'visible' => User::canRoute(['/cours/advanced']),
             ],
-            'lieu',
+            [
+                'label' => Yii::t('app', 'Lieu'),
+                'attribute' => 'fkLieu.nom',
+            ],
             [
                 'label' => Yii::t('app', 'Fk Moniteur'),
                 'value' => function($data) {
@@ -121,19 +138,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn',
                 'template'=>'{coursDateView} {coursDateUpdate} {coursDateDelete}',
                 'visibleButtons'=>[
-                    'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
-                    'coursDateDelete' => (Yii::$app->user->identity->id < 1000) ? true : false,
+                    'coursDateDelete' => User::canRoute(['/cours-date/delete']),
                 ],
                 'buttons'=>[
                     'coursDateView' => function ($url, $model, $key) {
-//                        if ($model->fkCours->fk_type == Yii::$app->params['coursPlanifie']) return '';
                         return Html::a('<span class="glyphicon glyphicon-user"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
                             'title' => Yii::t('yii', 'View'),
-                        ]);
-                    },
-                    'coursDateUpdate' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours-date/update', 'id' => $key]), [
-                            'title' => Yii::t('yii', 'Update'),
                         ]);
                     },
                     'coursDateDelete' => function ($url, $model, $key) use ($coursDateProvider) {
@@ -158,8 +168,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
         'caption' => '<div class="row"><div class="col-sm-2">'.Yii::t('app', 'Planification prévue').'</div>'.
-                        '<div class="col-sm-5">'.Html::a(Yii::t('app', 'Create Cours Date'), ['cours-date/create', 'cours_id' => $model->cours_id], ['class' => 'btn btn-primary'.$displayActions]).'
-                        '.Html::a(Yii::t('app', 'Create Cours Date Multiple'), ['cours-date/recursive', 'cours_id' => $model->cours_id], ['class' => 'btn btn-info'.$displayActions.$createR]).'</div>',
+                        '<div class="col-sm-8">'.$actionButtons.'</div>',
         'summary' => '',
     ]); ?>
 

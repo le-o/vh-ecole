@@ -31,8 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'parametre_id',
             'class_key',
             'nom',
+            [
+                'label' => Yii::t('app', 'Langue interface'),
+                'attribute' => 'fkLangue.nom'
+            ],
             'valeur:ntext',
             'info_special',
+            'date_fin_validite',
         ],
     ]) ?>
 

@@ -3,7 +3,9 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
+use yii\bootstrap\Alert;
 use kartik\export\ExportMenu;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\CoursDateSearch */
@@ -16,8 +18,25 @@ $this->params['breadcrumbs'][] = $this->title;
 $gridColumns = [
     ['class' => 'kartik\grid\SerialColumn'],
     'date',
-    'fkCours.fkNom.nom',
-    'fkCours.session',
+    [
+        'label' => Yii::t('app', 'Nom du cours'),
+        'attribute' => 'fkNom',
+        'value' => 'fkCours.fkNom.nom',
+    ],
+    [
+        'label' => Yii::t('app', 'Type'),
+        'attribute' => 'fkTypeCours',
+        'value' => 'fkCours.fkType.nom',
+    ],
+    [
+        'attribute' => 'session',
+        'value' => 'fkCours.session',
+    ],
+    [
+        'label' => Yii::t('app', 'Salle'),
+        'attribute' => 'fkSalle',
+        'value' => 'fkCours.fkSalle.nom',
+    ],
     [
         'label' => Yii::t('app', 'Fk Moniteur'),
         'value' => function($data) {
@@ -40,39 +59,67 @@ $gridColumns = [
         'attribute' => 'prix',
         'visible' => (Yii::$app->user->identity->id < 1100) ? true : false,
     ],
+    [
+        'label' => Yii::t('app', 'Nb Part'),
+        'value' => function($data) {
+            return $data->nombreClientsInscritsForDataGrid;
+        },
+    ],
     'remarque',
 
     ['class' => 'yii\grid\ActionColumn',
-        'template'=>'{coursDateView} {coursDateUpdate}',
+        'template'=>'{coursPresence} {coursDateView} {coursDateDelete}',
         'visibleButtons'=>[
-            'coursDateUpdate' => (Yii::$app->user->identity->id < 1000) ? true : false,
+            'coursPresence' => User::canRoute('/cours/presence'),
+            'coursDateView' => User::canRoute('/cours-date/view'),
+            'coursDateDelete' => User::canRoute('/cours-date/delete'),
         ],
         'buttons'=>[
+            'coursPresence' => function ($url, $model, $key) {
+                return Html::a('<span class="glyphicon glyphicon-print"></span>', Url::to(['/cours/presence', 'id' => $model->fk_cours]), [
+                    'title' => Yii::t('yii', 'Imprimer'),
+                ]);
+            },
             'coursDateView' => function ($url, $model, $key) {
-                if ($model->fkCours->fk_type == Yii::$app->params['coursPlanifie']) {
-                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours/view', 'id' => $model->fk_cours]), [
-                        'title' => Yii::t('yii', 'View'),
-                    ]);
-                }
                 return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::to(['/cours-date/view', 'id' => $key]), [
                     'title' => Yii::t('yii', 'View'),
                 ]);
             },
-            'coursDateUpdate' => function ($url, $model, $key) {
-                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::to(['/cours-date/update', 'id' => $key]), [
-                    'title' => Yii::t('yii', 'Update'),
+            'coursDateDelete' => function ($url, $model, $key) {
+                return Html::a('<span class="glyphicon glyphicon-trash"></span>', Url::to(['/cours-date/delete', 'id' => $key, 'from' => '/cours-date/liste']), [
+                    'title' => Yii::t('yii', 'Delete'),
+                    'data' => [
+                        'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                        'method' => 'post',
+                    ],
                 ]);
             },
         ],
     ],
 ];
 ?>
+
+<?php if (!empty($alerte)) {
+    echo Alert::widget([
+        'options' => [
+            'class' => 'alert-'.$alerte['class'],
+        ],
+        'body' => $alerte['message'],
+    ]); 
+} ?>
+
 <div class="cours-date-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php echo $this->render('_search', [
+            'model' => $searchModel,
+            'dataTypeCours' => $dataTypeCours,
+            'selectedTypeCours' => $selectedTypeCours,
+            'dataSalle' => $dataSalle,
+            'selectedSalle' => $selectedSalle,
+        ]); ?>
     
-    <?php if (Yii::$app->user->identity->id < 1000) { ?>
+    <?php if (User::canRoute(['/gridview/export'])) { ?>
         <div style="margin-bottom: 10px;">
             <?php
             // Renders a export dropdown menu
@@ -111,6 +158,7 @@ $gridColumns = [
         },
         'columns' => $gridColumns,
         'summary' => '',
+        'tableOptions' => ['class' => 'cours-date-liste']
     ]); ?>
 
 </div>

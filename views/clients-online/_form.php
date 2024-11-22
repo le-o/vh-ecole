@@ -5,11 +5,34 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use wbraganca\dynamicform\DynamicFormWidget;
+use app\models\Cours;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ClientsOnline */
 /* @var $form yii\widgets\ActiveForm */
 
+$this->registerJs('
+    jQuery(document).ready(function() {
+        displayMessage(jQuery("#choix_cours"), ' . implode(',', $selectedCours) . ');
+    });
+    function displayMessage(that, type) {
+        var arRegulier = [' . Cours::getCoursByType(Yii::$app->params['coursRegulie']) . '];
+        var arDemande = [' . $params->optsNomCoursByType(Yii::$app->params['coursPonctuel']) . '];
+        if (typeof type != \'undefined\') testType = parseInt(type);
+        else testType = parseInt(that.val());
+
+        if ($.inArray(testType, arRegulier) != -1) {
+            $("#choix_regulier").show();
+        } else {
+            $("#choix_regulier").hide();
+        }
+        if ($.inArray(testType, arDemande) != -1) {
+            $("#sur_demande_info").show();
+        } else {
+            $("#sur_demande_info").hide();
+        }
+    }'
+    , \yii\web\View::POS_END);
 $this->registerJs('
     $(".dynamicform_wrapper").on("beforeDelete", function(e, item) {
         if (! confirm("'.Yii::t('app', 'Etes-vous sur de vouloir supprimer cet élément?').'")) {
@@ -24,6 +47,8 @@ $this->registerJs('
     , \yii\web\View::POS_READY);
 ?>
 
+<br /><br />
+
 <div class="clients-online-form">
 
     <?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
@@ -37,26 +62,27 @@ $this->registerJs('
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <?= $form->field($model, 'adresse')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-1">
+            <?= $form->field($model, 'numeroRue')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-1">
             <?= $form->field($model, 'npa')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <?= $form->field($model, 'localite')->textInput(['maxlength' => true]) ?>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <?= $form->field($model, 'telephone')->textInput(['maxlength' => true]) ?>
-        </div>
-        <div class="col-sm-6">
-            <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_pays')->dropDownList(
+                $params->optsPays($model->fk_pays),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-3">
             <?= $form->field($model, 'date_naissance')->widget(DatePicker::classname(), [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
                 'removeButton' => false,
@@ -65,38 +91,74 @@ $this->registerJs('
                     'format' => 'dd.mm.yyyy',
                     'defaultViewDate' => ['year' => 1980]
                 ]
-            ]); ?>
+            ])->label(Yii::t('app', 'Date de naissance (du représentant légal si mineur)')); ?>
+        </div><div class="col-sm-3">
+            <?= $form->field($model, "no_avs")->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_sexe')->dropDownList(
+                $params->optsSexe($model->fk_sexe),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_nationalite')->dropDownList(
+                $params->optsPays($model->fk_nationalite),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
+        </div>
+        <div class="col-sm-2">
+            <?= $form->field($model, 'fk_langue_mat')->dropDownList(
+                $params->optsLangue($model->fk_langue_mat),
+                ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+            ) ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <?= $form->field($model, 'telephone')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-sm-6">
-            <label class="control-label" for="w1"><?= Yii::t('app', 'Nom du cours'); ?></label>
-	        <?= Select2::widget([
-				'name' => 'list_cours',
-				'value' => $selectedCours, // initial value
-				'data' => $dataCours,
-				'options' => ['placeholder' => Yii::t('app', 'Choisir un cours ...'), 'multiple' => false],
-			    'pluginOptions' => [
-			        'allowClear' => true,
-			        'tags' => true,
-			    ],
-			]); ?>
+            <?= $form->field($model, 'fk_cours')->widget(Select2::classname(), [
+                'options'=>['placeholder' => Yii::t('app', 'Choisir un cours ...'), 
+                    'id' => 'choix_cours',
+                    'multiple' => false, 
+                    'onchange'=>"displayMessage($(this))",
+                    'disabled' => (count($dataCours) == 1) ? true : false,
+                    'value' => $selectedCours, // initial value
+                ],
+                'data' => $dataCours,
+                'pluginOptions'=>[
+                    'initialize' => true,
+                    'allowClear' => true,
+                    'tags' => true,
+                ],
+            ]); ?>
         </div>
     </div>
     
     <div class="row">
         <div class="col-sm-12">
-            <?= yii\bootstrap\BaseHtml::checkbox('offre_annuelle', false, ['label' => Yii::t('app', 'Je souhaite profiter de l’offre annuelle (inscription aux semestres 1 et 2 avec abonnement annuel offert)')]) ?>
-            <?= yii\bootstrap\BaseHtml::checkbox('pmt_tranche', false, ['label' => Yii::t('app', 'Je souhaite étaler le paiement du cours en plusieurs tranches (10.- frais administratifs)')]) ?>
+            <?= yii\bootstrap\BaseHtml::radioList('offre_supp', false, [
+                'cours_essai' => Yii::t('app', 'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet'),
+                'pmt_complet' => Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en un seul versement'),
+                'pmt_tranche' => Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en plusieurs versements (+ CHF 40 de frais administratifs)')
+            ], ['id' => 'choix_regulier', 'style' => 'display:none;']) ?>
         </div>
     </div>
     
     <div class="row">
         <div class="col-sm-12"><br />
-            <?= $form->field($model, 'informations')->textarea(['rows' => 6])->label(Yii::t('app', 'Infos, détails et besoins particuliers (date et horaire, nom de la session, offres, 2 cours à l\'essai, etc.)')) ?>
+            <div id="sur_demande_info" style="display:none;"><span style="color:red; font-weight:bold;"><?= Yii::t('app', 'Vous avez choisi un cours sur demande, veuillez indiquer le(s) horaire(s) souhaité(s) date et heure') ?></span></div>
+            <?= $form->field($model, 'informations')->textarea(['rows' => 6])->label(Yii::t('app', 'Infos, détails et besoins particuliers')) ?>
         </div>
     </div>
     
     <div class="panel panel-default">
-        <div class="panel-heading"><h4><i class="glyphicon glyphicon-plus"></i> <?= Yii::t('app', 'Inscrire d\'autres personnes sous mon nom:') ?></h4></div>
+        <div class="panel-heading"><h4><i class="glyphicon glyphicon-plus"></i> <?= Yii::t('app', 'Coordonnées du/des enfant/s inscrit/s sous mon nom:') ?></h4></div>
         <div class="panel-body">
              <?php DynamicFormWidget::begin([
                 'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
@@ -112,6 +174,7 @@ $this->registerJs('
                     'nom',
                     'prenom',
                     'date_naissance',
+                    'no_avs',
                 ],
             ]); ?>
 
@@ -134,13 +197,13 @@ $this->registerJs('
                             }
                         ?>
                         <div class="row">
-                            <div class="col-sm-4">
+                            <div class="col-sm-2">
                                 <?= $form->field($modelClient, "[{$i}]nom")->textInput(['maxlength' => true]) ?>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-2">
                                 <?= $form->field($modelClient, "[{$i}]prenom")->textInput(['maxlength' => true]) ?>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-2">
                                 <?= $form->field($modelClient, "[{$i}]date_naissance")->widget(DatePicker::classname(), [
                                     'options' => ['placeholder' => 'jj.mm.aaaa'],
                                     'removeButton' => false,
@@ -150,6 +213,27 @@ $this->registerJs('
                                         'defaultViewDate' => ['year' => 1980]
                                     ]
                                 ]); ?>
+                            </div>
+                            <div class="col-sm-2">
+                                <?= $form->field($modelClient, "[{$i}]no_avs")->textInput(['maxlength' => true]) ?>
+                            </div>
+                            <div class="col-sm-1">
+                                <?= $form->field($modelClient, "[{$i}]fk_sexe")->dropDownList(
+                                    $params->optsSexe(),
+                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+                                ) ?>
+                            </div>
+                            <div class="col-sm-1">
+                                <?= $form->field($modelClient, "[{$i}]fk_nationalite")->dropDownList(
+                                    $params->optsPays(),
+                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+                                ) ?>
+                            </div>
+                            <div class="col-sm-2">
+                                <?= $form->field($modelClient, "[{$i}]fk_langue_mat")->dropDownList(
+                                    $params->optsLangue(),
+                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
+                                ) ?>
                             </div>
                         </div>
                     </div>
@@ -173,18 +257,7 @@ $this->registerJs('
     <?php ActiveForm::end(); ?>
     
     <br /><br />
-    <h4>Conditions d'inscription et d'annulation</h4>
-    Les <strong>cours sur demande</strong> (cours privés, cours organisés pour des groupes, cours découverte et anniversaires) se font 
-    sur réservation 72 heures à l'avance.<br />
-    100% de la prestation est due en cas d'annulation à moins de 72h. Si le client reporte le cours, 40% du montant sera demandé en guise de frais de report.<br />
-    <br />
-    Les <strong>cours planifiés</strong> (cours collectifs programmés en avance sur une saison ainsi que les stages) se font sur réservation. 
-    100% du montant doit être versé avant le début du cours pour pouvoir y participer. En cas d'annulation à moins de 72h par 
-    le client, 100% de la prestation est due.<br />
-    <br />
-    En cas d'annulation par l'organisateur, le montant déjà payé sera intégralement remboursé.<br />
-    <br />
-    Nous conseillons à notre aimable clientèle de souscrire à une assurance annulation afin d'éviter tout désagrément.
+    <?= Yii::t('app', "Conditions inscription et annulation") ?>
 
 
 </div>

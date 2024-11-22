@@ -2,9 +2,14 @@ html,
 body {
     height: 100%;
 }
+html > body.body-no-height {
+    height: unset;
+}
 
 .wrap {
     min-height: 100%;
+}
+.wrap, .wrap-no-height {
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
@@ -95,8 +100,35 @@ a.desc:after {
     min-width: 67px;
 }
 
+table.cours-date-liste > thead:first-child > tr:first-child > th:last-child {
+    min-width: 85px;
+}
+
+h3 {
+    color: rgb(130,54,140);
+    font-size: 1.1428em;
+    margin-bottom: 10px;
+}
+
 @media print {
   a[href]:after {
     content: none !important;
   }
+}
+
+#loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+span.select2-selection__choice__remove {
+    font-size: 14px !important;
+}
+
+div.datepicker {
+    z-index: 1050 !important;
 }

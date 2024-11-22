@@ -24,17 +24,8 @@ class ParametresController extends Controller
                     'delete' => ['post'],
                 ],
             ],
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            return (Yii::$app->user->identity->id < 1000) ? true : false;
-                        }
-                    ],
-                ],
+            'ghost-access'=> [
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
         ];
     }
@@ -46,7 +37,22 @@ class ParametresController extends Controller
     public function actionIndex()
     {
         $searchModel = new ParametresSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        // on sauve les filtres et la pagination
+        $params = Yii::$app->request->queryParams;
+        if (count($params) <= 1) {
+            if (isset(Yii::$app->session['ParametresSearch'])) {
+                $params = Yii::$app->session['ParametresSearch'];
+            } else {
+                Yii::$app->session['ParametresSearch'] = $params;
+            }
+        } else {
+            if (isset(Yii::$app->request->queryParams['ParametresSearch'])) {
+                Yii::$app->session['ParametresSearch'] = $params;
+            } else {
+                $params = Yii::$app->session['ParametresSearch'];
+            }
+        }
+        $dataProvider = $searchModel->search($params);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -116,11 +122,13 @@ class ParametresController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * @return false|string
+     */
     public function actionGetemail() {
         $data = Yii::$app->request->post();
-        $myEmail = Parametres::findOne($data['id']);
-        $test[] = ['sujet' => $myEmail->nom, 'contenu' => $myEmail->valeur];
-        echo json_encode($test);
+        $emailTemplate = Parametres::findOne($data['id']);
+        return json_encode([['sujet' => $emailTemplate->nom, 'contenu' => $emailTemplate->valeur]]);
     }
 
     /**

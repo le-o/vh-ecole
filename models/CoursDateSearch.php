@@ -12,13 +12,21 @@ use app\models\CoursDate;
  */
 class CoursDateSearch extends CoursDate
 {
-	public $fkCours;
-	public $participantMin;
-	public $participantMax;
+    public $fkCours;
+    public $participantMin;
+    public $participantMax;
     public $session;
     public $depuis;
     public $dateA;
     public $homepage = false;
+    public $anniversairepage = false;
+    public $withoutMoniteur = true;
+    public $fkTypeCours;
+    public $fkSalle;
+
+    public $listCours;
+
+    public $fkNom;
 	
     /**
      * @inheritdoc
@@ -26,8 +34,9 @@ class CoursDateSearch extends CoursDate
     public function rules()
     {
         return [
-            [['cours_date_id', 'fk_cours'], 'integer'],
-            [['date', 'heure_debut', 'lieu', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA'], 'safe'],
+            [['cours_date_id', 'fk_cours', 'fk_lieu', 'fkTypeCours', 'fkSalle'], 'integer'],
+            [['withoutMoniteur'], 'boolean'],
+            [['date', 'heure_debut', 'duree', 'prix', 'remarque', 'nb_client_non_inscrit', 'fkCours', 'participantMin', 'participantMax', 'session', 'depuis', 'dateA', 'fkNom', 'fkTypeCours', 'fkSalle'], 'safe'],
         ];
     }
 
@@ -47,32 +56,37 @@ class CoursDateSearch extends CoursDate
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $pagesize = 80)
     {
         $query = CoursDate::find();
-        $query->joinWith(['fkCours.fkNom']);
+        $query->joinWith(['fkCours.fkNom coursNom', 'fkCours.fkType coursType', 'fkCours.fkSalle coursSalle', 'coursHasMoniteurs']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['date' => SORT_ASC]],
             'pagination' => [
-                'pagesize' => 80,
+                'pagesize' => $pagesize,
             ],
         ]);
+
+        $coursNom = 'coursNom.nom';
+        $coursSession = 'cours.session';
         
-        $dataProvider->sort->attributes['fkCours'] = [
-            // The tables are the ones our relation are configured to
-            // in my case they are prefixed with "tbl_"
-            'asc' => ['cours.nom' => SORT_ASC],
-            'desc' => ['cours.nom' => SORT_DESC],
+        $dataProvider->sort->attributes['fkNom'] = [
+            'asc' => [$coursNom => SORT_ASC, $coursSession => SORT_ASC],
+            'desc' => [$coursNom => SORT_DESC, $coursSession => SORT_DESC],
         ];
-        $dataProvider->sort->attributes['participantMin'] = [
-            'asc' => ['cours.participant_min' => SORT_ASC],
-            'desc' => ['cours.participant_min' => SORT_DESC],
+        $dataProvider->sort->attributes['fkTypeCours'] = [
+            'asc' => ['coursType.nom' => SORT_ASC, $coursSession => SORT_ASC],
+            'desc' => ['coursType.nom' => SORT_DESC, $coursSession => SORT_DESC],
         ];
-        $dataProvider->sort->attributes['participantMax'] = [
-            'asc' => ['cours.participant_max' => SORT_ASC],
-            'desc' => ['cours.participant_max' => SORT_DESC],
+        $dataProvider->sort->attributes['fkSalle'] = [
+            'asc' => ['coursSalle.nom' => SORT_ASC, $coursSession => SORT_ASC],
+            'desc' => ['coursSalle.nom' => SORT_DESC, $coursSession => SORT_DESC],
+        ];
+        $dataProvider->sort->attributes['session'] = [
+            'asc' => [$coursSession => SORT_ASC, $coursNom => SORT_ASC],
+            'desc' => [$coursSession => SORT_DESC, $coursNom => SORT_DESC],
         ];
 
         $this->load($params);
@@ -86,6 +100,7 @@ class CoursDateSearch extends CoursDate
         $query->andFilterWhere([
             'cours_date_id' => $this->cours_date_id,
             'fk_cours' => $this->fk_cours,
+            'fk_lieu' => $this->fk_lieu,
             'date' => $this->date,
             'heure_debut' => $this->heure_debut,
             'duree' => $this->duree,
@@ -94,21 +109,40 @@ class CoursDateSearch extends CoursDate
             'cours.participant_max' => $this->participantMax,
         ]);
 
-        $query->andFilterWhere(['like', 'lieu', $this->lieu]);
         $query->andFilterWhere(['like', 'remarque', $this->remarque]);
         $query->andFilterWhere(['like', 'nb_client_non_inscrit', $this->nb_client_non_inscrit]);
-        $query->andFilterWhere(['like', 'parametres.nom', $this->fkCours]);
+        $query->andFilterWhere(['like', 'coursNom.nom', $this->fkCours]);
         $query->andFilterWhere(['like', 'cours.session', $this->session]);
-        
+        $query->andFilterWhere(['like', 'cours.fk_type', $this->fkTypeCours]);
+        $query->andFilterWhere(['like', 'cours.fk_salle', $this->fkSalle]);
+
+
+        if (!empty($this->listCours)) {
+            $query->andWhere(['IN', 'fk_cours', $this->listCours]);
+        }
+
         if ($this->depuis != '') {
             $query->andWhere("date >= '".date('Y-m-d', strtotime($this->depuis))."'");
-            if ($this->homepage == true) {
+            if ($this->anniversairepage) {
+                $query->andWhere("cours.is_publie = 1 AND cours.fk_statut = " . Yii::$app->params['coursActif']);
+            }
+            if ($this->homepage) {
                 $query->distinct = true;
                 $query->select = ['fk_cours'];
             }
         }
         if ($this->dateA != '') {
             $query->andWhere("date <= '".date('Y-m-d', strtotime($this->dateA))."'");
+            if ($this->homepage) {
+                $query->andWhere("cours.fk_statut = " . Yii::$app->params['coursActif']);
+                $query->andWhere("fk_cours NOT IN (SELECT DISTINCT(d2.fk_cours) FROM cours_date d2 WHERE d2.date > '".date('Y-m-d', strtotime($this->dateA))."')");
+                $query->distinct = true;
+                $query->select = ['fk_cours'];
+            }
+        }
+
+        if ($this->withoutMoniteur) {
+            $query->andFilterWhere(['cours_has_moniteurs.fk_moniteur' => Yii::$app->params['sansEncadrant']]);
         }
 
         return $dataProvider;

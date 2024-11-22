@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ]) ?>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <label class="control-label" for="date_range_1"><?= Yii::t('app', 'Jour semaine') ?></label>
                 <div class="form-group">
                     <label class="col-md-1 checkbox-inline" for="checkboxes-0"><input type="checkbox" name="jour_semaine[]" id="checkboxes-0" value="1">Lu</label>
@@ -91,7 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     
         <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <label class="control-label" for="w1"><?= Yii::t('app', 'Fk Moniteur'); ?></label>
                 <?= Select2::widget([
                     'name' => 'list_moniteurs',
@@ -104,8 +104,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ]); ?>
             </div>
+            <div class="col-sm-2">
+                <?= $form->field($model, 'baremeMoniteur')->dropDownList($modelParams->optsBaremeMoniteur(), ['prompt'=>'Fixer un barème']) ?>
+            </div>
             <div class="col-sm-6">
-                <?= $form->field($model, 'lieu')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'fk_lieu')->dropDownList($modelParams->optsLieu($model->fk_lieu)) ?>
             </div>
         </div>
         

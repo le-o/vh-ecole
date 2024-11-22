@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use webvimark\modules\UserManagement\models\rbacDB\Role;
+use webvimark\modules\UserManagement\models\User;
 use Yii;
 use app\models\Personnes;
 use app\models\PersonnesSearch;
@@ -9,6 +11,7 @@ use app\models\PersonnesHasInterlocuteurs;
 use app\models\Parametres;
 use app\models\Cours;
 use app\models\CoursDate;
+use app\models\ClientsHasCours;
 use app\models\ClientsHasCoursDate;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -22,81 +25,103 @@ use kartik\mpdf\Pdf;
 /**
  * PersonnesController implements the CRUD actions for Personnes model.
  */
-class PersonnesController extends Controller
+class PersonnesController extends CommonController
 {
+
+    private $filtres = [];
+
     public function behaviors()
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['post'],
                 ],
             ],
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'view'],
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            return (Yii::$app->user->identity->id < 1100) ? true : false;
-                        }
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            return (Yii::$app->user->identity->id < 1000) ? true : false;
-                        }
-                    ],
-                ],
+            'ghost-access'=> [
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
         ];
     }
+
+    public function __construct($id, $module)
+    {
+        $this->filtres = [
+            'moniteursActifs' => Yii::$app->params['typeEncadrantActif'],
+            'moniteurs' => Yii::$app->params['typeEncadrant'],
+            'personnes' => false,
+        ];
+        parent::__construct($id, $module);
+    }
+    
+    // for route purpose only
+    public function actionAdvanced() {}
 
     /**
      * Lists all Personnes models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($filtre = 'personnes')
     {
         $alerte = [];
         $searchModel = new PersonnesSearch();
+        $searchModel->fk_type = $this->filtres[$filtre];
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProviderAll = $searchModel->search(Yii::$app->request->queryParams, false);
         
         $listeEmails = [];
         foreach ($dataProviderAll->models as $myPersonne) {
             if (strpos($myPersonne->email, '@') !== false) {
-                $listeEmails[$myPersonne->email] = $myPersonne->email;
+                $listeEmails[$myPersonne->email] = trim($myPersonne->email);
             }
             
             foreach ($myPersonne->personneHasInterlocuteurs as $pi) {
-                $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
             }
         }
 
-        if (!empty(Yii::$app->request->post())) {
+        if (!empty(Yii::$app->request->post()) && isset(Yii::$app->request->post()['checkedEmails'])) {
             $mail = Yii::$app->request->post();
-            SiteController::actionEmail($mail['Parametres'], $listeEmails);
+            $this->actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
 
             $alerte['class'] = 'info';
             $alerte['message'] = Yii::t('app', 'Email envoyé à toutes les personnes sélectionnées');
         }
         
         $parametre = new Parametres();
-        $typeStatut = $parametre->optsStatut();
-        $typeFilter = $parametre->optsType();
+        $statutFilter = $parametre->optsStatut();
+        $salleFilter = $parametre->optsSalle();
+        $financeFilter = $parametre->optsFinance();
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
+
+        $buttonFilter = [
+            [
+                'label' => 'Personnes',
+                'filtre' => 'personnes',
+                'class' => ($filtre == 'personnes') ? ' btn-info' : '',
+            ],
+            [
+                'label' => 'Moniteurs actifs',
+                'filtre' => 'moniteursActifs',
+                'class' => ($filtre == 'moniteursActifs') ? ' btn-info' : '',
+            ],
+            [
+                'label' => 'Tous les moniteurs',
+                'filtre' => 'moniteurs',
+                'class' => ($filtre == 'moniteurs') ? ' btn-info' : '',
+            ],
+        ];
 
         return $this->render('index', [
             'alerte' => $alerte,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'typeStatut' => $typeStatut,
-            'typeFilter' => $typeFilter,
+            'statutFilter' => $statutFilter,
+            'salleFilter' => $salleFilter,
+            'financeFilter' => $financeFilter,
+            'buttonFilter' => $buttonFilter,
             'parametre' => $parametre,
             'emails' => $emails,
             'listeEmails' => $listeEmails,
@@ -107,55 +132,136 @@ class PersonnesController extends Controller
      * Lists all Personnes models.
      * @return mixed
      */
-    public function actionMoniteurs()
+    public function actionMoniteurs($isMoniteur = false)
     {
+        $this->layout = 'main_full';
         $searchModel = new PersonnesSearch();
-        $searchModel->fk_type = Yii::$app->params['typeEncadrant'];
+
+        ini_set('memory_limit', -1);
+
+        // si profil moniteur, accès uniquement à ses données
+        if ($isMoniteur) {
+            $searchModel->personne_id = Yii::$app->user->fkpersonne;
+        } elseif (!isset(Yii::$app->request->queryParams['PersonnesSearch'])) {
+            $searchModel->personne_id = -1;
+        }
         $dataProvider = $searchModel->searchMoniteurs(Yii::$app->request->queryParams, false);
         
         $searchParams = Yii::$app->request->queryParams;
         $searchParCours = (isset($searchParams['list_cours']) && $searchParams['list_cours'] !== '') ? true : false;
-        if (!isset($searchParams['from_date'])) $searchParams['from_date'] = date('01.01.Y');
-        if (!isset($searchParams['to_date'])) $searchParams['to_date'] = date('31.12.Y');
+        if (!isset($searchParams['from_date'])) {
+            $searchParams['from_date'] = date('01.01.Y');
+        }
+        if (!isset($searchParams['to_date'])) {
+            $searchParams['to_date'] = date('31.12.Y');
+        }
         $searchFrom = (isset($searchParams['from_date']) && $searchParams['from_date'] !== '') ? date('Y-m-d', strtotime($searchParams['from_date'])) : '1970-01-01';
         $searchTo = (isset($searchParams['to_date']) && $searchParams['to_date'] !== '') ? date('Y-m-d', strtotime($searchParams['to_date'])) : '9999-12-31';
         
         $dataMoniteurs = [];
         $heuresTotal = 0;
-        foreach ($dataProvider->models as $moniteur) {
-            $heures = 0;
-            foreach ($moniteur->moniteurHasCoursDate as $mcd) {
-                $coursDate = CoursDate::findOne($mcd->fk_cours_date);
-                
-                $dateRef = date('Y-m-d', strtotime($coursDate->date));
-                if ($dateRef >= $searchFrom && $dateRef <= $searchTo) {
-                    if ($searchParCours) {
-                        if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) $heures += $coursDate->duree;
-                    } else $heures += $coursDate->duree;
+        $baremes = (new Parametres())->optsBaremeMoniteur();
+        $baremes[-1] = 'Non défini'; // pour reprendre les heures si paramétrage inexistant
+        if (!$isMoniteur || !is_null($searchModel->personne_id)) {
+            foreach ($dataProvider->models as $moniteur) {
+                $heures = 0;
+                foreach ($baremes as $key => $bareme) {
+                    $heuresBareme[$key] = 0;
                 }
-            }
-            if (!$searchParCours || ($searchParCours && $heures !== 0)) {
-                $dataMoniteurs[$moniteur->personne_id]['statut'] = $moniteur->fkStatut->nom;
-                $dataMoniteurs[$moniteur->personne_id]['societe'] = $moniteur->societe;
-                $dataMoniteurs[$moniteur->personne_id]['nom'] = $moniteur->nom;
-                $dataMoniteurs[$moniteur->personne_id]['prenom'] = $moniteur->prenom;
-                $dataMoniteurs[$moniteur->personne_id]['localite'] = $moniteur->localite;
-                $dataMoniteurs[$moniteur->personne_id]['email'] = $moniteur->email;
-                $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;
-                $dataMoniteurs[$moniteur->personne_id]['heures'] = number_format($heures, 2, '.', '\'');
-                $heuresTotal += $heures;
+                foreach ($moniteur->moniteurHasCoursDate as $mcd) {
+                    $coursDate = CoursDate::findOne($mcd->fk_cours_date);
+
+                    if ($this->keepDateInStatistics($coursDate)) {
+                        $dateRef = date('Y-m-d', strtotime($coursDate->date));
+                        if ($dateRef >= $searchFrom && $dateRef <= $searchTo) {
+                            if ($searchParCours) {
+                                if ($coursDate->fkCours->fk_nom == $searchParams['list_cours']) {
+                                    $heures += $coursDate->duree;
+                                    // total par barème
+                                    $key = $this->getBaremeID($mcd, $moniteur->fk_formation);
+                                    if (!isset($heuresBareme[$key])) {
+                                        $heuresBareme[$key] = 0;
+                                    }
+                                    $heuresBareme[$key] += $coursDate->duree;
+                                }
+                            } else {
+                                $heures += $coursDate->duree;
+                                // total par barème
+                                $key = $this->getBaremeID($mcd, $moniteur->fk_formation);
+
+                                if (!isset($heuresBareme[$key])) {
+                                    $heuresBareme[$key] = 0;
+                                }
+                                $heuresBareme[$key] += $coursDate->duree;
+                            }
+                        }
+                    }
+                }
+                if (!$searchParCours || ($searchParCours && $heures !== 0)) {
+                    $dataMoniteurs[$moniteur->personne_id]['personne_id'] = $moniteur->personne_id;
+                    $dataMoniteurs[$moniteur->personne_id]['no_cresus'] = (isset($moniteur->moniteurInfo) ? $moniteur->moniteurInfo->no_cresus : '<!--n/a-->');
+                    $dataMoniteurs[$moniteur->personne_id]['nom'] = $moniteur->nom;
+                    $dataMoniteurs[$moniteur->personne_id]['prenom'] = $moniteur->prenom;
+                    $dataMoniteurs[$moniteur->personne_id]['adresse1'] = $moniteur->adresse1;
+                    $dataMoniteurs[$moniteur->personne_id]['adresse2'] = $moniteur->adresse2;
+                    $dataMoniteurs[$moniteur->personne_id]['npa'] = $moniteur->npa;
+                    $dataMoniteurs[$moniteur->personne_id]['localite'] = $moniteur->localite;
+                    $dataMoniteurs[$moniteur->personne_id]['date_naissance'] = $moniteur->date_naissance;
+                    $dataMoniteurs[$moniteur->personne_id]['fk_langues'] = $moniteur->fkLanguesNoms;
+                    $dataMoniteurs[$moniteur->personne_id]['email'] = $moniteur->email;
+                    $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;
+                    if (empty($moniteur->currentBareme)) {
+                        $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = ($moniteur->fk_formation == 0 || is_null($moniteur->fk_formation) || !isset($moniteur->fkFormation)) ? 'Non défini' : '**Ancienne configuration : ' . $moniteur->fkFormation->nom;
+                    } else {
+                        $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = $moniteur->currentBareme->fkBareme->nom;
+                    }
+                    $dataMoniteurs[$moniteur->personne_id]['heures'] = number_format($heures, 2, '.', '\'');
+                    foreach ($baremes as $key => $bareme) {
+                        $dataMoniteurs[$moniteur->personne_id][$bareme] = number_format($heuresBareme[$key], 2, '.', '\'');
+                    }
+                    $heuresTotal += $heures;
+                }
             }
         }
         $moniteursProvider = new ArrayDataProvider([
+            'key' => 'personne_id',
             'allModels' => $dataMoniteurs,
             'pagination' => [
                 'pageSize' => 100,
             ],
         ]);
         
+        // gestion du tri ici, car on a reconstruit le dataprovider manuellement
+        $moniteursProvider->setSort([
+            'attributes' => [
+                'type' => [
+                    'asc' => ['type' => SORT_ASC],
+                    'desc' => ['type' => SORT_DESC],
+                ],
+                'no_cresus' => [
+                    'asc' => ['no_cresus' => SORT_ASC],
+                    'desc' => ['no_cresus' => SORT_DESC],
+                ],
+                'nom' => [
+                    'asc' => ['nom' => SORT_ASC],
+                    'desc' => ['nom' => SORT_DESC],
+                ],
+                'prenom' => [
+                    'asc' => ['prenom' => SORT_ASC],
+                    'desc' => ['prenom' => SORT_DESC],
+                ],
+            ],
+            'defaultOrder' => [
+                'no_cresus' => SORT_ASC
+            ]
+        ]);
+        
         $modelParams = new Parametres();
         $dataCours = $modelParams->optsNomCours();
         $selectedCours = (isset($searchParams['list_cours'])) ? $searchParams['list_cours'] : '';
+        
+        $dataLangues = $modelParams->optsLangue();
+        $selectedLangue = (isset($searchParams['fk_langues'])) ? $searchParams['fk_langues'] : '';
         
         $fromData = serialize(['selectedCours' => $selectedCours, 'searchFrom' => $searchFrom, 'searchTo' => $searchTo]);
 
@@ -165,10 +271,21 @@ class PersonnesController extends Controller
             'searchTo' => ($searchTo == '9999-12-31') ? '' : date('d.m.Y', strtotime($searchTo)),
             'selectedCours' => $selectedCours,
             'dataCours' => $dataCours,
+            'selectedLangue' => $selectedLangue,
+            'dataLangues' => $dataLangues,
             'moniteursProvider' => $moniteursProvider,
             'heuresTotal' => number_format($heuresTotal, 2, '.', '\''),
             'fromData' => $fromData,
+            'isMoniteur' => $isMoniteur,
+            'baremes' => $baremes,
         ]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function actionMycours() {
+        return $this->actionMoniteurs(true);
     }
     
     /**
@@ -182,39 +299,59 @@ class PersonnesController extends Controller
         $model = $this->findModel($id);
         
         $fromData = unserialize($fromData);
-        
-        $coursDateDataProvider = [];
+
         $listeCoursDate = [];
         foreach ($model->moniteurHasCoursDate as $mcd) {
-            if ($fromData['selectedCours'] != '' && $mcd->fkCoursDate->fkCours->fk_nom == $fromData['selectedCours']) {
+            if (($fromData['selectedCours'] == '' ||
+                ($fromData['selectedCours'] != '' && $mcd->fkCoursDate->fkCours->fk_nom == $fromData['selectedCours'])) &&
+                $this->keepDateInStatistics($mcd->fkCoursDate)
+            ) {
                 $listeCoursDate[] = $mcd->fk_cours_date;
-            } elseif ($fromData['selectedCours'] == '') {
-                $listeCoursDate[] = $mcd->fk_cours_date;
+                if (null != $mcd->fk_bareme) {
+                    $baremeCours[$mcd->fk_cours_date] = '*' . $mcd->fkBareme->nom;
+                } else {
+                    $isBaremeSet = $mcd->fkMoniteur->getMoniteursHasBaremeFromDate(date('Y-m-d', strtotime($mcd->fkCoursDate->date)));
+                    $baremeCours[$mcd->fk_cours_date] = (null != $isBaremeSet ? $isBaremeSet->fkBareme->nom : $model->fkFormation->nom);
+                }
             }
         }
         $coursDate = CoursDate::find()
             ->where(['in', 'cours_date_id', $listeCoursDate])
             ->andWhere(['between', 'date', $fromData['searchFrom'], $fromData['searchTo']])
             ->orderBy(['date' => SORT_DESC]);
-        $coursDateDataProvider = new ActiveDataProvider([
-            'query' => $coursDate,
+        $arrayCoursDate = [];
+        foreach($coursDate->all() as $cd) {
+            $arrayCoursDate[] = [
+                'date' => $cd->date,
+                'nom' => $cd->fkCours->fkNom->nom,
+                'heure_debut' => $cd->heure_debut,
+                'heure_fin' => $cd->heureFin,
+                'lieu' => $cd->fkLieu->nom,
+                'duree' => $cd->duree,
+                'bareme' => $baremeCours[$cd->cours_date_id],
+            ];
+        }
+        $coursDateDataProvider = new ArrayDataProvider([
+            'allModels' => $arrayCoursDate,
             'pagination' => [
-                'pageSize' => 100,
+                'pageSize' => false,
             ],
         ]);
-        
+
         if (!$print) {
             return $this->render('viewmoniteur', [
                 'model' => $model,
                 'coursDateDataProvider' => $coursDateDataProvider,
                 'fromData' => $fromData,
+                'sum' => $coursDate->sum('duree'),
             ]);
         }
-        
+
         $content = $this->renderPartial('viewmoniteur', [
             'model' => $model,
             'coursDateDataProvider' => $coursDateDataProvider,
             'fromData' => $fromData,
+            'sum' => $coursDate->sum('duree'),
         ]);
         
         // setup kartik\mpdf\Pdf component
@@ -231,7 +368,7 @@ class PersonnesController extends Controller
             'content' => $content,
             // format content from your own css file if needed or use the
             // enhanced bootstrap css built by Krajee for mPDF formatting
-            'cssFile' => '@vendor/kartik-v/yii2-mpdf/assets/kv-mpdf-bootstrap.min.css',
+            'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
             // any css to be embedded if required
             'cssInline' => '
                 table { width:100%; border-collapse:collapse; }
@@ -257,66 +394,73 @@ class PersonnesController extends Controller
     /**
      * Displays a single Personnes model.
      * @param integer $id
+     * @param string $tab active tab
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($id, $tab = 'client')
     {
         $alerte = [];
         $model = $this->findModel($id);
         
         if (!empty(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
-            $newCours = explode('|', $post['new_cours']);
-            if ($newCours[1] == Yii::$app->params['coursPlanifie']) {
-                $modelDate = CoursDate::find()
-                    ->where(['=', 'fk_cours', $newCours[0]])
-                    ->andWhere(['>=', 'date', date('Y-m-d')])
-                    ->all();
-                if (empty($modelDate)) {
-                    $alerte['class'] = 'warning';
-                    $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
-                } else {
-                    foreach ($modelDate as $date) {
-                        $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                        $modelClientsHasCoursDate->fk_cours_date = $date->cours_date_id;
-                        $modelClientsHasCoursDate->fk_personne = $id;
-                        $modelClientsHasCoursDate->is_present = true;
-                        $modelClientsHasCoursDate->save(false);
+            
+            if (!empty($post['new_cours'])) {
+                // soit on ajoute un cours
+                $newCours = explode('|', $post['new_cours']);
+                if (in_array($newCours[1], Yii::$app->params['coursPlanifieS'])) {
+                    $modelDate = CoursDate::find()
+                        ->where(['=', 'fk_cours', $newCours[0]])
+                        ->andWhere(['>=', 'date', date('Y-m-d')])
+                        ->all();
+                    if (empty($modelDate)) {
+                        $alerte['class'] = 'warning';
+                        $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
+                    } else {
+                        $alerte = $this->addClientToCours($modelDate, $id, $newCours[0]);
                     }
-                    $alerte['class'] = 'success';
-                    $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+                } elseif (in_array($newCours[1], Yii::$app->params['coursPonctuelUnique'])) {
+                    $modelDate = CoursDate::findOne(['cours_date_id' => $newCours[0]]);
+                    $alerte = $this->addClientToCours([$modelDate], $id, $modelDate->fk_cours);
                 }
-            } elseif ($newCours[1] == Yii::$app->params['coursPonctuel']) {
-                $modelClientsHasCoursDate = new ClientsHasCoursDate();
-                $modelClientsHasCoursDate->fk_personne = $id;
-                $modelClientsHasCoursDate->fk_cours_date = $newCours[0];
-                $modelClientsHasCoursDate->is_present = true;
-                if (!$modelClientsHasCoursDate->save()) {
-                    $alerte['class'] = 'danger';
-                    $alerte['message'] = Yii::t('app', 'Inscription impossible - erreur inattendue, veuillez contactez le support.');
-                } else {
-                    $alerte['class'] = 'success';
-                    $alerte['message'] = Yii::t('app', 'La personne a bien été enregistrée comme participante !');
+            } elseif (!empty($post['Parametres'])) {
+                // soit on envoi un email
+                $post['Parametres']['personne_id'] = $id;
+                
+                // email interloc. = pas d'envoi sinon message d'erreur :(, donc on cherche les emails des interlocuteurs
+                if (strpos($model->email, '@') !== false) {
+                    $listeEmails[$model->email] = trim($model->email);
                 }
+                foreach ($model->personneHasInterlocuteurs as $pi) {
+                    $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
+                }
+                $this->actionEmail($post['Parametres'], $listeEmails);
+                $alerte['class'] = 'info';
+                $alerte['message'] = Yii::t('app', 'Email envoyé');
+            } else {
+                // dans ce cas on ajoute un participant sans en avoir sélectionné
+                $alerte['class'] = 'warning';
+                $alerte['message'] = Yii::t('app', 'L\'action à réaliser n\'a pas pu être définie.');
             }
         }
         
         $coursDateDataProvider = [];
-        if ($model->fk_type == Yii::$app->params['typeEncadrant']) {
+        $moniteursHasBaremeDataProvider = [];
+        if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
+            // on retrouve les barèmes
+            $moniteursHasBaremeDataProvider = new ActiveDataProvider([
+                'query' => $model->getMoniteursHasBareme()
+            ]);
+
+            // on retrouve les cours
             $listeCoursDate = [];
             foreach ($model->moniteurHasCoursDate as $mcd) {
-                $listeCoursDate[] = $mcd->fk_cours_date;
+                $coursDate = CoursDate::findOne($mcd->fk_cours_date);
+                if ($this->keepDateInStatistics($coursDate)) {
+                    $listeCoursDate[] = $mcd->fk_cours_date;
+                }
             }
             $coursDate = CoursDate::find()->where(['in', 'cours_date_id', $listeCoursDate])->orderBy(['date' => SORT_DESC]);
-//            $test = $coursDate->all();
-//            foreach ($test as $t) {
-//                if ($t->cours_date_id == 98) {
-//                    echo "<pre>";
-//                    print_r($t->fkCours);
-//                    echo "</pre>";
-//                    exit;
-//                }
-//            }
             $coursDateDataProvider = new ActiveDataProvider([
                 'query' => $coursDate,
                 'pagination' => [
@@ -330,7 +474,7 @@ class PersonnesController extends Controller
         foreach ($model->clientsHasCoursDate as $clientCoursDate) {
             $listeCours[] = $clientCoursDate->fkCoursDate->fk_cours;
             
-            if ($clientCoursDate->fkCoursDate->fkCours->fk_type == Yii::$app->params['coursPlanifie']) {
+            if (in_array($clientCoursDate->fkCoursDate->fkCours->fk_type, Yii::$app->params['coursPlanifieS'])) {
                 $cle = $clientCoursDate->fkCoursDate->fk_cours.'|'.$clientCoursDate->fkCoursDate->fkCours->fk_type;
                 $dataCoursDate[$cle]['duree'] = $clientCoursDate->fkCoursDate->fkCours->duree;
                 $dataCoursDate[$cle]['linkid'] = $clientCoursDate->fkCoursDate->fk_cours;
@@ -343,34 +487,53 @@ class PersonnesController extends Controller
             }
             $dataCoursDate[$cle]['fk_type'] = $clientCoursDate->fkCoursDate->fkCours->fk_type;
             $dataCoursDate[$cle]['fkType.nom'] = $clientCoursDate->fkCoursDate->fkCours->fkType->nom;
-            $dataCoursDate[$cle]['fkNom.nom'] = $clientCoursDate->fkCoursDate->fkCours->fkNom->nom;
+            $dataCoursDate[$cle]['fkNom.nom'] = $clientCoursDate->fkCoursDate->fkCours->fkNom->nom.' '.$clientCoursDate->fkCoursDate->fkCours->fkNiveau->nom;
             $dataCoursDate[$cle]['session'] = $clientCoursDate->fkCoursDate->fkCours->session;
             $dataCoursDate[$cle]['annee'] = $clientCoursDate->fkCoursDate->fkCours->annee;
+            $dataCoursDate[$cle]['fkSaison.nom'] = isset($clientCoursDate->fkCoursDate->fkCours->fkSaison) ? $clientCoursDate->fkCoursDate->fkCours->fkSaison->nom : '';
+
+            $isInscrit = ClientsHasCours::findOne(['fk_personne' => $model->personne_id, 'fk_cours' => $clientCoursDate->fkCoursDate->fk_cours]);
+            if (isset($isInscrit->fk_statut)) {
+                $dataCoursDate[$cle]['statutPartID'] = $isInscrit->fk_statut;
+            }
         }
         $coursDataProvider = new ArrayDataProvider([
-		    'allModels' => $dataCoursDate,
-		    'pagination' => [
-		        'pageSize' => 20,
-		    ],
-		]);
+            'allModels' => $dataCoursDate,
+            'pagination' => [
+                'pageSize' => 20,
+            ],
+        ]);
         
-        $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['is_actif' => [1]])->all();
+        $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['fk_statut' => [Yii::$app->params['coursActif']]])->all();
+        $dataCours = [];
         foreach ($coursNot as $c) {
-            if ($c->fk_type == Yii::$app->params['coursPlanifie']) {
-                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->session.'.'.$c->annee;    
+            if (in_array($c->fk_type, Yii::$app->params['coursPlanifieS'])) {
+                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->session.' '.$c->fkSaison->nom.' '.$c->fkSalle->nom;
             } else {
                 foreach ($c->coursDates as $coursDate) {
-                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->session.'.'.$c->annee.'-'.$coursDate->date;
+                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] =
+                            $c->fkNom->nom.' '.
+                            $c->fkNiveau->nom.' '.
+                            $c->session.' '.
+                            (!isset($c->fkSaison) ? 'none' : $c->fkSaison->nom).'-'.
+                            $coursDate->date;
                 }
             }
         }
         
+        $parametre = new Parametres();
+        $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
+        
         return $this->render('view', [
             'alerte' => $alerte,
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
             'coursDateDataProvider' => $coursDateDataProvider,
             'dataCours' => $dataCours,
             'coursDataProvider' => $coursDataProvider,
+            'parametre' => $parametre,
+            'emails' => $emails,
+            'activeTab' => $tab,
         ]);
     }
 
@@ -385,6 +548,9 @@ class PersonnesController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
+            if (isset(Yii::$app->request->post()['Personnes']['fk_langues'])) {
+                $model->fk_langues = Yii::$app->request->post()['Personnes']['fk_langues'];
+            }
             
             $transaction = \Yii::$app->db->beginTransaction();
             try {
@@ -397,7 +563,7 @@ class PersonnesController extends Controller
                     $addInterlocuteur = new PersonnesHasInterlocuteurs();
                     $addInterlocuteur->fk_personne = $model->personne_id;
                     $addInterlocuteur->fk_interlocuteur = $interlocuteur_id;
-                    if (!($flag = $addInterlocuteur->save(false))) {
+                    if (!$addInterlocuteur->save(false)) {
                         throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des interlocuteur(s).'));
                     }
                 }
@@ -405,7 +571,6 @@ class PersonnesController extends Controller
                 $transaction->commit();
                 return $this->redirect(['view', 'id' => $model->personne_id]);
             } catch (Exception $e) {
-                $alerte = $e->getMessage();
                 $transaction->rollBack();
             }
         }
@@ -427,19 +592,23 @@ class PersonnesController extends Controller
      * Updates an existing Personnes model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
+     * @param string $from
      * @return mixed
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $from = '')
     {
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
+            if (isset(Yii::$app->request->post()['Personnes']['fk_langues'])) {
+                $model->fk_langues = Yii::$app->request->post()['Personnes']['fk_langues'];
+            }
             
             $transaction = \Yii::$app->db->beginTransaction();
             try {
                 if (!$model->save()) {
-                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
+                    throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
                 }
                 
                 $interlocuteurs = (isset($post['list_interlocuteurs'])) ? $post['list_interlocuteurs'] : [];
@@ -448,26 +617,30 @@ class PersonnesController extends Controller
                     $addInterlocuteur = new PersonnesHasInterlocuteurs();
                     $addInterlocuteur->fk_personne = $model->personne_id;
                     $addInterlocuteur->fk_interlocuteur = $interlocuteur_id;
-                    if (!($flag = $addInterlocuteur->save(false))) {
-                        throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des interlocuteur(s).'));
+                    if (!$addInterlocuteur->save(false)) {
+                        throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des interlocuteur(s).'));
                     }
                 }
 
                 $transaction->commit();
+
+                $url = json_decode($from);
+                if (is_object($url)) {
+                    return $this->redirect([$url->url]);
+                }
                 return $this->redirect(['view', 'id' => $model->personne_id]);
             } catch (Exception $e) {
-                $alerte = $e->getMessage();
                 $transaction->rollBack();
             }
         }
         
         $myInterlocuteurs = PersonnesHasInterlocuteurs::find()->where(['fk_personne' => $model->personne_id])->all();
         foreach ($myInterlocuteurs as $interlocuteur) {
-	        $selectedInterlocuteurs[] = $interlocuteur->fk_interlocuteur;
+            $selectedInterlocuteurs[] = $interlocuteur->fk_interlocuteur;
         }
         $modelInterlocuteurs = Personnes::find()->where(['!=', 'personne_id', $model->personne_id])->orderBy('nom, prenom')->all();
         foreach ($modelInterlocuteurs as $interlocuteur) {
-            $dataInterlocuteurs[$interlocuteur->fkStatut->nom][$interlocuteur->personne_id] = $interlocuteur->NomPrenom;
+            $dataInterlocuteurs[$interlocuteur->personne_id] = $interlocuteur->NomPrenom;
         }
         
         return $this->render('update', [
@@ -476,6 +649,36 @@ class PersonnesController extends Controller
             'dataInterlocuteurs' => $dataInterlocuteurs,
             'selectedInterlocuteurs' => (isset($selectedInterlocuteurs)) ? $selectedInterlocuteurs : [],
         ]);
+    }
+    
+    /**
+     * Permet de lister les emails des personnes (ajax)
+     * @return json
+     */
+    public function actionSetemail() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (isset($_POST['keylist'])) {
+            $keys = $_POST['keylist'];
+            foreach ($keys as $k) {
+                $arrKeys = explode('*', $k);
+                $ids[] = (isset($arrKeys[1])) ? $arrKeys[1] : $arrKeys[0];
+            }
+            $listeEmails = [];
+            $models = Personnes::find()->where(['IN', 'personne_id', $ids])->all();
+            foreach ($models as $myPersonne) {
+                if (strpos($myPersonne->email, '@') !== false) {
+                    $listeEmails[$myPersonne->email] = $myPersonne->email;
+                }
+
+                foreach ($myPersonne->personneHasInterlocuteurs as $pi) {
+                    $listeEmails[$pi->fkInterlocuteur->email] = $pi->fkInterlocuteur->email;
+                }
+            }
+        } else {
+            $listeEmails = explode(', ', $_POST['allEmails']);
+        }
+        
+        return ['emails' => implode(', ', $listeEmails)];
     }
 
     /**
@@ -493,6 +696,23 @@ class PersonnesController extends Controller
     }
 
     /**
+     * @param $coursDate
+     * @return bool
+     */
+    protected function keepDateInStatistics($coursDate) {
+        $keep = false;
+        if (Yii::$app->params['coursUnique'] == $coursDate->fkCours->fk_type) {
+            $hasClient = $coursDate->clientsHasCoursDate;
+            if (count($hasClient) > 0) {
+                $keep = true;
+            }
+        } else {
+            $keep = true;
+        }
+        return $keep;
+    }
+
+    /**
      * Finds the Personnes model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -506,5 +726,20 @@ class PersonnesController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $mcd
+     * @return array
+     */
+    private function getBaremeID($mcd, $default): int
+    {
+        if (null != $mcd->fk_bareme) {
+            $key = $mcd->fk_bareme;
+        } else {
+            $isBaremeSet = $mcd->fkMoniteur->getMoniteursHasBaremeFromDate(date('Y-m-d', strtotime($mcd->fkCoursDate->date)));
+            $key = (!is_null($isBaremeSet) ? $isBaremeSet->fk_bareme : $default);
+        }
+        return (!is_null($key) ? $key : -1);
     }
 }
