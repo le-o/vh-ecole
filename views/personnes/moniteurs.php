@@ -14,7 +14,7 @@ ini_set('memory_limit', '-1');
 
 $this->registerCss('.table-responsive {overflow-x: visible;}');
 
-$this->title = ($isMoniteur) ? Yii::t('app', 'Mes cours comme moniteur') : Yii::t('app', 'Moniteurs');
+$this->title = ($isMoniteur) ? Yii::t('app', 'Mes cours comme moniteur') : Yii::t('app', 'Heures Moniteurs');
 $this->params['breadcrumbs'][] = Yii::t('app', 'Personnes');
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -80,6 +80,8 @@ $gridColumnsExport = array_merge(
     $gridColumnsHours,
     $gridColumnsEnd
 );
+$lastColumnIndex = count($gridColumnsExport)-1;
+$baremeColumnIndexes = range(11, count($gridColumnsHours)+12); // +12 pour ajouter la colonne heure
 ?>
 
 <div class="personnes-moniteurs">
@@ -107,6 +109,8 @@ $gridColumnsExport = array_merge(
                 'target' => ExportMenu::TARGET_SELF,
                 'showConfirmAlert' => false,
                 'showColumnSelector' => true,
+                'selectedColumns' => array_merge([1,2,3,7], $baremeColumnIndexes),
+                'noExportColumns' => [$lastColumnIndex],
                 'columnBatchToggleSettings' => [
                     'label' => Yii::t('app', 'Tous/aucun'),
                 ],

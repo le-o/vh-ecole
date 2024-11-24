@@ -36,7 +36,7 @@ use webvimark\modules\UserManagement\models\User;
                      ['label' => Yii::t('app', 'Inscription online'), 'url' => ['/clients-online'], 'visible' => User::canRoute(['/clients-online/index'])],
                      ['label' => Yii::t('app', 'Inscription anniversaire'), 'url' => ['/clients-online/createanniversaire', 'free' => true], 'linkOptions' => ['target'=>'_blank'], 'visible' => User::canRoute(['/clients-online/index'])],
                      ['label' => Yii::t('app', 'Clients actifs'), 'url' => ['/cours-date/actif'], 'visible' => User::canRoute(['/cours-date/actif'])],
-                     ['label' => Yii::t('app', 'Les moniteurs'), 'url' => ['/personnes/moniteurs'], 'visible' => User::canRoute(['/personnes/moniteurs'])],
+                     ['label' => Yii::t('app', 'Heures moniteurs'), 'url' => ['/personnes/moniteurs'], 'visible' => User::canRoute(['/personnes/moniteurs'])],
                      ['label' => '<strong>ADMIN TASKS</strong>', 'visible' => User::canRoute(['/parametres/index'])],
                      ['label' => '&nbsp;' . Yii::t('app', 'Gestion des codes'), 'url' => ['/parametres'], 'visible' => User::canRoute(['/parametres/index'])],
                      ['label' => '&nbsp;' . Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore'], 'visible' => User::canRoute(['/backuprestore/index'])],
