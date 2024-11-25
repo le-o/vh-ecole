@@ -31,7 +31,12 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => Yii::t('app', 'Nom cours'),
                 'value' => function ($model) {
-                    return ($model->fkCours) ? $model->fkCours->fkNom->nom : $model->fkCoursNom->nom;
+                    if ($model->fkCours) {
+                        return $model->fkCours->fkNom->nom;
+                    } elseif ($model->fkCoursNom) {
+                        return $model->fkCoursNom->nom;
+                    }
+                    return 'n/a';
                 }
             ],
             'nom',
