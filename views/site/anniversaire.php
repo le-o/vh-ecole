@@ -79,7 +79,6 @@ $this->title = 'VH Gestion des anniversaires';
                 <h2><?= $salle->nom ?></h2>
                 <?= yii2fullcalendar\yii2fullcalendar::widget([
                     'clientOptions' => [
-                        'lang' => 'fr',
                         'defaultView' => Yii::$app->session->get('anni-cal-view-' . $salle->parametre_id),
                         'weekNumbers' => true,
                         'defaultDate' => Yii::$app->session->get('anni-cal-debut-' . $salle->parametre_id),
@@ -92,6 +91,7 @@ $this->title = 'VH Gestion des anniversaires';
                     ],
                     'options' => [
                         'id' => 'myCalendar' . $salle->parametre_id,
+                        'lang' => 'fr',
                     ],
                     'header' => [
                         'center'=>'title',

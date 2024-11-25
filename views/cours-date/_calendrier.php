@@ -10,7 +10,6 @@ $this->title = 'VH Calendrier des cours';
     
     <?= yii2fullcalendar\yii2fullcalendar::widget([
         'clientOptions' => [
-            'lang' => 'fr',
             'defaultView' => 'agendaWeek',
             'weekNumbers' => true,
             'defaultDate' => date('Y-m-d'),
@@ -22,6 +21,7 @@ $this->title = 'VH Calendrier des cours';
         ],
         'options' => [
             'id' => 'myCalendar',
+            'lang' => 'fr',
         ],
         'header' => [
             'center'=>'title',

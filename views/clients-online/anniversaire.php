@@ -39,7 +39,6 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
         <div class="col-md-12">
             <?= yii2fullcalendar\yii2fullcalendar::widget([
                 'clientOptions' => [
-                    'lang' => 'fr',
                     'defaultView' => Yii::$app->session->get('anni-cal-view'),
                     'weekNumbers' => true,
                     'defaultDate' => Yii::$app->session->get('anni-cal-debut'),
@@ -55,6 +54,7 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
                 ],
                 'options' => [
                     'id' => 'myCalendar' . $model->parametre_id,
+                    'lang' => 'fr',
                 ],
                 'header' => [
                     'center'=>'title',
