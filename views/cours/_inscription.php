@@ -98,7 +98,7 @@ $this->registerJs($modalJs, View::POS_END);
     <?= GridView::widget([
         'dataProvider' => $coursDataProvider,
         'rowOptions' => function($model) {
-            if (Yii::$app->params['partDesinscrit'] == $model['statutPartID']) {
+            if (isset($model['statutPartID']) && Yii::$app->params['partDesinscrit'] == $model['statutPartID']) {
                 return ['class' => 'danger'];
             }
         },
