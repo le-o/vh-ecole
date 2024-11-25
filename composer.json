@@ -38,7 +38,9 @@
         "spatie/calendar-links": "^1.1",
         "webvimark/module-user-management": "*",
         "lajax/yii2-language-picker": "1.*",
-        "xstreamka/yii2-mobile-detect": "*"
+        "xstreamka/yii2-mobile-detect": "*",
+        "symfony/css-selector": "4.4.37 as 3.4.47",
+        "symfony/dom-crawler": "4.4.39 as 3.4.47"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",
