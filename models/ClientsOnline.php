@@ -247,7 +247,9 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
-            $this->date_naissance = date('Y-m-d', strtotime($this->date_naissance));
+            if (!empty($this->date_naissance)) {
+                $this->date_naissance = date('Y-m-d', strtotime($this->date_naissance));
+            }
             $this->date_inscription = date('Y-m-d H:i:s');
             return true;
         } else {
