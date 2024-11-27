@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use leo\modules\UserManagement\models\rbacDB\Role;
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\models\rbacDB\Role;
+use webvimark\modules\UserManagement\models\User;
 use Yii;
 use app\models\Personnes;
 use app\models\PersonnesSearch;
@@ -40,7 +40,7 @@ class PersonnesController extends CommonController
                 ],
             ],
             'ghost-access'=> [
-                'class' => 'leo\modules\UserManagement\components\GhostAccessControl',
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
         ];
     }

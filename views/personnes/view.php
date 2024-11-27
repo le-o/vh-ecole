@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap\Alert;
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\models\User;
 use yii\bootstrap\Tabs;
 
 /* @var $this yii\web\View */

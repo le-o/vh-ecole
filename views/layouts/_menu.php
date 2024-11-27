@@ -6,8 +6,8 @@
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 
-use leo\modules\UserManagement\UserManagementModule;
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\UserManagementModule;
+use webvimark\modules\UserManagement\models\User;
     
     NavBar::begin([
         'brandLabel' => 'Vertic-Halle - Gestion des cours',
