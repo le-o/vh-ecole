@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-use webvimark\modules\UserManagement\models\User;
+use leo\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Moniteurs */

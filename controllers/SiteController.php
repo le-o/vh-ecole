@@ -19,7 +19,7 @@ use yii\data\ActiveDataProvider;
 use yii\db\Exception;
 
 use Spatie\CalendarLinks\Link;
-use webvimark\modules\UserManagement\models\User;
+use leo\modules\UserManagement\models\User;
 use DateTime;
 
 require_once('../vendor/le-o/simpleCalDAV/SimpleCalDAVClient.php');
@@ -35,7 +35,7 @@ class SiteController extends Controller
         return [
             
             'ghost-access'=> [
-                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
+                'class' => 'leo\modules\UserManagement\components\GhostAccessControl',
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
