@@ -5,7 +5,7 @@ use yii\helpers\Url;
 use kartik\grid\GridView;
 use yii\bootstrap\Alert;
 use kartik\export\ExportMenu;
-use webvimark\modules\UserManagement\models\User;
+use leo\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\CoursDateSearch */

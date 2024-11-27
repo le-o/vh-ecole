@@ -39,7 +39,7 @@ class ClientsOnlineController extends CommonController
                 ],
             ],
             'ghost-access'=> [
-                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
+                'class' => 'leo\modules\UserManagement\components\GhostAccessControl',
             ],
         ];
     }
