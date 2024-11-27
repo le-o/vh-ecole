@@ -1,6 +1,6 @@
 <?php
 
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\models\User;
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\helpers\Url;

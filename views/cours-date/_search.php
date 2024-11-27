@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\models\User;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */

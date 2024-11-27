@@ -7,7 +7,7 @@ use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Alert;
 use yii\web\View;
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\models\User;
 use kartik\export\ExportMenu;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;

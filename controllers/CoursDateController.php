@@ -17,7 +17,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\db\Exception;
 use yii\data\ArrayDataProvider;
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\models\User;
 
 /**
  * CoursDateController implements the CRUD actions for CoursDate model.
@@ -37,7 +37,7 @@ class CoursDateController extends CommonController
                 ],
             ],
             'ghost-access'=> [
-                'class' => 'leo\modules\UserManagement\components\GhostAccessControl',
+                'class' => 'webvimark\modules\UserManagement\components\GhostAccessControl',
             ],
         ];
     }

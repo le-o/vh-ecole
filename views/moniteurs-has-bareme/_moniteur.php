@@ -6,7 +6,7 @@ use yii\grid\GridView;
 use kartik\select2\Select2;
 use yii\bootstrap\Alert;
 use yii\helpers\Url;
-use leo\modules\UserManagement\models\User;
+use webvimark\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\MoniteursHasBareme */
