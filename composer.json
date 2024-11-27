@@ -36,8 +36,7 @@
         "le-o/yii2fullcalendar":"4.0.3",
         "wbraganca/yii2-dynamicform": "dev-master",
         "spatie/calendar-links": "^1.1",
-        "le-o/components": "1.0.4",
-        "le-o/module-user-management": "dev-main-vh",
+        "webvimark/module-user-management": "*",
         "lajax/yii2-language-picker": "1.*",
         "xstreamka/yii2-mobile-detect": "*",
         "symfony/css-selector": "4.4.37 as 3.4.47",
@@ -92,14 +91,6 @@
         {
             "type": "git",
             "url": "https://github.com/le-o/yii2fullcalendar.git"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/le-o/components"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/le-o/user-management.git"
         },
         {
             "type": "composer",
