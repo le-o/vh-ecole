@@ -236,7 +236,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
      */
     public function afterFind()
     {
-        $this->date_naissance = ($this->date_naissance == '0000-00-00') ? '' : date('d.m.Y', strtotime($this->date_naissance));
+        $this->date_naissance = ($this->date_naissance == '0000-00-00' || empty($this->date_naissance)) ? '' : date('d.m.Y', strtotime($this->date_naissance));
         $this->date_inscription = date('d.m.Y H:i:s', strtotime($this->date_inscription));
         parent::afterFind();
     }
