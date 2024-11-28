@@ -8,7 +8,7 @@ use yii\grid\GridView;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
 use kartik\select2\Select2;
-use webvimark\modules\UserManagement\models\User;
+use leo\modules\UserManagement\models\User;
 
 /* @var $this yii\web\View */
 
