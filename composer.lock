@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c65423cd7eea03a3389b72393ed0b1f",
+    "content-hash": "7d94759fd383d2bdd0471831cd89be88",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -1987,6 +1987,63 @@
             "time": "2018-03-25T10:14:10+00:00"
         },
         {
+            "name": "le-o/components",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/le-o/components",
+                "reference": "ca8a03ecc02b28e49fb38a6936b7bbacb2a175db"
+            },
+            "require": {
+                "webvimark/helpers": "^1.0.0",
+                "webvimark/image": "^1.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "leo\\components\\": ""
+                }
+            },
+            "description": "Components for yii 2",
+            "time": "2020-10-01T04:43:07+00:00"
+        },
+        {
+            "name": "le-o/module-user-management",
+            "version": "dev-main-vh",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/le-o/user-management.git",
+                "reference": "c19634f215b0a73081bbecf88b08327bb4c69954"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/le-o/user-management/zipball/c19634f215b0a73081bbecf88b08327bb4c69954",
+                "reference": "c19634f215b0a73081bbecf88b08327bb4c69954",
+                "shasum": ""
+            },
+            "require": {
+                "ikimea/browser": "1.12.0",
+                "le-o/components": "1.0.4",
+                "webvimark/bootstrap-switch": "^1.0.0",
+                "webvimark/date-range-picker": "^1.0.0",
+                "webvimark/grid-bulk-actions": "^1.0.0",
+                "webvimark/grid-page-size": "^1.0.0",
+                "webvimark/helpers": "^1.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "leo\\modules\\UserManagement\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "User with improved RBAC - a fork from webvimark",
+            "support": {
+                "source": "https://github.com/le-o/user-management/tree/main-vh"
+            },
+            "time": "2024-11-27T20:30:10+00:00"
+        },
+        {
             "name": "le-o/yii2fullcalendar",
             "version": "4.0.3",
             "source": {
@@ -3419,16 +3476,16 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.5.0",
+            "version": "v3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1"
+                "reference": "74c71c939a79f7d5bf3c1ce9f5ea37ba0114c6f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1",
-                "reference": "0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/74c71c939a79f7d5bf3c1ce9f5ea37ba0114c6f6",
+                "reference": "74c71c939a79f7d5bf3c1ce9f5ea37ba0114c6f6",
                 "shasum": ""
             },
             "require": {
@@ -3466,7 +3523,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.5.0"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.5.1"
             },
             "funding": [
                 {
@@ -3482,7 +3539,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-04-18T09:32:20+00:00"
+            "time": "2024-09-25T14:20:29+00:00"
         },
         {
             "name": "symfony/dom-crawler",
@@ -3640,16 +3697,16 @@
         },
         {
             "name": "symfony/event-dispatcher-contracts",
-            "version": "v3.5.0",
+            "version": "v3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher-contracts.git",
-                "reference": "8f93aec25d41b72493c6ddff14e916177c9efc50"
+                "reference": "7642f5e970b672283b7823222ae8ef8bbc160b9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/8f93aec25d41b72493c6ddff14e916177c9efc50",
-                "reference": "8f93aec25d41b72493c6ddff14e916177c9efc50",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/7642f5e970b672283b7823222ae8ef8bbc160b9f",
+                "reference": "7642f5e970b672283b7823222ae8ef8bbc160b9f",
                 "shasum": ""
             },
             "require": {
@@ -3696,7 +3753,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.5.0"
+                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.5.1"
             },
             "funding": [
                 {
@@ -3712,7 +3769,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-04-18T09:32:20+00:00"
+            "time": "2024-09-25T14:20:29+00:00"
         },
         {
             "name": "symfony/mailer",
@@ -4344,16 +4401,16 @@
         },
         {
             "name": "symfony/service-contracts",
-            "version": "v3.5.0",
+            "version": "v3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/service-contracts.git",
-                "reference": "bd1d9e59a81d8fa4acdcea3f617c581f7475a80f"
+                "reference": "e53260aabf78fb3d63f8d79d69ece59f80d5eda0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/bd1d9e59a81d8fa4acdcea3f617c581f7475a80f",
-                "reference": "bd1d9e59a81d8fa4acdcea3f617c581f7475a80f",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/e53260aabf78fb3d63f8d79d69ece59f80d5eda0",
+                "reference": "e53260aabf78fb3d63f8d79d69ece59f80d5eda0",
                 "shasum": ""
             },
             "require": {
@@ -4407,7 +4464,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/service-contracts/tree/v3.5.0"
+                "source": "https://github.com/symfony/service-contracts/tree/v3.5.1"
             },
             "funding": [
                 {
@@ -4423,7 +4480,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-04-18T09:32:20+00:00"
+            "time": "2024-09-25T14:20:29+00:00"
         },
         {
             "name": "wbraganca/yii2-dynamicform",
@@ -4506,38 +4563,6 @@
                 "source": "https://github.com/webvimark/bootstrap-switch/tree/master"
             },
             "time": "2014-06-23T10:35:32+00:00"
-        },
-        {
-            "name": "webvimark/components",
-            "version": "1.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webvimark/components.git",
-                "reference": "805b7ecfaea1654a8c0f47bc007497c97bdc9613"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webvimark/components/zipball/805b7ecfaea1654a8c0f47bc007497c97bdc9613",
-                "reference": "805b7ecfaea1654a8c0f47bc007497c97bdc9613",
-                "shasum": ""
-            },
-            "require": {
-                "webvimark/helpers": "^1.0.0",
-                "webvimark/image": "^1.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "webvimark\\components\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "Components for yii 2",
-            "support": {
-                "issues": "https://github.com/webvimark/components/issues",
-                "source": "https://github.com/webvimark/components/tree/master"
-            },
-            "time": "2016-06-28T09:29:18+00:00"
         },
         {
             "name": "webvimark/date-range-picker",
@@ -4678,43 +4703,6 @@
                 "source": "https://github.com/webvimark/image/tree/master"
             },
             "time": "2014-07-02T07:33:43+00:00"
-        },
-        {
-            "name": "webvimark/module-user-management",
-            "version": "1.0.13",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webvimark/user-management.git",
-                "reference": "48adb6cc53fc0a7da34dbf31bba47a0ef8d35cd8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webvimark/user-management/zipball/48adb6cc53fc0a7da34dbf31bba47a0ef8d35cd8",
-                "reference": "48adb6cc53fc0a7da34dbf31bba47a0ef8d35cd8",
-                "shasum": ""
-            },
-            "require": {
-                "ikimea/browser": "1.12.0",
-                "webvimark/bootstrap-switch": "^1.0.0",
-                "webvimark/components": "^1.0.0",
-                "webvimark/date-range-picker": "^1.0.0",
-                "webvimark/grid-bulk-actions": "^1.0.0",
-                "webvimark/grid-page-size": "^1.0.0",
-                "webvimark/helpers": "^1.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "webvimark\\modules\\UserManagement\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "User with improved RBAC",
-            "support": {
-                "issues": "https://github.com/webvimark/user-management/issues",
-                "source": "https://github.com/webvimark/user-management/tree/master"
-            },
-            "time": "2016-10-14T10:53:00+00:00"
         },
         {
             "name": "xstreamka/yii2-mobile-detect",
@@ -5631,6 +5619,7 @@
         "kartik-v/yii2-widget-fileinput": 20,
         "kartik-v/yii2-widget-select2": 20,
         "kartik-v/yii2-widget-timepicker": 20,
+        "le-o/module-user-management": 20,
         "open-ecommerce/yii2-backuprestore": 20,
         "wbraganca/yii2-dynamicform": 20
     },
