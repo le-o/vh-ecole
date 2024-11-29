@@ -199,7 +199,11 @@ class PersonnesController extends CommonController
                 }
                 if (!$searchParCours || ($searchParCours && $heures !== 0)) {
                     $dataMoniteurs[$moniteur->personne_id]['personne_id'] = $moniteur->personne_id;
-                    $dataMoniteurs[$moniteur->personne_id]['no_cresus'] = (isset($moniteur->moniteurInfo) ? $moniteur->moniteurInfo->no_cresus : '<!--n/a-->');
+                    $dataMoniteurs[$moniteur->personne_id]['no_cresus'] = (
+                        isset($moniteur->moniteurInfo) && !is_null($moniteur->moniteurInfo->no_cresus)
+                            ? $moniteur->moniteurInfo->no_cresus
+                            : '<!--n/a-->'
+                    );
                     $dataMoniteurs[$moniteur->personne_id]['nom'] = $moniteur->nom;
                     $dataMoniteurs[$moniteur->personne_id]['prenom'] = $moniteur->prenom;
                     $dataMoniteurs[$moniteur->personne_id]['adresse1'] = $moniteur->adresse1;
