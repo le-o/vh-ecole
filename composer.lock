@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d94759fd383d2bdd0471831cd89be88",
+    "content-hash": "f59e85fb78e2902fe3f7f6d972100afe",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -2013,12 +2013,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/le-o/user-management.git",
-                "reference": "c19634f215b0a73081bbecf88b08327bb4c69954"
+                "reference": "e1a9c1b516197eeee605e4f806fb1895d6de3bf0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/le-o/user-management/zipball/c19634f215b0a73081bbecf88b08327bb4c69954",
-                "reference": "c19634f215b0a73081bbecf88b08327bb4c69954",
+                "url": "https://api.github.com/repos/le-o/user-management/zipball/e1a9c1b516197eeee605e4f806fb1895d6de3bf0",
+                "reference": "e1a9c1b516197eeee605e4f806fb1895d6de3bf0",
                 "shasum": ""
             },
             "require": {
@@ -2041,7 +2041,28 @@
             "support": {
                 "source": "https://github.com/le-o/user-management/tree/main-vh"
             },
-            "time": "2024-11-27T20:30:10+00:00"
+            "time": "2024-11-27T22:48:11+00:00"
+        },
+        {
+            "name": "le-o/simplecaldav",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/le-o/simpleCalDAV.git",
+                "reference": "f9533c96599c383d0b2a2ba42986bfb615673753"
+            },
+            "require": {
+                "webvimark/helpers": "^1.0.0",
+                "webvimark/image": "^1.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "leo\\components\\": ""
+                }
+            },
+            "description": "Components for yii 2",
+            "time": "2024-11-29T08:03:05+00:00"
         },
         {
             "name": "le-o/yii2fullcalendar",

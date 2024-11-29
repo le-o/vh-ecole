@@ -38,6 +38,7 @@
         "spatie/calendar-links": "^1.1",
         "le-o/components": "1.0.4",
         "le-o/module-user-management": "dev-main-vh",
+        "le-o/simplecaldav": "*",
         "lajax/yii2-language-picker": "1.*",
         "xstreamka/yii2-mobile-detect": "*",
         "symfony/css-selector": "4.4.37 as 3.4.47",
@@ -100,6 +101,10 @@
         {
             "type": "git",
             "url": "https://github.com/le-o/user-management.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/le-o/simpleCalDAV.git"
         },
         {
             "type": "composer",

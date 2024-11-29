@@ -22,7 +22,7 @@ use Spatie\CalendarLinks\Link;
 use leo\modules\UserManagement\models\User;
 use DateTime;
 
-require_once('../vendor/le-o/simpleCalDAV/SimpleCalDAVClient.php');
+require_once('../vendor/le-o/simplecaldav/SimpleCalDAVClient.php');
 
 class SiteController extends Controller
 {
