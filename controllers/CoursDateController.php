@@ -81,7 +81,7 @@ class CoursDateController extends CommonController
             $alerte['message'] = Yii::t('app', 'Cours sauvé, mais problème lors de l\'envoi du mail au moniteur.');
         } elseif ($msg === 'nombreAnni') {
             $alerte['class'] = 'warning';
-            $alerte['message'] = Yii::t('app', 'Attention, 3 anniversaires sont déjà réservés, voulez-vous vraiment enregistrer une inscription ?');
+            $alerte['message'] = Yii::t('app', 'Attention, le nombre maximum d\'anniversaires simultanés sont déjà réservés, voulez-vous vraiment enregistrer une inscription ?');
         }
         
         if ($post = Yii::$app->request->post()) {
