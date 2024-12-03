@@ -147,4 +147,52 @@ class Moniteurs extends \yii\db\ActiveRecord
     {
         return MoniteursHasFormations::findOne(['fk_moniteur' => $moniteur_id, 'fk_formation' => $formation_id]);
     }
+
+    /**
+     * @return string
+     */
+    public function getMoniteursRole() {
+        // Case animateur.rice ASSE ou encadrant.e ASSE ou instructeur/rice ASSE (choisir le meilleur niveau)
+        // ET ajouter à la ligne responsable de formation ASSE
+        // ET ajouter à la ligne expert.e ASSE - si les dates sont remplies évidemment
+        $role = '';
+        if (!empty($this->instructeur_asse)) {
+            $role = 'Instructeur';
+        } elseif (!empty($this->encadrant_asse)) {
+            $role = 'Encadrant';
+        } elseif (!empty($this->animateur_asse)) {
+            $role = 'Animateur';
+        }
+        $sep = (!empty($role) ? PHP_EOL : '');
+        if (!empty($this->referent_asse)) {
+            $role .= $sep . 'Responsable';
+        }
+        if (!empty($this->expert_asse)) {
+            $role .= $sep . 'Expert';
+        }
+        return $role;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMoniteursExamDate() {
+        // Date de passage de l'examen de animateur/encadrant/instructeur
+        // (prendre la date du meilleur niveau choisi avant dans la colonne "rolle"
+        if (!empty($this->expert_asse)) {
+            $date = $this->expert_asse;
+        } elseif (!empty($this->referent_asse)) {
+            $date = $this->referent_asse;
+        } elseif (!empty($this->instructeur_asse)) {
+            $date = $this->instructeur_asse;
+        } elseif (!empty($this->encadrant_asse)) {
+            $date = $this->encadrant_asse;
+        } elseif (!empty($this->animateur_asse)) {
+            $date = $this->animateur_asse;
+        } else {
+            return '';
+        }
+
+        return date('d.m.Y', strtotime($date));
+    }
 }

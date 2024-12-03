@@ -386,4 +386,16 @@ class Parametres extends \yii\db\ActiveRecord
         }
         return '#'.$couleur;
     }
+
+    public function listFormations() {
+        $query = self::find()->where(['class_key' => 22])->orderBy('tri');
+        $query->andWhere(['OR', 'date_fin_validite IS NULL', ['>=', 'date_fin_validite', 'today()']]);
+
+        $models = $query->all();
+        $codes = [];
+        foreach($models as $model) {
+            $codes[$model['parametre_id']] = $model->info_special;
+        }
+        return $codes;
+    }
 }

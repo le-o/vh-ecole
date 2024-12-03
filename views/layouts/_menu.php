@@ -44,6 +44,7 @@ use leo\modules\UserManagement\models\User;
                      ['label' => '&nbsp;' . Yii::t('app', 'Emails envoyés'), 'url' => ['/sent-email'], 'visible' => User::canRoute(['/sent-email/index'])],
                      ['label' => '<strong>EXPORTATION</strong>', 'visible' => User::canRoute(['/cours-date/actif'])],
                      ['label' => '&nbsp;' . Yii::t('app', 'Exportation JS'), 'url' => ['/cours-date/exportjs'], 'visible' => User::canRoute(['/cours-date/actif'])],
+                     ['label' => '&nbsp;' . Yii::t('app', 'Exportation ASSE'), 'url' => ['/moniteurs/exportasse'], 'visible' => User::canRoute(['/moniteurs/exportasse'])],
                 ],
             ],
             ['label' => Yii::t('app', 'Gestion des droits'), 'visible' => !Yii::$app->user->isGuest && User::canRoute(['/user-management/user/index']),

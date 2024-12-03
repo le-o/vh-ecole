@@ -430,12 +430,14 @@ return [
     'cashflow Baltschieder' => 'Cashflow Baltschieder',
     'inscrit(e) à l\'année' => 'eingeschrieben fürs Jahr',
     'Sans moniteur' => 'Sans moniteur',
-    'Actif' => '',
-    'Inactif' => '',
+    'actif.ve' => 'aktiv',
+    'inactif.ve' => 'inaktiv',
     'Annulé par VH' => '',
     'Annulé par client' => '',
     'warning12+' => 'ACHTUNG: Die Anzahl Personen die ausgewählt wurden, überschreiten unsere Limite für den 
         Geburtstagstisch. Nach der Anmeldung, werden wir uns so schnell wie möglich mit Ihenn in Verbindung setzen. Die 
         Reservierungsbestätigung wird erst nach der Verarbeitung der Anmeldung zugesendet.',
     'Cours sauvé, mais problème lors de l\'envoi du mail au moniteur.' => 'Cours sauvé, mais problème lors de l\'envoi du mail au moniteur.',
+    'Homme' => 'männlich',
+    'Femme' => 'weiblich',
 ];
