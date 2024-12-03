@@ -74,12 +74,6 @@ $gridColumns = [
         }
     ],
     ['label' => 'Bemerkung', 'attribute' => 'remarque'],
-    [
-        'label' => 'WB 17',
-        'value' => function($model) {
-            return ($model->checkMoniteursHasOneFormation($model->moniteur_id, 446) ? 'OK' : 'FAUX');
-        },
-    ],
 ];
 
 foreach ($formations as $key => $f) {
