@@ -34,6 +34,9 @@ class MoniteursController extends CommonController
                     'delete' => ['POST'],
                 ],
             ],
+            'ghost-access'=> [
+                'class' => 'leo\modules\UserManagement\components\GhostAccessControl',
+            ],
         ];
     }
 
