@@ -17,6 +17,11 @@ use yii\filters\VerbFilter;
  */
 class MoniteursController extends CommonController
 {
+
+    private static $SEXETOCIVILITE = [
+        410 => 'Monsieur',
+        411 => 'Madame'
+    ];
     /**
      * {@inheritdoc}
      */
@@ -182,126 +187,106 @@ class MoniteursController extends CommonController
      * List and export moniteurs.
      * @return mixed
      */
-    public function actionExportasse()
+    public function actionExport()
     {
         $this->layout = 'main_full.php';
         $searchModel = new MoniteursSearch();
-//        $searchModel->depuis = date('d.m.Y');
-//
-//        $searchModel->withoutMoniteur = false;
-//        // on clone le searchModel pour la liste déroulante des cours actifs
-//        $searchModelAllCours = clone $searchModel;
-//
-//        $searchModel->listCours = (isset(Yii::$app->request->queryParams['list_cours'])) ? Yii::$app->request->queryParams['list_cours'] : [];
-//        $selectedCours = $searchModel->listCours;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false);
 
-        return $this->render('/personnes/exportasse', [
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $gridColumnsASSE = $this->getGridColumnsForASSE();
+        $gridColumnsMP = $this->getGridColumnsForMP();
+
+        return $this->render('export', [
             'dataProvider' => $dataProvider,
-            'formations' => (new Parametres())->listFormations(),
+            'gridColumnsMP' => $gridColumnsMP,
+            'gridColumnsASSE' => $gridColumnsASSE,
         ]);
+    }
 
-        $selectedFinance = (isset(Yii::$app->request->queryParams['list_finance'])) ? Yii::$app->request->queryParams['list_finance'] : '';
-
-        $dataProviderAllCours = $searchModelAllCours->search(Yii::$app->request->queryParams, false);
-
-        if (!empty(Yii::$app->request->post()) && isset(Yii::$app->request->post()['checkedEmails'])) {
-            $mail = Yii::$app->request->post();
-            $this->actionEmail($mail['Parametres'], explode(', ', $mail['checkedEmails']));
-
-            $alerte['class'] = 'info';
-            $alerte['message'] = Yii::t('app', 'Email envoyé à toutes les personnes sélectionnées');
-        }
-
-        $arrayParticipants = [];
-        $listeEmails = [];
-        foreach ($dataProvider->models as $data) {
-            foreach ($data->clientsHasCoursDate as $client) {
-                if (!isset($arrayParticipants[$client->fk_personne]) && (empty($selectedFinance) || $selectedFinance == $client->fkPersonne->fk_finance)) {
-                    $arrayParticipants[$client->fk_personne]['nom'] = $client->fkPersonne->nom;
-                    $arrayParticipants[$client->fk_personne]['prenom'] = $client->fkPersonne->prenom;
-                    $arrayParticipants[$client->fk_personne]['finance'] = (isset($client->fkPersonne->fkFinance) ?
-                        $client->fkPersonne->fkFinance->nom : '');
-                    $arrayParticipants[$client->fk_personne]['suivi_client'] = $client->fkPersonne->suivi_client;
-                    $arrayParticipants[$client->fk_personne]['date_naissance'] = $client->fkPersonne->date_naissance;
-                    $arrayParticipants[$client->fk_personne]['cours_id'] = $data->fk_cours;
-                    $arrayParticipants[$client->fk_personne]['personne_id'] = $client->fk_personne;
-                    $arrayParticipants[$client->fk_personne]['avs'] = $client->fkPersonne->no_avs;
-                    $arrayParticipants[$client->fk_personne]['email'] =
-                        ('interloc.' == $client->fkPersonne->email && isset($client->fkPersonne->personneHasInterlocuteurs[0])) ?
-                            $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->email :
-                            $client->fkPersonne->email;
-                    $arrayParticipants[$client->fk_personne]['telephone'] =
-                        ('interloc.' == $client->fkPersonne->telephone && isset($client->fkPersonne->personneHasInterlocuteurs[0])) ?
-                            $client->fkPersonne->personneHasInterlocuteurs[0]->fkInterlocuteur->telephone :
-                            $client->fkPersonne->telephone;
-
-                    // pour export JS
-                    if ($forExport) {
-                        $arrayParticipants[$client->fk_personne]['nopersonnel'] = $client->fkPersonne->nopersonnel;
-                        $arrayParticipants[$client->fk_personne]['fkSexe'] = $client->fkPersonne->fkSexe;
-                        $arrayParticipants[$client->fk_personne]['no_avs'] = $client->fkPersonne->no_avs;
-                        $arrayParticipants[$client->fk_personne]['fkNationalite'] = $client->fkPersonne->fkNationalite;
-                        $arrayParticipants[$client->fk_personne]['fkLangueMat'] = $client->fkPersonne->fkLangueMat;
-                        $arrayParticipants[$client->fk_personne]['rue'] = $client->fkPersonne->adresse1;
-                        $arrayParticipants[$client->fk_personne]['numero'] = $client->fkPersonne->numeroRue;
-                        $arrayParticipants[$client->fk_personne]['npa'] = $client->fkPersonne->npa;
-                        $arrayParticipants[$client->fk_personne]['localite'] = $client->fkPersonne->localite;
-                        $arrayParticipants[$client->fk_personne]['fkPays'] = $client->fkPersonne->fkPays;
+    private function getGridColumnsForMP():array {
+        return [
+            [
+                'label' => 'Civilité',
+                'value' => function($model) {
+                    if (isset($model->fkPersonne->fk_sexe)) {
+                        return self::$SEXETOCIVILITE[$model->fkPersonne->fk_sexe];
                     }
-
-                    if (strpos($client->fkPersonne->email, '@') !== false) {
-                        $listeEmails[$client->fkPersonne->email] = trim($client->fkPersonne->email);
-                    }
-                    foreach ($client->fkPersonne->personneHasInterlocuteurs as $pi) {
-                        $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
-                    }
-                    $arrayParticipants[$client->fk_personne]['cours_info'] =
-                        (isset($data->fkCours->fk_nom) ? $data->fkCours->fkNom->nom : '') . ' ' .
-                        $data->fkCours->session . ' ' .
-                        (isset($data->fkCours->fk_saison) ? $data->fkCours->fkSaison->nom : '') . ' ' .
-                        (isset($data->fkCours->fk_salle) ? $data->fkCours->fkSalle->nom : '');
+                    return '';
                 }
-            }
-        }
-        // pour trier, par chance c'est dans le bon ordre :)
-        asort($arrayParticipants);
-
-        $participantDataProvider = new ArrayDataProvider([
-            'allModels' => $arrayParticipants,
-            'pagination' => [
-                'pageSize' => 100,
             ],
-        ]);
+            ['label' => 'Nom', 'attribute' => 'fkPersonne.nom'],
+            ['label' => 'Prénom', 'attribute' => 'fkPersonne.prenom'],
+            ['label' => 'Téléphone', 'attribute' => 'fkPersonne.telephone'],
+            ['label' => 'Date de naissance', 'attribute' => 'fkPersonne.date_naissance'],
+        ];
+    }
 
-        $dataCours = [];
-        foreach ($dataProviderAllCours->models as $data) {
-            if (!$forExport || ($forExport && in_array($data->fkCours->fkNom->info_special, Yii::$app->params["coursPlanifieS"]))) {
-                $dataCours[$data->fk_cours] = $data->fkCours->fkNom->nom . ' ' . $data->fkCours->session;
-            }
-        }
-        asort($dataCours);
+    private function getGridColumnsForASSE():array {
+        $columns = [
+            [
+                'label' => 'Kletteranlage',
+                'value' => function($model) {
+                    if (isset($model->fkPersonne->fk_salle_admin)) {
+                        return 'Vertic-Halle - ' . $model->fkPersonne->fkSalleadmin->nom;
+                    }
+                    return '';
+                }
+            ],
+            [
+                'label' => 'Rolle',
+                'value' => function($model) {
+                    return $model->moniteursRole;
+                }
+            ],
+            [
+                'label' => 'Status',
+                'value' => function($model) {
+                    if (isset($model->fkPersonne->fk_type)) {
+                        return Yii::t('app', $model->fkPersonne->fkType->nom, [], 'de-CH');
+                    }
+                    return '';
+                }
+            ],
+            ['label' => 'Name', 'attribute' => 'fkPersonne.nom'],
+            ['label' => 'Vorname', 'attribute' => 'fkPersonne.prenom'],
+            [
+                'label' => 'Strasse',
+                'value' => function($model) {
+                    return $model->fkPersonne->adresse1  . ' ' . $model->fkPersonne->numeroRue;
+                }
+            ],
+            ['label' => 'PLZ', 'attribute' => 'fkPersonne.npa'],
+            ['label' => 'Ort', 'attribute' => 'fkPersonne.localite'],
+            [
+                'label' => 'Geschlecht',
+                'value' => function($model) {
+                    if (isset($model->fkPersonne->fk_sexe)) {
+                        return Yii::t('app', $model->fkPersonne->fkSexe->nom, [], 'de-CH');
+                    }
+                    return '';
+                }
+            ],
+            ['label' => 'Geb. Datum', 'attribute' => 'fkPersonne.date_naissance'],
+            ['label' => 'Tel. ', 'attribute' => 'fkPersonne.telephone'],
+            ['label' => 'email', 'attribute' => 'fkPersonne.email'],
+            [
+                'label' => 'Prüfung',
+                'value' => function($model) {
+                    return $model->moniteursExamDate;
+                }
+            ],
+            ['label' => 'Bemerkung', 'attribute' => 'remarque'],
+        ];
 
-        $params = [];
-        if (!$forExport) {
-            $parametre = new Parametres();
-            $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
-            $dataFinance = $parametre->optsFinance();
-            $params = [
-                'selectedFinance' => $selectedFinance,
-                'dataFinance' => $dataFinance,
-                'parametre' => $parametre,
-                'emails' => $emails,
-                'listeEmails' => $listeEmails,
+        foreach ((new Parametres())->listFormations() as $key => $f) {
+            $columns[] = [
+                'label' => $f,
+                'value' => function($model) use ($key) {
+                    return ($model->checkMoniteursHasOneFormation($model->moniteur_id, $key) ? 'OK' : 'FAUX');
+                },
             ];
         }
-
-        return $this->render($view, array_merge([
-            'dataProvider' => $participantDataProvider,
-            'searchModel' => $searchModel,
-            'selectedCours' => $selectedCours,
-            'dataCours' => $dataCours,
-            'view' => $view,
-        ], $params));
+        return $columns;
     }
 }
