@@ -143,7 +143,7 @@ $this->title = 'VH Gestion des cours';
         } ?>
     </div>
         
-    <h2>VH Calendrier des cours</h2>
+    <h2>VH <?= Yii::t('app', 'Calendrier des cours') ?></h2>
     
     <div class="row">
         <?php foreach ($dataSalles as $salle) { ?>
@@ -163,7 +163,7 @@ $this->title = 'VH Gestion des cours';
                     ],
                     'options' => [
                         'id' => 'myCalendar' . $salle->parametre_id,
-                        'lang' => 'fr',
+                        'lang' => substr(Yii::$app->language, 0, 2),
                     ],
                     'header' => [
                         'center'=>'title',

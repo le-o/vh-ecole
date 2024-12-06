@@ -29,7 +29,7 @@ $this->title = 'VH Gestion des anniversaires';
         <?php if ($dataProviderNM->totalCount == 0 && User::canRoute(['/cours/update'])) { ?>
             <div class="row"><br /><br /><br />INFO: <?= Yii::t('app', 'Aucun anniversaire dans le futur sans moniteur') ?></div>
         <?php } elseif ($dataProviderNM->totalCount > 0 && User::canRoute(['/cours/update'])) { ?>
-            <h2><br /><?= Yii::t('app', 'Aniversaires sans moniteur') ?></h2>
+            <h2><br /><?= Yii::t('app', 'Anniversaires sans moniteur') ?></h2>
 
             <?= GridView::widget([
                 'dataProvider' => $dataProviderNM,
@@ -62,7 +62,7 @@ $this->title = 'VH Gestion des anniversaires';
         } ?>
     </div>
         
-    <h2>VH Calendrier des anniversaires</h2>
+    <h2>VH <?= Yii::t('app', 'Calendrier des anniversaires') ?></h2>
 
     <div class="row">
         <div class="col-md-6">
@@ -91,7 +91,7 @@ $this->title = 'VH Gestion des anniversaires';
                     ],
                     'options' => [
                         'id' => 'myCalendar' . $salle->parametre_id,
-                        'lang' => 'fr',
+                        'lang' => substr(Yii::$app->language, 0, 2),
                     ],
                     'header' => [
                         'center'=>'title',

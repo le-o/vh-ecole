@@ -98,17 +98,17 @@ class PersonnesController extends CommonController
 
         $buttonFilter = [
             [
-                'label' => 'Personnes',
+                'label' => Yii::t('app', 'Personnes'),
                 'filtre' => 'personnes',
                 'class' => ($filtre == 'personnes') ? ' btn-info' : '',
             ],
             [
-                'label' => 'Moniteurs actifs',
+                'label' => Yii::t('app', 'Moniteurs actifs'),
                 'filtre' => 'moniteursActifs',
                 'class' => ($filtre == 'moniteursActifs') ? ' btn-info' : '',
             ],
             [
-                'label' => 'Tous les moniteurs',
+                'label' => Yii::t('app', 'Tous les moniteurs'),
                 'filtre' => 'moniteurs',
                 'class' => ($filtre == 'moniteurs') ? ' btn-info' : '',
             ],

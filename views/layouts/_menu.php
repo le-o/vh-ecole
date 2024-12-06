@@ -10,7 +10,7 @@ use leo\modules\UserManagement\UserManagementModule;
 use leo\modules\UserManagement\models\User;
     
     NavBar::begin([
-        'brandLabel' => 'Vertic-Halle - Gestion des cours',
+        'brandLabel' => 'Vertic-Halle - ' . Yii::t('app', 'Gestion des cours'),
         'brandUrl' => Yii::$app->homeUrl,
         'innerContainerOptions' => ['class' => 'container-fluid'],
         'options' => [
@@ -42,7 +42,7 @@ use leo\modules\UserManagement\models\User;
                      ['label' => '&nbsp;' . Yii::t('app', 'Sauvegardes'), 'url' => ['/backuprestore'], 'visible' => User::canRoute(['/backuprestore/index'])],
                      ['label' => '&nbsp;' . Yii::t('app', 'Synchro calendrier'), 'url' => ['/site/calendarsync'], 'visible' => User::canRoute(['//site/calendarsync'])],
                      ['label' => '&nbsp;' . Yii::t('app', 'Emails envoyés'), 'url' => ['/sent-email'], 'visible' => User::canRoute(['/sent-email/index'])],
-                     ['label' => '<strong>EXPORTATION</strong>', 'visible' => User::canRoute(['/cours-date/actif'])],
+                     ['label' => '<strong>' . Yii::t('app', 'EXPORTATION') . '</strong>', 'visible' => User::canRoute(['/cours-date/actif'])],
                      ['label' => '&nbsp;' . Yii::t('app', 'Exportation JS'), 'url' => ['/cours-date/exportjs'], 'visible' => User::canRoute(['/cours-date/actif'])],
                      ['label' => '&nbsp;' . Yii::t('app', 'Exportation moniteurs'), 'url' => ['/moniteurs/export'], 'visible' => User::canRoute(['/moniteurs/export'])],
                 ],
