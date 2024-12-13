@@ -828,6 +828,7 @@ class CoursDateController extends CommonController
             } elseif ($checkEmpty && $online) {
                 if (!isset($display[$time->date][$time->heure_debut]['nbDisplayed'])) {
                     $display[$time->date][$time->heure_debut]['nbDisplayed'] = 0;
+                    $display[$time->date][$time->heure_debut]['nbWithClient'] = 0;
                 }
                 if (!isset($display[$time->date][$time->heure_debut][$time->fkCours->fk_nom])) {
                     $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom] = 0;
@@ -838,7 +839,13 @@ class CoursDateController extends CommonController
                 if (isset(Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu])
                     && Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] == $display[$time->date][$time->heure_debut]['nbDisplayed']
                 ) {
-                    continue;
+                    if (1 < Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] ||
+                        // conditions particulières pour l'affichage pour Saxon (seul 1 à la fois)
+                        (1 == Yii::$app->params['nbAnnivParSalle'][$time->fk_lieu] &&
+                            0 < $display[$time->date][$time->heure_debut]['nbWithClient'])
+                    ) {
+                        continue;
+                    }
                 }
                 
                 if (!empty($time->clientsHasCoursDate)) {
@@ -846,6 +853,7 @@ class CoursDateController extends CommonController
                     $Event->title .= ' RESERVE';
                     $Event->color = '#ff0000';
                     $Event->url = '';
+                    $display[$time->date][$time->heure_debut]['nbWithClient']++;
                 } else {
                     if (1 < $display[$time->date][$time->heure_debut][$time->fkCours->fk_nom]) {
                         continue;
