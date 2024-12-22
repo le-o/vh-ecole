@@ -125,6 +125,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'modelMoniteur' => $model->moniteurInfo,
         'personne_id' => $model->personne_id,
         'type' => $model->fk_type,
+        'baremeSuggere' => $baremeSuggere,
         'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
         'coursDateDataProvider' => $coursDateDataProvider,
     ]);
