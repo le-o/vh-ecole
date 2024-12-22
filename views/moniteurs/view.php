@@ -63,18 +63,11 @@ use leo\modules\UserManagement\models\User;
                             return implode('<br /> ', $display);
                         }
                     ],
-
-//                    'fc_2017:boolean',
-//                    'fc_2018:boolean',
-//                    'c_2019:boolean',
-//                    'c_2020:boolean',
-//                    'c_2021:boolean',
-//                    'c_2022:boolean',
-//                    'c_2023:boolean',
-//                    'c_2024:boolean',
                 ],
             ]) ?>
         <?php }
+
+        echo $baremeSuggere;
 
         if (User::canRoute(['/moniteurs-has-bareme/index'])) { ?>
             <?= $this->render('/moniteurs-has-bareme/_moniteur', [
