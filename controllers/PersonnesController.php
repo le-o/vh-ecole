@@ -762,51 +762,53 @@ class PersonnesController extends CommonController
             $dates = [];
             $moniteur = $model->moniteurInfo;
 
-            if (!empty($moniteur->parcours) && !empty($moniteur->methode_VCS) && !empty($moniteur->js_allround)
-                && !empty($moniteur->instructeur_asse) && !empty($moniteur->experience_cours)
-                && (!empty($moniteur->js3_escalade) || !empty($moniteur->prof_escalade))
-            ) {
-                $dates = [$moniteur->parcours, $moniteur->methode_VCS, $moniteur->js_allround,
-                    $moniteur->instructeur_asse, $moniteur->experience_cours,
-                    $moniteur->js3_escalade, $moniteur->prof_escalade
-                ];
-                $bareme = 'moniteur 5';
-            } elseif (!empty($moniteur->prof_escalade)) {
-                $dates[] = $moniteur->prof_escalade;
-                $bareme = 'moniteur 4';
-            } elseif (!empty($moniteur->parcours) && !empty($moniteur->methode_VCS) && !empty($moniteur->js2_escalade)
-                && !empty($moniteur->js_allround) && !empty($moniteur->instructeur_asse) && !empty($moniteur->experience_cours)
-            ) {
-                $dates = [$moniteur->parcours, $moniteur->methode_VCS, $moniteur->js2_escalade,
-                    $moniteur->js_allround, $moniteur->instructeur_asse, $moniteur->experience_cours
-                ];
-                $bareme = 'moniteur 4';
-            } elseif (!empty($moniteur->parcours) && !empty($moniteur->methode_VCS) && !empty($moniteur->js1_escalade)
-                && !empty($moniteur->js_allround) && !empty($moniteur->instructeur_asse) && !empty($moniteur->experience_cours)
-            ) {
-                $dates = [$moniteur->parcours, $moniteur->methode_VCS, $moniteur->js1_escalade,
-                    $moniteur->js_allround, $moniteur->instructeur_asse, $moniteur->experience_cours
-                ];
-                $bareme = 'moniteur 3';
-            } elseif (!empty($moniteur->animateur_asse) && !empty($moniteur->parcours) && !empty($moniteur->methode_VCS)) {
-                $dates = [$moniteur->animateur_asse, $moniteur->parcours, $moniteur->methode_VCS];
+            if (!empty($moniteur->animateur_asse) && !empty($moniteur->parcours)) {
+                $dates = [$moniteur->animateur_asse, $moniteur->parcours];
+                $bareme = 'animateur';
+
                 if (!empty($moniteur->js1_escalade)) {
                     $dates[] = $moniteur->js1_escalade;
                     $bareme = 'moniteur 1';
-                    if (!empty($moniteur->experience_cours) && !empty($moniteur->js_allround)) {
-                        $dates[] = $moniteur->experience_cours;
+
+                    if (!empty($moniteur->methode_VCS) && !empty($moniteur->js_allround)) {
+                        $dates[] = $moniteur->methode_VCS;
                         $dates[] = $moniteur->js_allround;
                         $bareme = 'moniteur 2';
+
+                        if (!empty($moniteur->experience_cours)) {
+                            $dates[] = $moniteur->experience_cours;
+                            $bareme = 'moniteur 3';
+                        }
+
+                        if (!empty($moniteur->instructeur_asse)) {
+                            $dates[] = $moniteur->instructeur_asse;
+                            $bareme = 'moniteur 4';
+
+                            if (!empty($moniteur->js2_escalade)) {
+                                $dates[] = $moniteur->js2_escalade;
+                                $bareme = 'moniteur 5';
+
+                                if (!empty($moniteur->js3_escalade) || !empty($moniteur->prof_escalade)) {
+                                    $dates[] = $moniteur->js3_escalade;
+                                    $dates[] = $moniteur->prof_escalade;
+                                    $bareme = 'moniteur 6';
+                                }
+                            }
+                        } elseif (!empty($moniteur->prof_escalade)) {
+                            $dates[] = $moniteur->prof_escalade;
+                            $bareme = 'moniteur 4';
+                        }
                     } elseif (!empty($moniteur->instructeur_asse) || !empty($moniteur->js2_escalade) || !empty($moniteur->js3_escalade)) {
-                        $dates[] = $moniteur->instructeur_asse;
-                        $dates[] = $moniteur->js2_escalade;
-                        $dates[] = $moniteur->js3_escalade;
+                        $dates = [
+                            $moniteur->animateur_asse, $moniteur->parcours, $moniteur->methode_VCS,
+                            $moniteur->js1_escalade, $moniteur->js_allround,
+                            $moniteur->instructeur_asse, $moniteur->js2_escalade, $moniteur->js3_escalade
+                        ];
                         $bareme = 'moniteur 2';
                     }
-                } else {
-                    $bareme = 'animateur';
                 }
             }
+
             $baremeSuggere = 'Barème suggéré : Barème ' . $bareme;
             if (!empty($dates)) {
                 $date = date("d.m.Y", max(array_map('strtotime', $dates)));
