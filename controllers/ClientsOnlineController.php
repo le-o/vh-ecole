@@ -419,12 +419,15 @@ class ClientsOnlineController extends CommonController
                 $clientDirect = [];
 
                 if (in_array($model->fk_cours_nom, Yii::$app->params['anniversaireAventure'])) {
-                    $inscriptionAuto = !$free
-                        && $model->inscriptionRules[$model->agemoyen . '-aventure'][$model->nbparticipant];
+                    if (240 == $model->fk_cours_nom) {
+                        $rule = $model->inscriptionRules[$model->agemoyen . '-aventure-' . $model->fk_cours_nom][$model->nbparticipant];
+                    } else {
+                        $rule = $model->inscriptionRules[$model->agemoyen . '-aventure'][$model->nbparticipant];
+                    }
                 } else {
-                    $inscriptionAuto = !$free
-                        && $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
+                    $rule = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
                 }
+                $inscriptionAuto = !$free && $rule;
 
                 if ($inscriptionAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
