@@ -799,11 +799,7 @@ class PersonnesController extends CommonController
                             $bareme = 'moniteur 4';
                         }
                     } elseif (!empty($moniteur->instructeur_asse) || !empty($moniteur->js2_escalade) || !empty($moniteur->js3_escalade)) {
-                        $dates = [
-                            $moniteur->animateur_asse, $moniteur->parcours, $moniteur->methode_VCS,
-                            $moniteur->js1_escalade, $moniteur->js_allround,
-                            $moniteur->instructeur_asse, $moniteur->js2_escalade, $moniteur->js3_escalade
-                        ];
+                        $dates = [$moniteur->instructeur_asse, $moniteur->js2_escalade, $moniteur->js3_escalade];
                         $bareme = 'moniteur 2';
                     }
                 }
@@ -811,7 +807,7 @@ class PersonnesController extends CommonController
 
             $baremeSuggere = 'Barème suggéré : Barème ' . $bareme;
             if (!empty($dates)) {
-                $date = date("d.m.Y", max(array_map('strtotime', $dates)));
+                $date = date("d.m.Y", max(array_map('strtotime', array_filter($dates))));
                 $baremeSuggere .= ' - ' . $date;
             }
         }
