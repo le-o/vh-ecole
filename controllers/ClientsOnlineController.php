@@ -418,8 +418,13 @@ class ClientsOnlineController extends CommonController
             if ($model->validate() && isset($model->inscriptionRules[$model->agemoyen][$model->nbparticipant])) {
                 $clientDirect = [];
 
-                $inscriptionAuto = !$free
-                    && $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
+                if (in_array($model->fk_cours_nom, Yii::$app->params['anniversaireAventure'])) {
+                    $inscriptionAuto = !$free
+                        && $model->inscriptionRules[$model->agemoyen . '-aventure'][$model->nbparticipant];
+                } else {
+                    $inscriptionAuto = !$free
+                        && $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
+                }
 
                 if ($inscriptionAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
@@ -506,7 +511,7 @@ class ClientsOnlineController extends CommonController
         }
 
         if (!$free) {
-            $titrePage = Yii::t('app', 'Inscription') . ' ' .$modelCours->fkNom->nom . ' ' . Yii::t('app', 'du_date') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à_heure') . ' ' . $modelCoursDate->heure_debut;
+            $titrePage = Yii::t('app', 'Inscription') . ' ' . $modelCours->fkNom->nom . ' ' . Yii::t('app', 'du_date') . ' ' . $modelCoursDate->date . ' ' . Yii::t('app', 'à_heure') . ' ' . $modelCoursDate->heure_debut;
         } else {
             $titrePage = Yii::t('app', 'Inscription anniversaire : date et heure à choix');
         }
