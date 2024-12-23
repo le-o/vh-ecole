@@ -422,7 +422,11 @@ class ClientsOnlineController extends CommonController
                     if (240 == $model->fk_cours_nom) {
                         $rule = $model->inscriptionRules[$model->agemoyen . '-aventure-' . $model->fk_cours_nom][$model->nbparticipant];
                     } else {
-                        $rule = $model->inscriptionRules[$model->agemoyen . '-aventure'][$model->nbparticipant];
+                        if (isset($model->inscriptionRules[$model->agemoyen . '-aventure'])) {
+                            $rule = $model->inscriptionRules[$model->agemoyen . '-aventure'][$model->nbparticipant];
+                        } else {
+                            $rule = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
+                        }
                     }
                 } else {
                     $rule = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
