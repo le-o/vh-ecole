@@ -195,4 +195,76 @@ class Moniteurs extends \yii\db\ActiveRecord
 
         return date('d.m.Y', strtotime($date));
     }
+
+    /**
+     * @return string
+     */
+    public function getBaremeSuggereComplete(): string {
+        return $this->getBaremeSuggere(true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaremeSuggereSimple(): string {
+        return $this->getBaremeSuggere(false);
+    }
+
+    /**
+     * @param bool $withLabel
+     * @return string
+     */
+    private function getBaremeSuggere(bool $withLabel): string {
+        $bareme = 'auxiliaire';
+        $dates = [];
+        if (!empty($this->animateur_asse) && !empty($this->parcours)) {
+            $dates = [$this->animateur_asse, $this->parcours];
+            $bareme = 'animateur';
+
+            if (!empty($this->js1_escalade)) {
+                $dates[] = $this->js1_escalade;
+                $bareme = 'moniteur 1';
+
+                if (!empty($this->methode_VCS) && !empty($this->js_allround)) {
+                    $dates[] = $this->methode_VCS;
+                    $dates[] = $this->js_allround;
+                    $bareme = 'moniteur 2';
+
+                    if (!empty($this->experience_cours)) {
+                        $dates[] = $this->experience_cours;
+                        $bareme = 'moniteur 3';
+                    }
+
+                    if (!empty($this->instructeur_asse)) {
+                        $dates[] = $this->instructeur_asse;
+                        $bareme = 'moniteur 4';
+
+                        if (!empty($this->js2_escalade)) {
+                            $dates[] = $this->js2_escalade;
+                            $bareme = 'moniteur 5';
+
+                            if (!empty($this->js3_escalade) || !empty($this->prof_escalade)) {
+                                $dates[] = $this->js3_escalade;
+                                $dates[] = $this->prof_escalade;
+                                $bareme = 'moniteur 6';
+                            }
+                        }
+                    } elseif (!empty($this->prof_escalade)) {
+                        $dates[] = $this->prof_escalade;
+                        $bareme = 'moniteur 4';
+                    }
+                } elseif (!empty($this->instructeur_asse) || !empty($this->js2_escalade) || !empty($this->js3_escalade)) {
+                    $dates = [$this->instructeur_asse, $this->js2_escalade, $this->js3_escalade];
+                    $bareme = 'moniteur 2';
+                }
+            }
+        }
+
+        $baremeSuggere = ($withLabel ? 'Barème suggéré : Barème ' . $bareme : ucfirst($bareme));
+        if (!empty($dates)) {
+            $date = date("d.m.Y", max(array_map('strtotime', array_filter($dates))));
+            $baremeSuggere .= ' - ' . $date;
+        }
+        return $baremeSuggere;
+    }
 }
