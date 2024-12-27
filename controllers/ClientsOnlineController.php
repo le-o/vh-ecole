@@ -420,13 +420,15 @@ class ClientsOnlineController extends CommonController
 
                 if (in_array($model->fk_cours_nom, Yii::$app->params['anniversaireAventure'])) {
                     if (240 == $model->fk_cours_nom) {
-                        $rule = $model->inscriptionRules[$model->agemoyen . '-aventure-' . $model->fk_cours_nom][$model->nbparticipant];
+                        $rule = (isset($model->inscriptionRules[$model->agemoyen . '-aventure-' . $model->fk_cours_nom])
+                            ? $model->inscriptionRules[$model->agemoyen . '-aventure-' . $model->fk_cours_nom][$model->nbparticipant]
+                            : $model->inscriptionRules[$model->agemoyen][$model->nbparticipant]
+                        );
                     } else {
-                        if (isset($model->inscriptionRules[$model->agemoyen . '-aventure'])) {
-                            $rule = $model->inscriptionRules[$model->agemoyen . '-aventure'][$model->nbparticipant];
-                        } else {
-                            $rule = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
-                        }
+                        $rule = (isset($model->inscriptionRules[$model->agemoyen . '-aventure'])
+                            ? $model->inscriptionRules[$model->agemoyen . '-aventure'][$model->nbparticipant]
+                            : $model->inscriptionRules[$model->agemoyen][$model->nbparticipant]
+                        );
                     }
                 } else {
                     $rule = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
