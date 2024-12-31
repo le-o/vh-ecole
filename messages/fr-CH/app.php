@@ -419,7 +419,8 @@ return [
     'Inactif' => '',
     'Annulé par VH' => '',
     'Annulé par client' => '',
-    'warning12+' => 'ATTENTION : vous avez sélectionné un nombre de personnes qui dépasse la limite maximale de nos 
-        tables d’anniversaire. Suite à votre inscription, nous vous contacterons dans les meilleurs délais afin de 
-        préparer votre venue. Votre confirmation de réservation ne vous sera envoyée qu’une fois votre demande traitée.',
+    'warning12+' => 'ATTENTION : vous avez sélectionné un nombre de personnes qui dépasse la limite maximale d\'une
+        table anniversaire et nous devons vérifier qu\'une table supplémentaire est disponible. Suite à votre inscription,
+        nous vous contacterons dans les meilleurs délais afin de préparer votre venue. Votre confirmation de réservation
+        ne vous sera envoyée qu’une fois votre demande traitée.',
 ];

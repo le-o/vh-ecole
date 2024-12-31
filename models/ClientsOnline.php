@@ -39,7 +39,7 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public $agemoyen;
     public $nbparticipant;
 
-    // tableau de validation des inscriptions automatique
+    // tableau de validation des inscriptions automatiques
     public $inscriptionRules = [
         // anniversaire light
         '2-12' => [
@@ -65,12 +65,28 @@ class ClientsOnline extends \yii\db\ActiveRecord
             4 => true,
             5 => true,
             6 => true,
-            7 => false,
-            8 => false,
+            7 => true,
+            8 => true,
             9 => false,
             10 => false,
             11 => false,
             12 => false,
+            '12+' => false,
+        ],
+        // anniversaire aventure
+        '5-6-aventure' => [
+            1 => true,
+            2 => true,
+            3 => true,
+            4 => true,
+            5 => true,
+            6 => true,
+            7 => true,
+            8 => true,
+            9 => true,
+            10 => true,
+            11 => true,
+            12 => true,
             '12+' => false,
         ],
         '7-11' => [
@@ -83,9 +99,9 @@ class ClientsOnline extends \yii\db\ActiveRecord
             7 => true,
             8 => true,
             9 => true,
-            10 => false,
-            11 => false,
-            12 => false,
+            10 => true,
+            11 => true,
+            12 => true,
             '12+' => false,
         ],
         '12+' => [
@@ -101,6 +117,21 @@ class ClientsOnline extends \yii\db\ActiveRecord
             10 => true,
             11 => true,
             12 => true,
+            '12+' => false,
+        ],
+        '12+-aventure-240' => [
+            1 => false,
+            2 => false,
+            3 => false,
+            4 => false,
+            5 => false,
+            6 => false,
+            7 => false,
+            8 => false,
+            9 => false,
+            10 => false,
+            11 => false,
+            12 => false,
             '12+' => false,
         ]
     ];
