@@ -214,6 +214,11 @@ class PersonnesController extends CommonController
                     $dataMoniteurs[$moniteur->personne_id]['fk_langues'] = $moniteur->fkLanguesNoms;
                     $dataMoniteurs[$moniteur->personne_id]['email'] = $moniteur->email;
                     $dataMoniteurs[$moniteur->personne_id]['telephone'] = $moniteur->telephone;
+                    $dataMoniteurs[$moniteur->personne_id]['baremeSuggere'] = (
+                        isset($moniteur->moniteurInfo)
+                            ? $moniteur->moniteurInfo->baremeSuggereSimple
+                            : '<!--n/a-->'
+                    );
                     if (empty($moniteur->currentBareme)) {
                         $dataMoniteurs[$moniteur->personne_id]['fk_formation'] = ($moniteur->fk_formation == 0 || is_null($moniteur->fk_formation) || !isset($moniteur->fkFormation)) ? 'Non défini' : '**Ancienne configuration : ' . $moniteur->fkFormation->nom;
                     } else {
@@ -472,7 +477,9 @@ class PersonnesController extends CommonController
                 ],
             ]);
         }
-        
+
+        $baremeSuggere = $this->getBaremeSuggere($model);
+
         $listeCours = [];
         $dataCoursDate = [];
         foreach ($model->clientsHasCoursDate as $clientCoursDate) {
@@ -531,6 +538,7 @@ class PersonnesController extends CommonController
         return $this->render('view', [
             'alerte' => $alerte,
             'model' => $model,
+            'baremeSuggere' => $baremeSuggere,
             'moniteursHasBaremeDataProvider' => $moniteursHasBaremeDataProvider,
             'coursDateDataProvider' => $coursDateDataProvider,
             'dataCours' => $dataCours,
@@ -745,5 +753,17 @@ class PersonnesController extends CommonController
             $key = (!is_null($isBaremeSet) ? $isBaremeSet->fk_bareme : $default);
         }
         return (!is_null($key) ? $key : -1);
+    }
+
+    /**
+     * @param Personnes $model
+     * @return string
+     */
+    private function getBaremeSuggere(Personnes $model): string
+    {
+        if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
+            return $model->moniteurInfo->baremeSuggereComplete;
+        }
+        return '';
     }
 }

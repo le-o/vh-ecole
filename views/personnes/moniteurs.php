@@ -70,7 +70,12 @@ $gridColumnsEnd = [
         ],
     ],
 ];
-$gridColumns = array_merge ($gridColumnsBegin, $gridColumnsMiddle, $gridColumnsHours, $gridColumnsEnd);
+$baremeSuggere[] = [
+    'attribute' => 'baremeSuggere',
+    'format' => 'raw',
+    'label' => Yii::t('app', 'Barème suggéré'),
+];
+$gridColumns = array_merge ($gridColumnsBegin, $gridColumnsMiddle, $baremeSuggere, $gridColumnsHours, $gridColumnsEnd);
 $gridColumnsExport = array_merge(
     $gridColumnsBegin,
     ['adresse1', 'adresse2', 'npa', 'date_naissance', [
