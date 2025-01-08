@@ -406,15 +406,6 @@ class ClientsOnlineController extends CommonController
             $date = (!$free ? $modelCoursDate->date : Yii::$app->request->post()['anni-date']);
             $heure = (!$free ? $modelCoursDate->heure_debut : Yii::$app->request->post()['anni-heure']);
 
-            $infoAnniversaire = $model->informations . '
-********************* INFO ANNIVERSAIRE *********************
-* ' . Yii::t('app', 'Prénom de l\'enfant') . ' : ' . $model->prenom_enfant . '
-* ' . Yii::t('app', 'Date de naissance de l\'enfant') . ' : ' . $model->date_naissance_enfant . '
-* ' . Yii::t('app', 'Age moyen des enfants') . ' : ' . $model->agemoyen . '
-* ' . Yii::t('app', 'Nombre de participant') . ' : ' . $model->nbparticipant . '
-*
-* ' . Yii::t('app', 'Date choisie') . ' : ' . $date . ' ' . $heure;
-
             if ($model->validate() && isset($model->inscriptionRules[$model->agemoyen][$model->nbparticipant])) {
                 $clientDirect = [];
 
@@ -434,6 +425,20 @@ class ClientsOnlineController extends CommonController
                     $rule = $model->inscriptionRules[$model->agemoyen][$model->nbparticipant];
                 }
                 $inscriptionAuto = !$free && $rule;
+
+                $infoAnniversaire = $model->informations . '
+********************* INFO ANNIVERSAIRE *********************';
+                if ($rule) {
+                    $infoAnniversaire .= "
+** ANNIVERSAIRE AVEC NOUVEAUX TARIFS **";
+                }
+                    $infoAnniversaire .= '
+* ' . Yii::t('app', 'Prénom de l\'enfant') . ' : ' . $model->prenom_enfant . '
+* ' . Yii::t('app', 'Date de naissance de l\'enfant') . ' : ' . $model->date_naissance_enfant . '
+* ' . Yii::t('app', 'Age moyen des enfants') . ' : ' . $model->agemoyen . '
+* ' . Yii::t('app', 'Nombre de participant') . ' : ' . $model->nbparticipant . '
+*
+* ' . Yii::t('app', 'Date choisie') . ' : ' . $date . ' ' . $heure;
 
                 if ($inscriptionAuto) {
                     $clientDirect[] = $this->setPersonneAttribute($model);
