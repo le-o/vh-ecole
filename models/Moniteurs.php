@@ -93,6 +93,21 @@ class Moniteurs extends \yii\db\ActiveRecord
             $this->formationsStored[] = $f->fk_formation;
         }
 
+        $this->animateur_asse = ($this->animateur_asse == '' ? '' : date('d.m.Y', strtotime($this->animateur_asse)));
+        $this->parcours = ($this->parcours == '') ? null : date('d.m.Y', strtotime($this->parcours));
+        $this->methode_VCS = ($this->methode_VCS == '') ? null : date('d.m.Y', strtotime($this->methode_VCS));
+        $this->js_allround = ($this->js_allround == '') ? null : date('d.m.Y', strtotime($this->js_allround));
+        $this->js1_escalade = ($this->js1_escalade == '') ? null : date('d.m.Y', strtotime($this->js1_escalade));
+        $this->encadrant_asse = ($this->encadrant_asse == '') ? null : date('d.m.Y', strtotime($this->encadrant_asse));
+        $this->experience_cours = ($this->experience_cours == '') ? null : date('d.m.Y', strtotime($this->experience_cours));
+        $this->instructeur_asse = ($this->instructeur_asse == '') ? null : date('d.m.Y', strtotime($this->instructeur_asse));
+        $this->referent_asse = ($this->referent_asse == '') ? null : date('d.m.Y', strtotime($this->referent_asse));
+        $this->expert_asse = ($this->expert_asse == '') ? null : date('d.m.Y', strtotime($this->expert_asse));
+        $this->js2_escalade = ($this->js2_escalade == '') ? null : date('d.m.Y', strtotime($this->js2_escalade));
+        $this->js3_escalade = ($this->js3_escalade == '') ? null : date('d.m.Y', strtotime($this->js3_escalade));
+        $this->prof_escalade = ($this->prof_escalade == '') ? null : date('d.m.Y', strtotime($this->prof_escalade));
+        $this->js_expert = ($this->js_expert == '') ? null : date('d.m.Y', strtotime($this->js_expert));
+
         parent::afterFind();
     }
 
