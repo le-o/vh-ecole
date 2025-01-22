@@ -134,7 +134,7 @@ class ClientsOnlineController extends CommonController
                     INFO: '.Yii::t('app', 'Le client souhaite être inscrit au cours suivant').': '.
                     $modelCours->cours_id.'-'.$modelCours->fkNom->nom.' '.$modelCours->fkNiveau->nom;
                 $model->informations .= (isset($modelCours->fkSemestre)) ? ' - ' . $modelCours->fkSemestre->nom : ' - ';
-                $model->informations .= $modelCours->fkSaison->nom.' '.$modelCours->session;
+                $model->informations .= (isset($modelCours->fkSaison) ? $modelCours->fkSaison->nom : '') . ' ' . $modelCours->session;
                 $model->informations .= '<br />'.Yii::t('app', 'Salle concernée') . ': ' . $modelCours->fkSalle->nom;
                 if (Yii::$app->params['coursRegulie'] == $modelCours->fk_type) {
                     $clientAuto = true;
