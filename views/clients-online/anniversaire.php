@@ -54,7 +54,7 @@ $this->title = Yii::t('app', 'Anniversaires') . ' - Vertic-Halle';
                 ],
                 'options' => [
                     'id' => 'myCalendar' . $model->parametre_id,
-                    'lang' => 'fr',
+                    'lang' => substr(Yii::$app->language, 0, 2),
                 ],
                 'header' => [
                     'center'=>'title',

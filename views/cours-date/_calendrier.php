@@ -21,7 +21,7 @@ $this->title = 'VH Calendrier des cours';
         ],
         'options' => [
             'id' => 'myCalendar',
-            'lang' => 'fr',
+            'lang' => substr(Yii::$app->language, 0, 2),
         ],
         'header' => [
             'center'=>'title',
