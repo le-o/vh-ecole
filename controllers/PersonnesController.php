@@ -761,7 +761,7 @@ class PersonnesController extends CommonController
      */
     private function getBaremeSuggere(Personnes $model): string
     {
-        if (isset($model->moniteurInfo) && in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
+        if (in_array($model->fk_type, Yii::$app->params['typeEncadrant'])) {
             return $model->moniteurInfo->baremeSuggereComplete;
         }
         return '';
