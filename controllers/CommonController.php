@@ -26,7 +26,7 @@ class CommonController extends Controller
 {
     
     /**
-     * 
+     *
      * @param int $cours_date_id
      * @param array $moniteurs
      * @param boolean $delete
@@ -61,7 +61,7 @@ class CommonController extends Controller
     }
     
     /**
-     * 
+     *
      * @param object $model
      * @param string $nomMoniteurs
      * @param string $cud
@@ -130,7 +130,7 @@ class CommonController extends Controller
     }
     
     /**
-     * 
+     *
      * @param type $array1
      * @param type $array2
      * @return type
@@ -193,8 +193,8 @@ class CommonController extends Controller
             $myPersonne = Personnes::findOne($mail['personne_id']);
             
             $content = str_replace(
-                ['#prenom#', '#nom#', ' #tous-les-participants#'], 
-                [$myPersonne->prenom, $myPersonne->nom, ''], 
+                ['#prenom#', '#nom#', ' #tous-les-participants#'],
+                [$myPersonne->prenom, $myPersonne->nom, ''],
                 $content);
         }
         
@@ -266,11 +266,11 @@ class CommonController extends Controller
             $content = str_replace(
                 ['#nom-du-cours#', '#jour-du-cours#', '#heure-debut#', '#heure-fin#', '#salle-cours#',
                     '#nom-de-session#', '#nom-de-saison#', '#prix-du-cours#', '#date-prochain#',
-                    '#toutes-les-dates#', '#toutes-les-dates-avec-lieux#', '#dates-inscrit#', '#dates-inscrit-avec-lieux#', 
+                    '#toutes-les-dates#', '#toutes-les-dates-avec-lieux#', '#dates-inscrit#', '#dates-inscrit-avec-lieux#',
                     '#statut-inscription#', '#cours-acompte-30#', '#infostarifs#', '#description-cours#', '#extrait-cours#'],
                 [$myCours->fkNom->nom, $jour_cours, $heure_debut, $heure_fin, $myCours->fkSalle->nom,
                     Yii::t('app', $myCours->session), $saison, ($myCours->fk_type == Yii::$app->params['coursPonctuel'] && isset($myCoursDate) ? $myCoursDate->prix : $myCours->prix), $date,
-                    implode(', ', $datesCours), implode(', ', $datesCoursLieux), implode(', ', $datesCoursInscrit), implode(', ', $datesCoursInscritLieux), 
+                    implode(', ', $datesCours), implode(', ', $datesCoursLieux), implode(', ', $datesCoursInscrit), implode(', ', $datesCoursInscritLieux),
                     $statutInscription, $montantAcompte30, $myCours->offre_speciale, $myCours->description, $myCours->extrait],
                 $content
             );
