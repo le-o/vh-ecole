@@ -56,7 +56,7 @@ class ClientsHasCours extends \yii\db\ActiveRecord
      */
     public function getFkPersonne()
     {
-        return $this->hasOne(Personnes::className(), ['personne_id' => 'fk_personne']);
+        return $this->hasOne(Personnes::class, ['personne_id' => 'fk_personne']);
     }
 
     /**
@@ -64,7 +64,7 @@ class ClientsHasCours extends \yii\db\ActiveRecord
      */
     public function getFkCours()
     {
-        return $this->hasOne(Cours::className(), ['cours_id' => 'fk_cours']);
+        return $this->hasOne(Cours::class, ['cours_id' => 'fk_cours']);
     }
 
     /**
@@ -72,6 +72,6 @@ class ClientsHasCours extends \yii\db\ActiveRecord
      */
     public function getFkStatut()
     {
-        return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_statut']);
+        return $this->hasOne(Parametres::class, ['parametre_id' => 'fk_statut']);
     }
 }

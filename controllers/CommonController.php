@@ -245,7 +245,9 @@ class CommonController extends Controller
             $statutInscription = 'n/a';
             if (isset($myPersonne)) {
                 $myClientsHasCours = ClientsHasCours::findOne(['fk_personne' => $myPersonne->personne_id, 'fk_cours' => $myCours->cours_id]);
-                $statutInscription = Yii::t('app', $myClientsHasCours->fkStatut->nom);
+                if (!empty($myClientsHasCours)) {
+                    $statutInscription = Yii::t('app', $myClientsHasCours->fkStatut->nom);
+                }
             }
             if (isset($myCoursDate)) {
                 $heure_debut = $myCoursDate->heure_debut;
