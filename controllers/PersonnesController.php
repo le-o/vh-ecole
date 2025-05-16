@@ -518,16 +518,23 @@ class PersonnesController extends CommonController
         $coursNot = Cours::find()->where(['not in', 'cours_id', $listeCours])->andWhere(['fk_statut' => [Yii::$app->params['coursActif']]])->all();
         $dataCours = [];
         foreach ($coursNot as $c) {
+            $commun = [
+                $c->fkNom->nom ?? '',
+                $c->fkNiveau->nom ?? '',
+                $c->session ?? '',
+            ];
             if (in_array($c->fk_type, Yii::$app->params['coursPlanifieS'])) {
-                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = $c->fkNom->nom.' '.$c->fkNiveau->nom.' '.$c->session.' '.$c->fkSaison->nom.' '.$c->fkSalle->nom;
+                $datas = array_merge($commun, [
+                    $c->fkSaison->nom ?? '',
+                    $c->fkSalle->nom ?? '',
+                ]);
+                $dataCours[$c->fkType->nom][$c->cours_id.'|'.$c->fk_type] = implode(' ', $datas);
             } else {
                 foreach ($c->coursDates as $coursDate) {
-                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] =
-                            $c->fkNom->nom.' '.
-                            $c->fkNiveau->nom.' '.
-                            $c->session.' '.
-                            (!isset($c->fkSaison) ? 'none' : $c->fkSaison->nom).'-'.
-                            $coursDate->date;
+                    $datas = array_merge($commun, [
+                        (!isset($c->fkSaison) ? 'none' : $c->fkSaison->nom) . '-' . $coursDate->date
+                    ]);
+                    $dataCours[$c->fkType->nom][$coursDate->cours_date_id.'|'.$c->fk_type] = implode(' ', $datas);
                 }
             }
         }
