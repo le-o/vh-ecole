@@ -30,11 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php if (User::canRoute(['/cours-date/advanced'])) { ?>
     
     <?= $this->render('_form', [
-        'model' => $model,
-        'dataCours' => $dataCours,
-        'dataMoniteurs' => $dataMoniteurs,
-        'selectedMoniteurs' => $selectedMoniteurs,
-        'modelParams' => $modelParams,
+            'model' => $model,
+            'dataCours' => $dataCours,
+            'dataMoniteurs' => $dataMoniteurs,
+            'selectedMoniteurs' => $selectedMoniteurs,
+            'modelParams' => $modelParams,
+            'pageRetour' => $pageRetour,
     ]) ?>
     
     <?php } else { ?>

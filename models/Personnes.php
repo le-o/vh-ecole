@@ -348,7 +348,12 @@ class Personnes extends \yii\db\ActiveRecord
      */
     public function getMoniteursHasBaremeFromDate($date)
     {
-        return MoniteursHasBareme::find()->where(['fk_personne' => $this->personne_id])->andWhere(':mydate BETWEEN date_debut AND date_fin', [':mydate' => $date])->one();
+        return MoniteursHasBareme::find()
+            ->where(['fk_personne' => $this->personne_id])
+            ->andWhere(':mydate BETWEEN date_debut AND date_fin',
+                [':mydate' => date('Y-m-d', strtotime($date))]
+            )
+            ->one();
     }
 
     /**
@@ -357,6 +362,15 @@ class Personnes extends \yii\db\ActiveRecord
     public function getCurrentBareme()
     {
         return $this->getMoniteursHasBaremeFromDate(date('Y-m-d'));
+    }
+
+    public function getLetterBaremeFromDate($date)
+    {
+        $moniteurHasBareme = $this->getMoniteursHasBaremeFromDate($date);
+        return (!is_null($moniteurHasBareme)
+            ? '<sup>' . $moniteurHasBareme->fkBareme->info_special . '</sup>'
+            : ''
+        );
     }
     
     /**
