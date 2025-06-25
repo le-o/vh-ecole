@@ -243,21 +243,6 @@ class CoursController extends CommonController
                         if (null !== $newPrice) {
                             CoursDate::updateAll(['prix' => $newPrice], 'fk_cours = ' . $model->cours_id);
                         }
-                        if ('' !== Yii::$app->request->post()['editBareme']) {
-                            $coursDate = CoursDate::findAll(['fk_cours' => $model->cours_id]);
-                            foreach ($coursDate as $modelCoursDate) {
-                                if ('reinit' != Yii::$app->request->post()['editBareme']) {
-                                    CoursHasMoniteurs::updateAll(['fk_bareme' => Yii::$app->request->post()['editBareme']], 'fk_cours_date = ' . $modelCoursDate->cours_date_id);
-                                } else {
-                                    foreach ($modelCoursDate->coursHasMoniteurs as $coursHasMoniteur) {
-                                        $coursHasMoniteur->fk_bareme = null;
-                                        $coursHasMoniteur->save(false);
-                                    }
-                                }
-                            }
-                            $alerte['class'] = 'info';
-                            $alerte['message'] = Yii::t('app', 'Barème modifier pour toutes les dates !');
-                        }
                     }
                 }
             } else {
@@ -739,7 +724,7 @@ class CoursController extends CommonController
         
         $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->andWhere(['not in', 'personne_id', $dejaMoniteurs])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
+            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom . ' ' . $moniteur->getLetterBaremeFromDate(date('Y-m-d'));
         }
         
         // on ajoute au tableau le nouveau moniteur choisi

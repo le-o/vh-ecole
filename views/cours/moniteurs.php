@@ -47,6 +47,7 @@ $this->registerJsFile(
                         'allowClear' => true,
                         'tags' => true,
                         'style' => 'width: 80%;',
+                        'escapeMarkup' => new \yii\web\JsExpression("function(m) { return m; }"),
                     ],
                 ]); ?>
             </div>
@@ -54,30 +55,51 @@ $this->registerJsFile(
                 <?= Html::submitButton(Yii::t('app', 'Ajouter'), ['class' => 'btn btn-primary']); ?>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <span class="glyphicon glyphicon-info-sign"></span> Pour modifier un barème, il est possible de cliquer sur la date ou sur le barème à côté de la case à cocher.
+            </div>
+        </div>
         
         <?php echo '<table id="array-check-all" class="table table-striped table-bordered"><tr><td></td>';
         foreach ($arrayData as $data) {
-            echo '<th>'.$data['model']->date.'</th>';
+            echo '<th>' . Html::a(
+                    $data['model']->date,
+                    \yii\helpers\Url::to(['/cours-date/view', 'id' => $data['model']->cours_date_id, 'msg' => 'moniteur'])) . '</th>';
         }
         echo '</tr>';
 
         // ligne pour chaque moniteurs
         foreach ($arrayMoniteurs as $key => $moniteur) {
-            echo '<tr><td>' . $moniteur->fkMoniteur->nom . ' ' . $moniteur->fkMoniteur->prenom . ' ';
+            $baremeActuel = $moniteur->fkMoniteur->getLetterBaremeFromDate(date('Y-m-d'));
+            echo '<tr><td>' . $moniteur->fkMoniteur->nomPrenom . ' ' . $baremeActuel . ' ';
             $allChecked = true;
-            $myCell = '';
+            $myCell = [];
             foreach ($arrayData as $data) {
                 $dateCours = date('Ymd', strtotime($data['model']->date));
                 $isChecked = (isset($data['moniteurs']) && array_key_exists($key, $data['moniteurs']) ? true : false);
                 $allChecked = $allChecked && $isChecked;
-                $myCell .= '<td>'.yii\bootstrap\BaseHtml::checkbox('datemoniteur[' . $dateCours . '][' . $data['model']->cours_date_id . '|' . $key . ']', $isChecked).'</td>';
+                $baremeDate = '';
+                foreach ($data['model']->coursHasMoniteurs as $coursHasMoniteur) {
+                    if ($moniteur->fk_moniteur == $coursHasMoniteur->fk_moniteur &&
+                        (!is_null($coursHasMoniteur->fk_bareme)
+                            || $moniteur->fkMoniteur->getLetterBaremeFromDate($data['model']->date) != $baremeActuel)
+                    ) {
+                        $baremeDate = Html::a(strip_tags($coursHasMoniteur->letterBareme),
+                            \yii\helpers\Url::to(['/cours-date/view', 'id' => $data['model']->cours_date_id, 'msg' => 'moniteur'])
+                        );
+                    }
+                }
+                $myCell[] = yii\bootstrap\BaseHtml::checkbox('datemoniteur[' . $dateCours . '][' . $data['model']->cours_date_id . '|' . $key . ']', $isChecked)
+                    . ' ' . $baremeDate;
             }
             echo '<div class="pull-right">' . Html::checkbox(null, $allChecked, [
                     'class' => 'check-all-line',
                 ]) . ' ' . Yii::t('app', 'Tous/aucun') . '</div>';
-            echo  '</td>';
-            echo $myCell;
-            echo '</tr>';
+            echo  '</td><td>';
+            echo implode('</td><td>', $myCell);
+            echo '</td></tr>';
         }
         echo '</table>';
         ?>

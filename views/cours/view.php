@@ -125,10 +125,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => Yii::t('app', 'Fk Moniteur'),
+                'format' => 'raw',
                 'value' => function($data) {
+                    $coursdate = date('Y-m-d', strtotime($data->date));
                     $array_moniteurs = [];
                     foreach ($data->coursHasMoniteurs as $moniteur) {
-                        $array_moniteurs[] = $moniteur->fkMoniteur->nom.' '.$moniteur->fkMoniteur->prenom;
+                        $array_moniteurs[] = $moniteur->fkMoniteur->nom . ' ' . $moniteur->fkMoniteur->prenom . ' ' . $moniteur->letterBareme;
                     }
                     return implode(', ', $array_moniteurs);
                 },
