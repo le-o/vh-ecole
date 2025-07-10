@@ -95,7 +95,6 @@ class ClientsOnlineController extends CommonController
         Yii::$app->language = $lang_interface;
 
         $model = new ClientsOnline();
-        $modelsClient = [new ClientsOnline];
         if ($cours_id !== null && $cours_id !== '') {
             $modelCours = Cours::findOne($cours_id);
             if (Yii::$app->params['coursUnique'] == $modelCours->fk_type) {
@@ -142,9 +141,6 @@ class ClientsOnlineController extends CommonController
             } else {
                 $model->fk_cours = null;
             }
-
-            $modelsClient = Model::createMultiple(ClientsOnline::classname(), [], 'client_online_id');
-            Model::loadMultiple($modelsClient, $post);
             
             if ($model->validate()) {
                 $clientDirect = [];
@@ -160,47 +156,46 @@ class ClientsOnlineController extends CommonController
                         $clientAuto = false;
                     }
                 }
-                if ($clientAuto) {
-                    $clientDirect[] = $this->setPersonneAttribute($model);
-                    $model->is_actif = 0;
-                }
+
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
+                    // si existant, on sauve le représentant légal
+                    $hasRepresentant = false;
+                    if (!empty($post['ClientsOnline']['nom_representant']) && !empty($post['ClientsOnline']['prenom_representant'])) {
+                        $modelRepresentant = new ClientsOnline();
+                        $modelRepresentant->nom = $post['ClientsOnline']['nom_representant'];
+                        $modelRepresentant->nom_representant = $post['ClientsOnline']['nom_representant'];
+                        $modelRepresentant->prenom = $post['ClientsOnline']['prenom_representant'];
+                        $modelRepresentant->prenom_representant = $post['ClientsOnline']['prenom_representant'];
+                        $modelRepresentant->fk_cours_nom = $model->fk_cours_nom;;
+                        $modelRepresentant->adresse = $model->adresse;
+                        $modelRepresentant->numeroRue = $model->numeroRue;
+                        $modelRepresentant->npa = $model->npa;
+                        $modelRepresentant->localite = $model->localite;
+                        $modelRepresentant->fk_pays = $model->fk_pays;
+                        $modelRepresentant->telephone = $model->telephone;
+                        $modelRepresentant->email = $model->email;
+                        $modelRepresentant->is_actif = 1;
+                        if ($clientAuto) {
+                            $clientDirect[] = $this->setPersonneAttribute($modelRepresentant);
+                            $modelRepresentant->is_actif = 0;
+                        }
+                        if (!$modelRepresentant->save(false)) {
+                            throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du représentant légal.'));
+                        }
+                        $model->fk_parent = $modelRepresentant->client_online_id;
+                        $hasRepresentant = true;
+                    }
+                    // on sauve le client
+                    if ($clientAuto) {
+                        $clientDirect[] = $this->setPersonneAttribute($model);
+                        $model->is_actif = 0;
+                    }
                     if (!$model->save()) {
                         throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde de la personne.'));
                     }
-                    
-                    // tout est ok pour le client principal, on sauve les clients liés
-                    foreach ($modelsClient as $client) {
-                        if ($client->nom != '' && $client->prenom != '') {
-                            if (empty($client->no_avs)) {
-                                throw new \Exception(Yii::t('app', 'Le no AVS des enfants est obligatoire.'));
-                            }
 
-                            $client->fk_cours_nom = $model->fk_cours_nom;
-                            $client->fk_cours = $model->fk_cours;
-                            $client->fk_parent = $model->client_online_id;
-                            $client->adresse = $model->adresse;
-                            $client->numeroRue = $model->numeroRue;
-                            $client->npa = $model->npa;
-                            $client->localite = $model->localite;
-                            $client->fk_pays = $model->fk_pays;
-                            $client->telephone = $model->telephone;
-                            $client->email = $model->email;
-                            $client->is_actif = 1;
-
-                            if ($clientAuto) {
-                                $clientDirect[] = $this->setPersonneAttribute($client);
-                                $client->is_actif = 0;
-                            }
-
-                            if (!$client->save()) {
-                                throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du client lié.'));
-                            }
-                        }
-                    }
                     if ($clientAuto) {
-                        $inscritCours = (1 < count($clientDirect)) ? false : true;
                         $parentID = null;
 
                         foreach ($clientDirect as $cd) {
@@ -247,14 +242,14 @@ class ClientsOnlineController extends CommonController
                                 $isPersonne->save();
                             }
 
-                            // si on a un interlocuteur, on ne sauve pas l'inscription au cours, mais juste la personne
-                            if (!$inscritCours) {
-                                $inscritCours = true;
+                            // si on a un représentant légal, on ne sauve pas l'inscription au cours, mais juste la personne
+                            if ($hasRepresentant && is_null($parentID)) {
                                 $parentID = $existeID;
                                 continue;
                             }
-                            // si on a un interlocuteur, on sauve le lien entre les personnes
-                            if (!is_null($parentID)) {
+
+                            // si on a un représentant légal, on sauve le lien entre les personnes
+                            if ($hasRepresentant) {
                                 $hasInterloc = PersonnesHasInterlocuteurs::find()->where(['fk_personne' => $existeID, 'fk_interlocuteur' => $parentID])->one();
                                 if (null == $hasInterloc) {
                                     $i = new PersonnesHasInterlocuteurs;
@@ -315,7 +310,6 @@ class ClientsOnlineController extends CommonController
         
         return $this->render('create', [
             'model' => $model,
-            'modelsClient' => $modelsClient,
             'dataCours' => $dataCours,
             'selectedCours' => $selectedCours,
             'params' => new Parametres,
@@ -375,7 +369,6 @@ class ClientsOnlineController extends CommonController
 
         $model = new ClientsOnline();
         $model->setScenario('anniversaire');
-        $modelsClient = [new ClientsOnline];
 
         $selectedCours = [];
         if (!$free) {
@@ -553,7 +546,6 @@ class ClientsOnlineController extends CommonController
 
         return $this->render('create', [
             'model' => $model,
-            'modelsClient' => $modelsClient,
             'dataCours' => $dataCours,
             'selectedCours' => $selectedCours,
             'params' => new Parametres,
@@ -573,7 +565,6 @@ class ClientsOnlineController extends CommonController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $modelsClient = [new ClientsOnline];
         
         $modelCours = Cours::find()->distinct()->JoinWith(['fkNom'])->orderBy('nom, tri')->all();
         foreach ($modelCours as $cours) {
@@ -585,7 +576,6 @@ class ClientsOnlineController extends CommonController
         } else {
             return $this->render('update', [
                 'model' => $model,
-                'modelsClient' => $modelsClient,
                 'dataCours' => $dataCours,
                 'selectedCours' => [$model->fk_cours_nom],
                 'params' => new Parametres,
