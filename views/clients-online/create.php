@@ -8,7 +8,6 @@ use yii\bootstrap\Alert;
 
 $arrayForm = [
     'model' => $model,
-    'modelsClient' => $modelsClient,
     'dataCours' => $dataCours,
     'selectedCours' => $selectedCours,
     'params' => $params,

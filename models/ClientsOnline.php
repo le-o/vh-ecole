@@ -38,6 +38,8 @@ class ClientsOnline extends \yii\db\ActiveRecord
     public $date_naissance_enfant;
     public $agemoyen;
     public $nbparticipant;
+    public $nom_representant;
+    public $prenom_representant;
 
     // tableau de validation des inscriptions automatiques
     public $inscriptionRules = [
@@ -181,11 +183,11 @@ class ClientsOnline extends \yii\db\ActiveRecord
     {
         return [
             [['fk_parent', 'fk_cours_nom', 'fk_cours', 'fk_pays', 'fk_nationalite', 'fk_sexe', 'is_actif'], 'integer'],
-            [['fk_cours_nom', 'adresse', 'npa', 'localite', 'telephone', 'email'], 'required'],
+            [['fk_cours_nom', 'nom', 'prenom', 'adresse', 'npa', 'localite', 'telephone', 'email'], 'required'],
             [['numeroRue', 'fk_pays'], 'required', 'except' => 'anniversaire'],
             [['date_naissance', 'date_naissance_enfant', 'date_inscription'], 'safe'],
             [['informations', 'agemoyen', 'nbparticipant'], 'string'],
-            [['nom', 'prenom', 'prenom_enfant'], 'string', 'max' => 60],
+            [['nom', 'prenom', 'nom_representant', 'prenom_representant', 'prenom_enfant'], 'string', 'max' => 60],
             [['adresse', 'localite', 'email'], 'string', 'max' => 100],
             [['npa'], 'string', 'max' => 5],
             [['telephone'], 'string', 'max' => 20],
@@ -194,59 +196,25 @@ class ClientsOnline extends \yii\db\ActiveRecord
             ['no_avs', 'makeAVSMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance'],
             ['iagree', 'compare', 'operator' => '==', 'compareValue' => true, 'message' => Yii::t('app', 'Vous devez accepter les conditions générales')],
 
-            [['nom', 'prenom', 'prenom_enfant', 'agemoyen', 'nbparticipant'], 'required', 'on' => ['anniversaire']],
+            [['prenom_enfant', 'agemoyen', 'nbparticipant'], 'required', 'on' => ['anniversaire']],
 
             ['fk_sexe', 'required', 'when' => function ($model) {
                     return $model->nom != '';
-                }, 'whenClient' => "function (attribute, value) {
-                    if (attribute.name.indexOf('[') == -1) {
-                       index = '';
-                    } else {
-                        if (attribute.name.charAt(0) === '[') { //when dynamic form is not activated and name of inputs is like [0]fk_sexe
-                            index = '-' + attribute.name.charAt(1); //I get the array index
-                        } else {
-                            index = '-' + attribute.name.charAt(14); //dynamic form activated the name of inputs changed like this ClientsOnline[0][fk_sexe].
-                        }
-                    }
-                    return '' != $('[id$=' + index + '-nom]').val();
-            }", 'except' => 'anniversaire'],
+                }, 'except' => 'anniversaire'],
             ['fk_nationalite', 'required', 'when' => function ($model) {
                 return $model->nom != '';
-            }, 'whenClient' => "function (attribute, value) {
-                    if (attribute.name.indexOf('[') == -1) {
-                       index = '';
-                    } else {
-                        if (attribute.name.charAt(0) === '[') { //when dynamic form is not activated and name of inputs is like [0]fk_sexe
-                            index = '-' + attribute.name.charAt(1); //I get the array index
-                        } else {
-                            index = '-' + attribute.name.charAt(14); //dynamic form activated the name of inputs changed like this ClientsOnline[0][fk_sexe].
-                        }
-                    }
-                    console.log($('[id$=' + index + '-nom]').val());
-                    return '' != $('[id$=' + index + '-nom]').val();
-            }", 'except' => 'anniversaire'],
+            }, 'except' => 'anniversaire'],
             ['fk_langue_mat', 'required', 'when' => function ($model) {
                 return $model->nom != '';
-            }, 'whenClient' => "function (attribute, value) {
-                    if (attribute.name.indexOf('[') == -1) {
-                       index = '';
-                    } else {
-                        if (attribute.name.charAt(0) === '[') { //when dynamic form is not activated and name of inputs is like [0]fk_sexe
-                            index = '-' + attribute.name.charAt(1); //I get the array index
-                        } else {
-                            index = '-' + attribute.name.charAt(14); //dynamic form activated the name of inputs changed like this ClientsOnline[0][fk_sexe].
-                        }
-                    }
-                    return '' != $('[id$=' + index + '-nom]').val();
-            }", 'except' => 'anniversaire']
+            }, 'except' => 'anniversaire']
         ];
     }
 
     public function makeAVSMandatory($attribute_name, $params)
     {
-        if (empty($this->$attribute_name) &&  !empty($this->$params)) {
+        if (empty($this->$attribute_name) && !empty($this->$params)) {
             $from = new \DateTime($this->$params);
-            $to   = new \DateTime('today');
+            $to = new \DateTime('today');
             if (20 > $from->diff($to)->y) {
                 $this->addError($attribute_name, Yii::t('app', "Le no AVS est obligatoire."));
             }
@@ -289,6 +257,8 @@ class ClientsOnline extends \yii\db\ActiveRecord
             'nbparticipant' => Yii::t('app', 'Choisir un nombre de participant (enfants et adultes)'),
             'prenom_enfant' => Yii::t('app', 'Prénom de l\'enfant'),
             'date_naissance_enfant' => Yii::t('app', 'Date de naissance de l\'enfant'),
+            'nom_representant' => Yii::t('app', 'Nom du représentant légal (si mineur.e)'),
+            'prenom_representant' => Yii::t('app', 'Prénom du représentant légal (si mineur.e)'),
         ];
     }
     
