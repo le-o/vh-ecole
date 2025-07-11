@@ -112,7 +112,7 @@ class PersonnesSearch extends Personnes
             return $dataProvider;
         }
         
-        $query->where(['IN', 'fk_type', Yii::$app->params['typeEncadrant']]);
+        $query->where(['IN', 'fk_type', Yii::$app->params['typeEncadrantActif']]);
         if (isset($params['fk_langues']) && $params['fk_langues'] != '') {
             $this->fk_langues = $params['fk_langues'];
             $query->andWhere(['LIKE', 'fk_langues', $this->fk_langues]);
