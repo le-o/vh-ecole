@@ -101,6 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'pluginOptions' => [
                         'allowClear' => true,
                         'tags' => true,
+                        'escapeMarkup' => new \yii\web\JsExpression("function(m) { return m; }"),
                     ],
                 ]); ?>
             </div>
