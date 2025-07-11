@@ -82,12 +82,15 @@ $this->registerJsFile(
                 $allChecked = $allChecked && $isChecked;
                 $baremeDate = '';
                 foreach ($data['model']->coursHasMoniteurs as $coursHasMoniteur) {
-                    if ($moniteur->fk_moniteur == $coursHasMoniteur->fk_moniteur &&
-                        (!is_null($coursHasMoniteur->fk_bareme)
-                            || $moniteur->fkMoniteur->getLetterBaremeFromDate($data['model']->date) != $baremeActuel)
-                    ) {
-                        $baremeDate = Html::a(strip_tags($coursHasMoniteur->letterBareme),
-                            \yii\helpers\Url::to(['/cours-date/view', 'id' => $data['model']->cours_date_id, 'msg' => 'moniteur'])
+                    if ($moniteur->fk_moniteur == $coursHasMoniteur->fk_moniteur) {
+                        if (!is_null($coursHasMoniteur->fk_bareme)
+                            || $moniteur->fkMoniteur->getLetterBaremeFromDate($data['model']->date) != $baremeActuel) {
+                            $tolink = $coursHasMoniteur->letterBareme;
+                        } else {
+                            $tolink = $baremeActuel;
+                        }
+                        $baremeDate = Html::a(strip_tags($tolink),
+                            \yii\helpers\Url::to(['/cours-date/changebaremefordate', 'fk_moniteur' => $moniteur->fk_moniteur, 'fk_cours_date' => $data['model']->cours_date_id])
                         );
                     }
                 }
