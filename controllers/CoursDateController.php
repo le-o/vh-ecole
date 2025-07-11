@@ -518,6 +518,43 @@ class CoursDateController extends CommonController
             'modelParams' => new Parametres,
         ]);
     }
+
+    public function actionChangebaremefordate($fk_moniteur, $fk_cours_date) {
+        $model = CoursHasMoniteurs::find()->where(['fk_moniteur' => $fk_moniteur, 'fk_cours_date' => $fk_cours_date])->one();
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            $post = Yii::$app->request->post();
+            $model->fk_bareme = $post['CoursHasMoniteurs']['fk_bareme'];
+            $transaction = \Yii::$app->db->beginTransaction();
+            try {
+                if (!$model->save()) {
+                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
+                }
+                $transaction->commit();
+
+                return $this->redirect([
+                    'cours/gestionmoniteurs',
+                    'cours_id' => $model->fkCoursDate->fk_cours
+                ]);
+            } catch (Exception $e) {
+                $alerte['class'] = 'danger';
+                $alerte['message'] = $e->getMessage();
+                $transaction->rollBack();
+            }
+        }
+
+        // si le barème est vide, on met la valeur du barème actuel par défaut
+        if (is_null($model->fk_bareme)) {
+            $model->fk_bareme = $model->fkMoniteur->currentBareme->fk_bareme;
+        }
+
+        return $this->render('moniteurs', [
+            'alerte' => $alerte ?? '',
+            'model' => $model,
+            'listeBareme' => (new Parametres)->optsBaremeMoniteur(),
+        ]);
+    }
     
     /**
      * Displays a single CoursDate model.
