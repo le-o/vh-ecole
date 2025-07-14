@@ -71,6 +71,7 @@ use kartik\time\TimePicker;
 			    'pluginOptions' => [
 			        'allowClear' => true,
 			        'tags' => true,
+                    'escapeMarkup' => new \yii\web\JsExpression("function(m) { return m; }"),
 			    ],
 			]); ?>
         </div>
@@ -111,6 +112,10 @@ use kartik\time\TimePicker;
         <?php } ?>
     </div>
 
-    <?php ActiveForm::end(); ?>
+    <?php
+    if ($pageRetour !== null) {
+        echo Html::hiddenInput('pageRetour', $pageRetour);
+    }
+    ActiveForm::end(); ?>
 
 </div>

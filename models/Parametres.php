@@ -183,6 +183,14 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array options barème moniteur for drop-down
+     */
+    public function optsBaremeMoniteurSimple($selectedParam = null)
+    {
+        return $this->optsDropDown(8, $selectedParam, null, true, 'info_special');
+    }
+
+    /**
      * @return array options statut participant for drop-down
      */
     public function optsStatutPart($selectedParam = null)
@@ -306,7 +314,7 @@ class Parametres extends \yii\db\ActiveRecord
     /**
      * @return array options from classkey for drop-down
      */
-    public function optsDropDown($classKey, $selectedParam, $queryWhere = null, $restrictLangue = true)
+    public function optsDropDown($classKey, $selectedParam, $queryWhere = null, $restrictLangue = true, $label = 'nom')
     {
         $query = self::find()->where(['class_key' => $classKey])->orderBy('tri');
         
@@ -326,7 +334,7 @@ class Parametres extends \yii\db\ActiveRecord
         $codes = $query->all();
         $temp = array();
         foreach($codes as $code) {
-            $temp[$code['parametre_id']] = Yii::t('app', $code->nom);
+            $temp[$code['parametre_id']] = Yii::t('app', $code->$label);
         }
         return $temp;
     }

@@ -160,7 +160,7 @@ class PersonnesController extends CommonController
         
         $dataMoniteurs = [];
         $heuresTotal = 0;
-        $baremes = (new Parametres())->optsBaremeMoniteur();
+        $baremes = (new Parametres())->optsBaremeMoniteurSimple();
         $baremes[-1] = 'Non défini'; // pour reprendre les heures si paramétrage inexistant
         if (!$isMoniteur || !is_null($searchModel->personne_id)) {
             foreach ($dataProvider->models as $moniteur) {

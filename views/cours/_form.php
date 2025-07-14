@@ -146,13 +146,6 @@ $this->registerJs($script, View::POS_END);
             <?= $form->field($model, 'fk_categories')->checkboxList($modelParams->optsCategorie()) ?>
             <?= $form->field($model, 'fk_langue')->dropDownList($modelParams->optsLangue($model->fk_langue)) ?>
             <?= $form->field($model, 'fk_salle')->dropDownList($modelParams->optsSalle($model->fk_salle)) ?>
-
-            <label for="editBareme"><?= Yii::t('app', 'Changer le barème pour toutes les dates') ?></label>
-            <?php
-            $option = ['reinit' => Yii::t('app', 'Supprimer le barème fixe')];
-            $formations = $option + $modelParams->optsBaremeMoniteur();
-            ?>
-            <?= Html::dropDownList('editBareme', null, $formations, ['class' => 'form-control', 'prompt'=>Yii::t('app', 'Fixer la barème')]) ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'image')->widget(FileInput::classname(), [

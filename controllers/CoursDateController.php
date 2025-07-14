@@ -136,7 +136,9 @@ class CoursDateController extends CommonController
                     }
 
                     $transaction->commit();
-                    if (in_array($myCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
+                    if (isset($post['pageRetour']) && $post['pageRetour'] === 'moniteur') {
+                        return $this->redirect(['cours/gestionmoniteurs', 'cours_id' => $model->fk_cours]);
+                    } elseif (in_array($myCours->fk_type, Yii::$app->params['coursPonctuelUnique'])) {
                         return $this->redirect(['cours-date/view', 'id' => $model->cours_date_id]);
                     } else {
                         return $this->redirect(['cours/view', 'id' => $model->fk_cours]);
@@ -208,7 +210,7 @@ class CoursDateController extends CommonController
             $alerte['class'] = 'warning';
             $alerte['message'] = Yii::t('app', 'Barèmes fixés incohérents : à controller !');
         }
-        $dataMoniteurs = $this->getDataMoniteurs();
+        $dataMoniteurs = $this->getDataMoniteurs($model, $selectedMoniteurs);
         
         $participantDataProvider = new ArrayDataProvider([
             'allModels' => $arrayParticipants,
@@ -233,6 +235,7 @@ class CoursDateController extends CommonController
             'alerte' => $alerte,
             'model' => $model,
             'listeMoniteurs' => (isset($listeMoniteurs)) ? $listeMoniteurs : '',
+            'pageRetour' => ($msg === 'moniteur' ? $msg : null),
             
             'dataCours' => $dataCours,
             'dataMoniteurs' => $dataMoniteurs,
@@ -456,7 +459,7 @@ class CoursDateController extends CommonController
                 }
                 
                 // on inscrit les participants déjà existant pour les autres planifications de ce cours
-                // seulement pour les cours planifiés (planifié et régulié)
+                // seulement pour les cours planifiés (planifié et régulier)
                 if (in_array($myCours->fk_type, Yii::$app->params['coursPlanifieS'])) {
                     $participants = ClientsHasCours::find()->where(['fk_cours' => $model->fk_cours, 'fk_statut' => Yii::$app->params['partInscrit']])->all();
                     foreach ($participants as $part) {
@@ -497,7 +500,7 @@ class CoursDateController extends CommonController
         }
         
         $dataCours = [$cours_id => $myCours->fkNom->nom];
-        $dataMoniteurs = $this->getDataMoniteurs();
+        $dataMoniteurs = $this->getDataMoniteurs($model);
 
         if ($model->duree == '') {
             $model->duree = $myCours->duree;
@@ -513,6 +516,43 @@ class CoursDateController extends CommonController
             'dataMoniteurs' => $dataMoniteurs,
             'selectedMoniteurs' => [],
             'modelParams' => new Parametres,
+        ]);
+    }
+
+    public function actionChangebaremefordate($fk_moniteur, $fk_cours_date) {
+        $model = CoursHasMoniteurs::find()->where(['fk_moniteur' => $fk_moniteur, 'fk_cours_date' => $fk_cours_date])->one();
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            $post = Yii::$app->request->post();
+            $model->fk_bareme = $post['CoursHasMoniteurs']['fk_bareme'];
+            $transaction = \Yii::$app->db->beginTransaction();
+            try {
+                if (!$model->save()) {
+                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du cours.'));
+                }
+                $transaction->commit();
+
+                return $this->redirect([
+                    'cours/gestionmoniteurs',
+                    'cours_id' => $model->fkCoursDate->fk_cours
+                ]);
+            } catch (Exception $e) {
+                $alerte['class'] = 'danger';
+                $alerte['message'] = $e->getMessage();
+                $transaction->rollBack();
+            }
+        }
+
+        // si le barème est vide, on met la valeur du barème actuel par défaut
+        if (is_null($model->fk_bareme)) {
+            $model->fk_bareme = $model->fkMoniteur->currentBareme->fk_bareme;
+        }
+
+        return $this->render('moniteurs', [
+            'alerte' => $alerte ?? '',
+            'model' => $model,
+            'listeBareme' => (new Parametres)->optsBaremeMoniteur(),
         ]);
     }
     
@@ -584,7 +624,7 @@ class CoursDateController extends CommonController
         
         $myCours = Cours::findOne($cours_id);
         $dataCours = [$cours_id => $myCours->fkNom->nom];
-        $dataMoniteurs = $this->getDataMoniteurs();
+        $dataMoniteurs = $this->getDataMoniteurs($model);
         
         if ($model->duree == '') {
             $model->duree = $myCours->duree;
@@ -879,12 +919,23 @@ class CoursDateController extends CommonController
     /**
      * @return array
      */
-    private function getDataMoniteurs(): array
+    private function getDataMoniteurs(CoursDate $modelCoursDate = null, $selectedMoniteurs = []): array
     {
         $dataMoniteurs = [];
         $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
-            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom;
+            $bareme = '';
+            if (in_array($moniteur->personne_id, $selectedMoniteurs)) {
+                $moniteurFromCours = CoursHasMoniteurs::find()->where(['fk_moniteur' => $moniteur->personne_id, 'fk_cours_date' => $modelCoursDate->cours_date_id])->one();
+                if (!empty($moniteurFromCours->fk_bareme)) {
+                    $bareme = $moniteurFromCours->letterBareme;
+                }
+            }
+            if (empty($bareme)) {
+                $date = ((is_null($modelCoursDate) || is_null($modelCoursDate->date)) ? date('Y-m-d') : $modelCoursDate->date);
+                $bareme = $moniteur->getLetterBaremeFromDate($date);
+            }
+            $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom . ' ' . $bareme;
         }
         return $dataMoniteurs;
     }

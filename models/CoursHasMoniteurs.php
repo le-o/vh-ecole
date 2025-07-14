@@ -74,6 +74,19 @@ class CoursHasMoniteurs extends \yii\db\ActiveRecord
         return $this->hasOne(Parametres::className(), ['parametre_id' => 'fk_bareme']);
     }
 
+    public function getLetterBareme()
+    {
+        if (!is_null($this->fk_bareme)) {
+            return '<sup>' . $this->fkBareme->info_special . '</sup>';
+        }
+
+        $moniteurHasBareme = $this->fkMoniteur->getMoniteursHasBaremeFromDate($this->fkCoursDate->date);
+        return (!is_null($moniteurHasBareme)
+            ? '<sup>' . $moniteurHasBareme->fkBareme->info_special . '</sup>'
+            : ''
+        );
+    }
+
     /**
      * @inheritdoc
      */
