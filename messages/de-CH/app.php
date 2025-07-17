@@ -99,6 +99,7 @@ return [
     'Date' => 'Datum',
     'Date Inscription' => 'Anmeldungsdatum',
     'Date Naissance' => 'Geburtsdatum',
+    'Date de naissance participant.e' => 'Geburtsdatum Teilnehmer',
     'Date de naissance de l\'enfant' => 'Geburtsdatum Kind',
     'Date d\'inscription' => 'Anmeldungsdatum',
     'Date du cours' => 'Kursdatum',
