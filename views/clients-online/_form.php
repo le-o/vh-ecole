@@ -22,9 +22,9 @@ $this->registerJs('
         else testType = parseInt(that.val());
 
         if ($.inArray(testType, arRegulier) != -1) {
-            $("#choix_regulier").show();
+            $(".choix_regulier").show();
         } else {
-            $("#choix_regulier").hide();
+            $(".choix_regulier").hide();
         }
         if ($.inArray(testType, arDemande) != -1) {
             $("#sur_demande_info").show();
@@ -74,9 +74,7 @@ $this->registerJs('
                 ['prompt'=>Yii::t('app', 'Choisir une valeur')]
             ) ?>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <?= $form->field($model, 'date_naissance')->widget(DatePicker::classname(), [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
                 'removeButton' => false,
@@ -85,8 +83,14 @@ $this->registerJs('
                     'format' => 'dd.mm.yyyy',
                     'defaultViewDate' => ['year' => 1980]
                 ]
-            ]); ?>
-        </div><div class="col-sm-3">
+            ])->label(Yii::t('app', 'Date de naissance participant.e')) ?>
+        </div>
+    </div>
+    <div class="row choix_regulier" style="border: 2px solid darkorange; display: none;">
+        <div class="col-sm-3">
+            <label class="control-label"><?= Yii::t('app', 'Données obligatoires pour les moins de 20 ans (J+S)') ?></label>
+        </div>
+        <div class="col-sm-3">
             <?= $form->field($model, "no_avs")->textInput(['maxlength' => true])->label(Yii::t('app', 'No AVS participant.e')) ?>
         </div>
         <div class="col-sm-2">
@@ -119,7 +123,7 @@ $this->registerJs('
             <?= $form->field($model, 'fk_cours')->widget(Select2::classname(), [
                 'options'=>['placeholder' => Yii::t('app', 'Choisir un cours ...'), 
                     'id' => 'choix_cours',
-                    'multiple' => false, 
+                    'multiple' => false,
                     'onchange'=>"displayMessage($(this))",
                     'disabled' => (count($dataCours) == 1) ? true : false,
                     'value' => $selectedCours, // initial value
@@ -140,7 +144,7 @@ $this->registerJs('
                 'cours_essai' => Yii::t('app', 'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet'),
                 'pmt_complet' => Yii::t('app', 'Paiement du cours en un seul versement'),
                 'pmt_tranche' => Yii::t('app', 'Paiement du cours en plusieurs versements (+ CHF 40 de frais administratifs)')
-            ], ['id' => 'choix_regulier', 'style' => 'display:none;']) ?>
+            ], ['class' => 'choix_regulier', 'style' => 'display:none;']) ?>
         </div>
     </div>
     
