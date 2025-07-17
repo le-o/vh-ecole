@@ -113,7 +113,7 @@ use kartik\time\TimePicker;
     </div>
 
     <?php
-    if ($pageRetour !== null) {
+    if (isset($pageRetour) && $pageRetour !== null) {
         echo Html::hiddenInput('pageRetour', $pageRetour);
     }
     ActiveForm::end(); ?>
