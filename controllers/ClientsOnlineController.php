@@ -167,7 +167,7 @@ class ClientsOnlineController extends CommonController
                         $modelRepresentant->nom_representant = $post['ClientsOnline']['nom_representant'];
                         $modelRepresentant->prenom = $post['ClientsOnline']['prenom_representant'];
                         $modelRepresentant->prenom_representant = $post['ClientsOnline']['prenom_representant'];
-                        $modelRepresentant->fk_cours_nom = $model->fk_cours_nom;;
+                        $modelRepresentant->fk_cours_nom = $model->fk_cours_nom;
                         $modelRepresentant->adresse = $model->adresse;
                         $modelRepresentant->numeroRue = $model->numeroRue;
                         $modelRepresentant->npa = $model->npa;
@@ -180,8 +180,14 @@ class ClientsOnlineController extends CommonController
                             $clientDirect[] = $this->setPersonneAttribute($modelRepresentant);
                             $modelRepresentant->is_actif = 0;
                         }
-                        if (!$modelRepresentant->save(false)) {
-                            throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du représentant légal.'));
+                        // si la personne existe déjà, on ne fait pas de doublon
+                        $existeClientOnline = ClientsOnline::find()->where(['nom' => $modelRepresentant->nom, 'prenom' => $modelRepresentant->prenom])->one();
+                        if (null == $existeClientOnline) {
+                            if (!$modelRepresentant->save(false)) {
+                                throw new \Exception(Yii::t('app', 'Problème lors de la sauvegarde du représentant légal.'));
+                            }
+                        } else {
+                            $modelRepresentant->client_online_id = $existeClientOnline->client_online_id;
                         }
                         $model->fk_parent = $modelRepresentant->client_online_id;
                         $hasRepresentant = true;
