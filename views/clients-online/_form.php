@@ -22,9 +22,9 @@ $this->registerJs('
         else testType = parseInt(that.val());
 
         if ($.inArray(testType, arRegulier) != -1) {
-            $("#choix_regulier").show();
+            $(".choix_regulier").show();
         } else {
-            $("#choix_regulier").hide();
+            $(".choix_regulier").hide();
         }
         if ($.inArray(testType, arDemande) != -1) {
             $("#sur_demande_info").show();
@@ -33,18 +33,6 @@ $this->registerJs('
         }
     }'
     , \yii\web\View::POS_END);
-$this->registerJs('
-    $(".dynamicform_wrapper").on("beforeDelete", function(e, item) {
-        if (! confirm("'.Yii::t('app', 'Etes-vous sur de vouloir supprimer cet élément?').'")) {
-            return false;
-        }
-        return true;
-    });
-
-    $(".dynamicform_wrapper").on("limitReached", function(e, item) {
-        alert("'.Yii::t('app', 'Vous avez atteint la limite autorisée.').'");
-    });'
-    , \yii\web\View::POS_READY);
 ?>
 
 <br /><br />
@@ -54,11 +42,17 @@ $this->registerJs('
     <?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
     
     <div class="row">
-        <div class="col-sm-6">
-            <?= $form->field($model, 'nom')->textInput(['maxlength' => true])->label(Yii::t('app', 'Nom (du représentant légal si mineur)')) ?>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'nom')->textInput(['maxlength' => true])->label(Yii::t('app', 'Nom participant.e')) ?>
         </div>
-        <div class="col-sm-6">
-            <?= $form->field($model, 'prenom')->textInput(['maxlength' => true])->label(Yii::t('app', 'Prénom (du représentant légal si mineur)')) ?>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'prenom')->textInput(['maxlength' => true])->label(Yii::t('app', 'Prénom participant.e')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'nom_representant')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'prenom_representant')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
     <div class="row">
@@ -80,9 +74,7 @@ $this->registerJs('
                 ['prompt'=>Yii::t('app', 'Choisir une valeur')]
             ) ?>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <?= $form->field($model, 'date_naissance')->widget(DatePicker::classname(), [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
                 'removeButton' => false,
@@ -91,9 +83,15 @@ $this->registerJs('
                     'format' => 'dd.mm.yyyy',
                     'defaultViewDate' => ['year' => 1980]
                 ]
-            ])->label(Yii::t('app', 'Date de naissance (du représentant légal si mineur)')); ?>
-        </div><div class="col-sm-3">
-            <?= $form->field($model, "no_avs")->textInput(['maxlength' => true]) ?>
+            ])->label(Yii::t('app', 'Date de naissance participant.e')) ?>
+        </div>
+    </div>
+    <div class="row choix_regulier" style="border: 2px solid darkorange; display: none;">
+        <div class="col-sm-3">
+            <label class="control-label"><?= Yii::t('app', 'Données obligatoires pour les moins de 20 ans (J+S)') ?></label>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, "no_avs")->textInput(['maxlength' => true])->label(Yii::t('app', 'No AVS participant.e')) ?>
         </div>
         <div class="col-sm-2">
             <?= $form->field($model, 'fk_sexe')->dropDownList(
@@ -125,7 +123,7 @@ $this->registerJs('
             <?= $form->field($model, 'fk_cours')->widget(Select2::classname(), [
                 'options'=>['placeholder' => Yii::t('app', 'Choisir un cours ...'), 
                     'id' => 'choix_cours',
-                    'multiple' => false, 
+                    'multiple' => false,
                     'onchange'=>"displayMessage($(this))",
                     'disabled' => (count($dataCours) == 1) ? true : false,
                     'value' => $selectedCours, // initial value
@@ -144,9 +142,9 @@ $this->registerJs('
         <div class="col-sm-12">
             <?= yii\bootstrap\BaseHtml::radioList('offre_supp', false, [
                 'cours_essai' => Yii::t('app', 'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet'),
-                'pmt_complet' => Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en un seul versement'),
-                'pmt_tranche' => Yii::t('app', 'J\'inscris mon enfant pour la saison et je paie le montant du cours en plusieurs versements (+ CHF 40 de frais administratifs)')
-            ], ['id' => 'choix_regulier', 'style' => 'display:none;']) ?>
+                'pmt_complet' => Yii::t('app', 'Paiement du cours en un seul versement'),
+                'pmt_tranche' => Yii::t('app', 'Paiement du cours en plusieurs versements (+ CHF 40 de frais administratifs)')
+            ], ['class' => 'choix_regulier', 'style' => 'display:none;']) ?>
         </div>
     </div>
     
@@ -154,93 +152,6 @@ $this->registerJs('
         <div class="col-sm-12"><br />
             <div id="sur_demande_info" style="display:none;"><span style="color:red; font-weight:bold;"><?= Yii::t('app', 'Vous avez choisi un cours sur demande, veuillez indiquer le(s) horaire(s) souhaité(s) date et heure') ?></span></div>
             <?= $form->field($model, 'informations')->textarea(['rows' => 6])->label(Yii::t('app', 'Infos, détails et besoins particuliers')) ?>
-        </div>
-    </div>
-    
-    <div class="panel panel-default">
-        <div class="panel-heading"><h4><i class="glyphicon glyphicon-plus"></i> <?= Yii::t('app', 'Coordonnées du/des enfant/s inscrit/s sous mon nom:') ?></h4></div>
-        <div class="panel-body">
-             <?php DynamicFormWidget::begin([
-                'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
-                'widgetBody' => '.container-items', // required: css class selector
-                'widgetItem' => '.item', // required: css class
-                'limit' => 4, // the maximum times, an element can be cloned (default 999)
-                'min' => 1, // 0 or 1 (default 1)
-                'insertButton' => '.add-item', // css class
-                'deleteButton' => '.remove-item', // css class
-                'model' => $modelsClient[0],
-                'formId' => 'dynamic-form',
-                'formFields' => [
-                    'nom',
-                    'prenom',
-                    'date_naissance',
-                    'no_avs',
-                ],
-            ]); ?>
-
-            <div class="container-items"><!-- widgetContainer -->
-            <?php foreach ($modelsClient as $i => $modelClient): ?>
-                <div class="item panel panel-default"><!-- widgetBody -->
-                    <div class="panel-heading">
-                        <h3 class="panel-title pull-left"><?= Yii::t('app', 'Client') ?></h3>
-                        <div class="pull-right">
-                            <button type="button" class="add-item btn btn-success btn-xs"><i class="glyphicon glyphicon-plus"></i></button>
-                            <button type="button" class="remove-item btn btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button>
-                        </div>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="panel-body">
-                        <?php
-                            // necessary for update action.
-                            if (!$modelClient->isNewRecord) {
-                                echo Html::activeHiddenInput($modelClient, "[{$i}]client_online_id");
-                            }
-                        ?>
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <?= $form->field($modelClient, "[{$i}]nom")->textInput(['maxlength' => true]) ?>
-                            </div>
-                            <div class="col-sm-2">
-                                <?= $form->field($modelClient, "[{$i}]prenom")->textInput(['maxlength' => true]) ?>
-                            </div>
-                            <div class="col-sm-2">
-                                <?= $form->field($modelClient, "[{$i}]date_naissance")->widget(DatePicker::classname(), [
-                                    'options' => ['placeholder' => 'jj.mm.aaaa'],
-                                    'removeButton' => false,
-                                    'pluginOptions' => [
-                                        'autoclose'=>true,
-                                        'format' => 'dd.mm.yyyy',
-                                        'defaultViewDate' => ['year' => 1980]
-                                    ]
-                                ]); ?>
-                            </div>
-                            <div class="col-sm-2">
-                                <?= $form->field($modelClient, "[{$i}]no_avs")->textInput(['maxlength' => true]) ?>
-                            </div>
-                            <div class="col-sm-1">
-                                <?= $form->field($modelClient, "[{$i}]fk_sexe")->dropDownList(
-                                    $params->optsSexe(),
-                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
-                                ) ?>
-                            </div>
-                            <div class="col-sm-1">
-                                <?= $form->field($modelClient, "[{$i}]fk_nationalite")->dropDownList(
-                                    $params->optsPays(),
-                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
-                                ) ?>
-                            </div>
-                            <div class="col-sm-2">
-                                <?= $form->field($modelClient, "[{$i}]fk_langue_mat")->dropDownList(
-                                    $params->optsLangue(),
-                                    ['prompt'=>Yii::t('app', 'Choisir une valeur')]
-                                ) ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-            </div>
-            <?php DynamicFormWidget::end(); ?>
         </div>
     </div>
     
