@@ -8,6 +8,12 @@
  */
 return [
     'Adresse' => 'Address',
+    'Afficher' => 'Display',
+    'Age moyen des enfants' => 'Average age of children',
+    'Calendrier des anniversaires' => 'Birthday calendar',
+    'Choisir un âge moyen' => 'Choose a middle age',
+    'Choisir un anniversaire' => 'Choose a birthday',
+    'Choisir un nombre de participant (enfants et adultes)' => 'Choose a number of participants (children and adults)',
     'Choisir une valeur' => 'Choose a value',
     'Conditions inscription et annulation' => '<h4>Registration and cancellation conditions</h4>
     Registration for climbing courses is by reservation. No cancellation fees are charged up to 7 days before the course
@@ -21,10 +27,24 @@ return [
     <br />
     Vertic-Halle reserves the right to modify the service depending on the level and number of participants, if
     conditions allow and the course objectives can be achieved.',
+    'Conditions inscription et annulation anniversaire' => '<h4>Registration and cancellation conditions</h4>
+    Registration for birthday parties at Vertic-Halle requires a reservation. No fee is due up to 7 days before the event.
+    Within 7 days of the event, 40% of the basic fee is due. In case of cancellation on the day of the event, 100% of the
+    fee is due.<br /><br />
+    Vertic-Halle does not refund any amounts due under the above-mentioned conditions. In the event of cancellation by
+    Vertic-Halle, the amount already paid will be refunded.<br /><br />
+    Vertic-Halle reserves the right to modify the service depending on the level and number of participants, if conditions
+    allow and the course objectives can be achieved.',
+    'Date de naissance de l\'enfant' => 'Child\'s date of birth',
     'Date de naissance participant.e' => 'Participant date of birth',
+    'du_date' => 'from',
+    'à_heure' => 'at',
     'En cochant cette case je déclare avoir lu et accepté les conditions d\'inscription et d\'annulation indiquées au bas de cette page' => 'By ticking this box I declare that I have read and accept the registration and cancellation conditions indicated at the bottom of this page.',
     'Fk Cours' => 'Course name',
     'Infos, détails et besoins particuliers' => 'Information, Details and special needs',
+    'Inscription' => 'Registration',
+    'Inscription anniversaire' => 'Birthday registration',
+    'Inscription anniversaire : date et heure à choix' => 'Birthday registration: date and time of your choice',
     'J\'aimerais que mon enfant essaie avant de l\'inscrire pour la saison et je souhaite être contacté à ce sujet' => 'I would like my child to try out before registering them for the season and I would like to be contacted about this',
     'Langue maternelle' => 'Native language',
     'Localite' => 'Locality',
@@ -33,14 +53,18 @@ return [
     'nom du cours' => 'Course name',
     'Nom du représentant légal (si mineur.e)' => 'Name of legal representative (if a minor)',
     'Nom participant.e' => 'Participant name',
+    'Nom (personne responsable)' => 'Name (person in charge)',
     'Nous avons bien reçu votre commande.<br>Un mail de confirmation de réception de celle-ci vous a été envoyé par e-mail.' => 'We have received your order.<br>A confirmation email has been sent to you',
     'Npa' => 'Postcode',
     'Numéro' => 'Number',
     'Paiement du cours en un seul versement' => 'Payment in one instalment',
     'Paiement du cours en plusieurs versements (+ CHF 40 de frais administratifs)' => 'Payment in various instalments (+40 CHF)',
     'Pays' => 'Country',
+    'plus de {nombre} personnes' => 'more than {nombre} persons',
+    'Prénom de l\'enfant' => 'Child\'s first name',
     'Prénom du représentant légal (si mineur.e)' => 'First name of legal representative (if a minor)',
     'Prénom participant.e' => 'Participant first name',
+    'Prénom (personne responsable)' => 'First name (person in charge)',
     'S\'inscrire' => 'Register',
     'Sexe' => 'Gender',
     'Telephone' => 'Phone number',
