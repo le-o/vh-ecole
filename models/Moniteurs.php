@@ -261,7 +261,6 @@ class Moniteurs extends \yii\db\ActiveRecord
                             if (!empty($this->js3_escalade) || !empty($this->prof_escalade)) {
                                 $dates[] = $this->js3_escalade;
                                 $dates[] = $this->prof_escalade;
-                                $bareme = 'moniteur 6';
                             }
                         }
                     } elseif (!empty($this->prof_escalade)) {
