@@ -248,24 +248,24 @@ class Moniteurs extends \yii\db\ActiveRecord
                     if (!empty($this->experience_cours)) {
                         $dates[] = $this->experience_cours;
                         $bareme = 'moniteur 3';
-                    }
 
-                    if (!empty($this->instructeur_asse)) {
-                        $dates[] = $this->instructeur_asse;
-                        $bareme = 'moniteur 4';
+                        if (!empty($this->instructeur_asse)) {
+                            $dates[] = $this->instructeur_asse;
+                            $bareme = 'moniteur 4';
 
-                        if (!empty($this->js2_escalade)) {
-                            $dates[] = $this->js2_escalade;
-                            $bareme = 'moniteur 5';
+                            if (!empty($this->js2_escalade)) {
+                                $dates[] = $this->js2_escalade;
+                                $bareme = 'moniteur 5';
 
-                            if (!empty($this->js3_escalade) || !empty($this->prof_escalade)) {
-                                $dates[] = $this->js3_escalade;
-                                $dates[] = $this->prof_escalade;
+                                if (!empty($this->js3_escalade) || !empty($this->prof_escalade)) {
+                                    $dates[] = $this->js3_escalade;
+                                    $dates[] = $this->prof_escalade;
+                                }
                             }
+                        } elseif (!empty($this->prof_escalade)) {
+                            $dates[] = $this->prof_escalade;
+                            $bareme = 'moniteur 4';
                         }
-                    } elseif (!empty($this->prof_escalade)) {
-                        $dates[] = $this->prof_escalade;
-                        $bareme = 'moniteur 4';
                     }
                 } elseif (!empty($this->instructeur_asse) || !empty($this->js2_escalade) || !empty($this->js3_escalade)) {
                     $dates = [$this->instructeur_asse, $this->js2_escalade, $this->js3_escalade];
