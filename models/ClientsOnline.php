@@ -193,20 +193,13 @@ class ClientsOnline extends \yii\db\ActiveRecord
             [['telephone'], 'string', 'max' => 20],
             [['no_avs'], 'string', 'max' => 16],
             [['no_avs'], 'match', 'pattern' => '/[7][5][6]\\.[\d]{4}[.][\d]{4}[.][\d]{2}$/'],
-            ['no_avs', 'makeAVSMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance'],
+            ['no_avs', 'makeAVSMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance', 'except' => 'anniversaire'],
+            ['fk_sexe', 'makeFieldMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance', 'except' => 'anniversaire'],
+            ['fk_nationalite', 'makeFieldMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance', 'except' => 'anniversaire'],
+            ['fk_langue_mat', 'makeFieldMandatory', 'skipOnEmpty'=>false, 'params' => 'date_naissance', 'except' => 'anniversaire'],
             ['iagree', 'compare', 'operator' => '==', 'compareValue' => true, 'message' => Yii::t('app', 'Vous devez accepter les conditions générales')],
 
             [['prenom_enfant', 'agemoyen', 'nbparticipant'], 'required', 'on' => ['anniversaire']],
-
-            ['fk_sexe', 'required', 'when' => function ($model) {
-                    return $model->nom != '';
-                }, 'except' => 'anniversaire'],
-            ['fk_nationalite', 'required', 'when' => function ($model) {
-                return $model->nom != '';
-            }, 'except' => 'anniversaire'],
-            ['fk_langue_mat', 'required', 'when' => function ($model) {
-                return $model->nom != '';
-            }, 'except' => 'anniversaire']
         ];
     }
 
@@ -217,6 +210,17 @@ class ClientsOnline extends \yii\db\ActiveRecord
             $to = new \DateTime('today');
             if (20 > $from->diff($to)->y) {
                 $this->addError($attribute_name, Yii::t('app', "Le no AVS est obligatoire."));
+            }
+        }
+    }
+
+    public function makeFieldMandatory($attribute_name, $params)
+    {
+        if (empty($this->$attribute_name) && !empty($this->$params)) {
+            $from = new \DateTime($this->$params);
+            $to = new \DateTime('today');
+            if (20 > $from->diff($to)->y) {
+                $this->addError($attribute_name, Yii::t('app', "Le champ est obligatoire."));
             }
         }
     }
