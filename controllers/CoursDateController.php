@@ -200,6 +200,7 @@ class CoursDateController extends CommonController
         $dataCours = [$model->fk_cours => $myCours->fkNom->nom];
         $myMoniteurs = CoursHasMoniteurs::find()->where(['fk_cours_date' => $model->cours_date_id])->all();
         $baremeValue = [];
+        $selectedMoniteurs = [];
         foreach ($myMoniteurs as $moniteur) {
             $selectedMoniteurs[] = $moniteur->fk_moniteur;
             $model->baremeMoniteur = $moniteur->fk_bareme;
