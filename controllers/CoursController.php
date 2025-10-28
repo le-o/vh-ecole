@@ -27,9 +27,9 @@ use kartik\mpdf\Pdf;
  */
 class CoursController extends CommonController
 {
-    
+
     public $freeAccessActions = ['getcoursjson'];
-    
+
     public function behaviors()
     {
         return [
@@ -39,7 +39,7 @@ class CoursController extends CommonController
                     'delete' => ['post'],
                 ],
             ],
-            'ghost-access'=> [
+            'ghost-access' => [
                 'class' => 'leo\modules\UserManagement\components\GhostAccessControl',
             ],
             [
@@ -53,9 +53,11 @@ class CoursController extends CommonController
             ],
         ];
     }
-    
+
     // for route purpose only
-    public function actionAdvanced() {}
+    public function actionAdvanced()
+    {
+    }
 
     /**
      * Lists all Cours models.
@@ -65,7 +67,7 @@ class CoursController extends CommonController
     {
         $searchModel = new CoursSearch();
         $dataSalles = Parametres::findAll(['class_key' => 16]);
-        
+
         $filterSalle = Yii::$app->session['salles'];
 
         // on sauve les filtres et la pagination
@@ -102,7 +104,7 @@ class CoursController extends CommonController
                 }
             }
         }
-        
+
         $searchModel->bySalle = $filterSalle;
         if ($onlyForWeb !== null) {
             Yii::$app->session['onlyForWeb'] = $onlyForWeb;
@@ -112,7 +114,7 @@ class CoursController extends CommonController
         $searchModel->isPriorise = $onlyForWeb;
         Yii::$app->session['salles'] = $filterSalle;
         $dataProvider = $searchModel->search($params);
-        
+
         foreach ($dataSalles as $s) {
             $btnSalle[] = [
                 'salleID' => (in_array($s->parametre_id, $searchModel->bySalle)) ? '-' . $s->parametre_id : '+' . $s->parametre_id,
@@ -121,7 +123,7 @@ class CoursController extends CommonController
             ];
         }
         $btnClassPriorise = ($onlyForWeb ? ' btn-info' : '');
-        
+
         $parametre = new Parametres();
         $saisonFilter = $parametre->optsSaison();
         $statutFilter = $parametre->optsStatutCours();
@@ -172,7 +174,7 @@ class CoursController extends CommonController
             $alerte['class'] = 'danger';
             $alerte['message'] = $msg;
         }
-        
+
         if (!empty(Yii::$app->request->post()) || $session->getFlash('newParticipant') != '') {
             // soit on force toutes les dates, soit on prend que le futur (mode normal !)
             if ($session->getFlash('newParticipant') != '') {
@@ -194,7 +196,7 @@ class CoursController extends CommonController
                 if (empty($modelDate)) {
                     $alerte['class'] = 'warning';
                     $alerte['message'] = Yii::t('app', 'Inscription impossible - aucune date dans le futur');
-                    $alerte['message'] .= '<a class="btn btn-link" href="'.Url::to(['/cours/view', 'id' => $id]).'">'.Yii::t('app', 'Forcer l\'inscription à toutes les dates ?').'</a>';
+                    $alerte['message'] .= '<a class="btn btn-link" href="' . Url::to(['/cours/view', 'id' => $id]) . '">' . Yii::t('app', 'Forcer l\'inscription à toutes les dates ?') . '</a>';
                     $session->setFlash('newParticipant', $new['new_participant']);
                 } else {
                     $alerte = $this->addClientToCours($modelDate, $new['new_participant'], $model->cours_id);
@@ -216,7 +218,7 @@ class CoursController extends CommonController
                         // store the source file extension
                         $ext = end((explode(".", $image->name)));
                         // generate a unique file name
-                        $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
+                        $model->image_web = Yii::$app->security->generateRandomString() . ".{$ext}";
                         $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
                         if (!$image->saveAs($path)) {
                             $alerte['class'] = 'warning';
@@ -251,26 +253,26 @@ class CoursController extends CommonController
                 $alerte['message'] = Yii::t('app', 'Vous devez sélectionner un participant pour pouvoir l\'ajouter.');
             }
         }
-        
+
         // on assigne la valeur de l'image au champ caché
         $model->image_hidden = $model->image_web;
-        
+
         $participants = Personnes::find()->distinct()->joinWith('clientsHasCours', false)->where(['IN', 'clients_has_cours.fk_cours', $model->cours_id])->orderBy('clients_has_cours.fk_statut ASC');
         $listParticipants = $participants->all();
         $excludePart = [];
         $listeEmails = [];
         foreach ($listParticipants as $participant) {
             $excludePart[] = $participant->personne_id;
-            
+
             if (strpos($participant->email, '@') !== false) {
                 $listeEmails[$participant->email] = trim($participant->email);
             }
-            
+
             foreach ($participant->personneHasInterlocuteurs as $pi) {
                 $listeEmails[$pi->fkInterlocuteur->email] = trim($pi->fkInterlocuteur->email);
             }
         }
-	    
+
         $dataClients = Personnes::getClientsNotInCours($excludePart);
 
         // liste des dates de cours
@@ -288,7 +290,7 @@ class CoursController extends CommonController
                 'pageSize' => 20,
             ],
         ]);
-        foreach($participantDataProvider->models as $part) {
+        foreach ($participantDataProvider->models as $part) {
             $part->statutPart = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->cours_id])->fkStatut->nom;
             $part->statutPartID = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->cours_id])->fk_statut;
         }
@@ -296,10 +298,10 @@ class CoursController extends CommonController
         $parametre = new Parametres();
         $parametre->listeEmails = implode(', ', $listeEmails);
         $emails = ['' => Yii::t('app', 'Faire un choix ...')] + $parametre->optsEmail();
-        
+
         // pour l'affichage des paramètres en mode édition
         $modelParams = new Parametres;
-	    
+
         return $this->render('view', [
             'alerte' => $alerte,
             'model' => $model,
@@ -333,7 +335,7 @@ class CoursController extends CommonController
                 // store the source file extension
                 $ext = end((explode(".", $image->name)));
                 // generate a unique file name
-                $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
+                $model->image_web = Yii::$app->security->generateRandomString() . ".{$ext}";
                 $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
                 if (!$image->saveAs($path)) {
                     $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
@@ -352,7 +354,7 @@ class CoursController extends CommonController
             'modelParams' => $modelParams,
         ]);
     }
-    
+
     /**
      * Clone a Cours model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -386,13 +388,13 @@ class CoursController extends CommonController
             // petite astuce pour enregistrer comme il faut le tableau des jours dans la bdd
             $model->fk_jours = Yii::$app->request->post()['Cours']['fk_jours'];
             $model->fk_categories = Yii::$app->request->post()['Cours']['fk_categories'];
-                    
+
             // on s'occupe de sauver l'image si elle existe
             if ($image = UploadedFile::getInstance($model, 'image')) {
                 // store the source file extension
                 $ext = end((explode(".", $image->name)));
                 // generate a unique file name
-                $model->image_web = Yii::$app->security->generateRandomString().".{$ext}";
+                $model->image_web = Yii::$app->security->generateRandomString() . ".{$ext}";
                 $path = Yii::$app->basePath . Yii::$app->params['uploadPath'] . $model->image_web;
                 if (!$image->saveAs($path)) {
                     $alerte = Yii::t('app', 'Problème lors de la sauvegarde de l\'image.');
@@ -403,16 +405,16 @@ class CoursController extends CommonController
                 }
                 $model->image_web = null;
             }
-            
+
             if (!$model->save()) {
-		        $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
-		    } else {
-	            return $this->redirect(['view', 'id' => $model->cours_id]);
-	        }
+                $alerte = Yii::t('app', 'Problème lors de la sauvegarde du cours.');
+            } else {
+                return $this->redirect(['view', 'id' => $model->cours_id]);
+            }
         }
         $modelParams = new Parametres;
         return $this->render('update', [
-	        'alerte' => $alerte,
+            'alerte' => $alerte,
             'model' => $model,
             'modelParams' => $modelParams,
         ]);
@@ -471,8 +473,8 @@ class CoursController extends CommonController
                     ClientsHasCoursDate::deleteAll(['fk_personne' => $personne_id, 'fk_cours_date' => $date->cours_date_id]);
                 }
             }
-            
-            // on modifie le statut 
+
+            // on modifie le statut
             $transaction->commit();
             $msg = 'supp';
         } catch (Exception $e) {
@@ -480,7 +482,7 @@ class CoursController extends CommonController
             $transaction->rollBack();
         }
 
-        return $this->redirect(['/'.$from.'/view', 'id' => $cours_ou_date_id, 'msg' => $msg]);
+        return $this->redirect(['/' . $from . '/view', 'id' => $cours_ou_date_id, 'msg' => $msg]);
     }
 
     /**
@@ -502,21 +504,21 @@ class CoursController extends CommonController
                 $allDate[] = $date;
                 foreach ($date->coursHasMoniteurs as $moniteur) {
                     $emails[$moniteur->fk_moniteur] = $moniteur->fkMoniteur->email;
-                    $nomMoniteurs[$moniteur->fk_moniteur] = $moniteur->fkMoniteur->prenom.' '.$moniteur->fkMoniteur->nom;
+                    $nomMoniteurs[$moniteur->fk_moniteur] = $moniteur->fkMoniteur->prenom . ' ' . $moniteur->fkMoniteur->nom;
                 }
-                
+
                 CoursHasMoniteurs::deleteAll(['fk_cours_date' => $date->cours_date_id]);
                 ClientsHasCoursDate::deleteAll(['fk_cours_date' => $date->cours_date_id]);
             }
             CoursDate::deleteAll(['fk_cours' => $id]);
-            
+
             // on envoi l'email à tous les moniteurs
             if (!empty($emails)) {
                 $contenu = $this->generateMoniteurEmail($firstDate, $nomMoniteurs, 'delete', $allDate);
                 $this->actionEmail($contenu, $emails);
             }
             $this->findModel($id)->delete();
-            
+
             $transaction->commit();
         } catch (Exception $e) {
             $msg = $e->getMessage();
@@ -526,26 +528,27 @@ class CoursController extends CommonController
 
         return $this->redirect(['index']);
     }
-    
+
     /**
      * Affichage de la page de gestion globale des inscriptions.
      * Permet la mise à jour des données des inscriptions pour un cours (toutes les dates)
      * @param integer $id
      * @return mixed
      */
-    public function actionGestioninscriptions($cours_id) {
+    public function actionGestioninscriptions($cours_id)
+    {
         $model = $this->findModel($cours_id);
         $alerte = '';
-        
+
         if (!empty(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
-            
+
             if (isset($post['new_inscription']) && !empty($post['new_inscription'])) {
                 $dejaParticipants[] = $post['new_inscription'];
                 $newParticipant = new ClientsHasCoursDate();
                 $newParticipant->fk_personne = $post['new_inscription'];
             } else {
-                
+
                 $allParticipants = json_decode($post['allParticipants']);
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
@@ -594,14 +597,14 @@ class CoursController extends CommonController
                     // on redirige vers la page du cours
                     $msg = 'inscrip';
                     return $this->redirect(['/cours/view', 'id' => $cours_id, 'msg' => $msg]);
-                    
+
                 } catch (Exception $e) {
                     $alerte = $e->getMessage();
                     $transaction->rollBack();
                 }
             }
         }
-        
+
         // préparation des data
         foreach ($model->coursDates as $coursDate) {
             $arrayData[$coursDate->cours_date_id]['model'] = $coursDate;
@@ -611,17 +614,17 @@ class CoursController extends CommonController
                 $arrayData[$coursDate->cours_date_id]['participants'][$participant->fk_personne] = $participant;
             }
         }
-        
+
         $modelParticipants = Personnes::find()->where(['<>', 'fk_type', Yii::$app->params['typeEncadrantActif']])->andWhere(['not in', 'personne_id', $dejaParticipants])->orderBy('nom, prenom')->all();
         foreach ($modelParticipants as $participant) {
             $dataParticipants[$participant->fkStatut->nom][$participant->personne_id] = $participant->NomPrenom;
         }
-        
+
         // on ajoute au tableau le nouveau participant choisi
         if (isset($newParticipant)) {
             $arrayParticipants[$newParticipant->fk_personne] = $newParticipant;
         }
-        
+
         return $this->render('inscriptions', [
             'alerte' => $alerte,
             'model' => $model,
@@ -630,20 +633,21 @@ class CoursController extends CommonController
             'arrayData' => $arrayData,
         ]);
     }
-    
+
     /**
      * Affichage de la page de gestion globale des inscriptions.
      * Permet la mise à jour des données des personnes inscrites
      * @param integer $id
      * @return mixed
      */
-    public function actionGestionmoniteurs($cours_id) {
+    public function actionGestionmoniteurs($cours_id)
+    {
         $model = $this->findModel($cours_id);
         $alerte = '';
-        
+
         if (!empty(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
-            
+
             if (isset($post['new_moniteur']) && !empty($post['new_moniteur'])) {
                 $dejaMoniteurs[] = $post['new_moniteur'];
                 $newMoniteur = new CoursHasMoniteurs();
@@ -655,42 +659,44 @@ class CoursController extends CommonController
                 foreach ($model->coursDates as $coursDate) {
                     $dateCours = date('Ymd', strtotime($coursDate->date));
                     foreach ($coursDate->coursHasMoniteurs as $moniteur) {
-                        $arrayBefore[$dateCours][$moniteur->fk_cours_date.'|'.$moniteur->fk_moniteur] = true;
-                        $arrayClone[$moniteur->fk_cours_date.'|'.$moniteur->fk_moniteur] = clone($moniteur);
+                        $arrayBefore[$dateCours][$moniteur->fk_cours_date . '|' . $moniteur->fk_moniteur] = true;
+                        $arrayClone[$moniteur->fk_cours_date . '|' . $moniteur->fk_moniteur] = clone($moniteur);
                     }
                 }
-            
+
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
                     // on supprime tous les moniteurs pour les cours en question
                     foreach ($model->coursDates as $coursDate) {
                         CoursHasMoniteurs::deleteAll('fk_cours_date = :cours_date_id', ['cours_date_id' => $coursDate->cours_date_id]);
                     }
-                    
-                    // on met les dates dans le bon ordre avant le traitement
-                    ksort($post['datemoniteur']);
 
-                    // on reconstruit la liste d'après la saisie
-                    foreach ($post['datemoniteur'] as $parDate) {
-                        foreach ($parDate as $key => $v) {
-                            $ids = explode('|', $key);
-                            $addMoniteur = new CoursHasMoniteurs();
-                            $addMoniteur->fk_cours_date = $ids[0];
-                            $addMoniteur->fk_moniteur = $ids[1];
-                            $addMoniteur->is_responsable = 0;
+                    if (isset($post['datemoniteur'])) {
+                        // on met les dates dans le bon ordre avant le traitement
+                        ksort($post['datemoniteur']);
 
-                            if (isset($arrayClone[$key])) {
-                                $addMoniteur->fk_bareme = $arrayClone[$key]->fk_bareme;
-                            }
+                        // on reconstruit la liste d'après la saisie
+                        foreach ($post['datemoniteur'] as $parDate) {
+                            foreach ($parDate as $key => $v) {
+                                $ids = explode('|', $key);
+                                $addMoniteur = new CoursHasMoniteurs();
+                                $addMoniteur->fk_cours_date = $ids[0];
+                                $addMoniteur->fk_moniteur = $ids[1];
+                                $addMoniteur->is_responsable = 0;
 
-                            if (!$addMoniteur->save()) {
-                                throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
-                            }
-                            if ($withNotification) {
-                                $dates[$addMoniteur->fk_cours_date]['date'] = $addMoniteur->fkCoursDate->date;
-                                $dates[$addMoniteur->fk_cours_date]['heure'] = substr($addMoniteur->fkCoursDate->heure_debut, 0, 5);
-                                $dates[$addMoniteur->fk_cours_date]['moniteurs'][] = $addMoniteur->fkMoniteur->prenom . ' ' . $addMoniteur->fkMoniteur->nom;
-                                $dates[$addMoniteur->fk_cours_date]['remarque'] = $addMoniteur->fkCoursDate->remarque;
+                                if (isset($arrayClone[$key])) {
+                                    $addMoniteur->fk_bareme = $arrayClone[$key]->fk_bareme;
+                                }
+
+                                if (!$addMoniteur->save()) {
+                                    throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde du/des moniteur(s).'));
+                                }
+                                if ($withNotification) {
+                                    $dates[$addMoniteur->fk_cours_date]['date'] = $addMoniteur->fkCoursDate->date;
+                                    $dates[$addMoniteur->fk_cours_date]['heure'] = substr($addMoniteur->fkCoursDate->heure_debut, 0, 5);
+                                    $dates[$addMoniteur->fk_cours_date]['moniteurs'][] = $addMoniteur->fkMoniteur->prenom . ' ' . $addMoniteur->fkMoniteur->nom;
+                                    $dates[$addMoniteur->fk_cours_date]['remarque'] = $addMoniteur->fkCoursDate->remarque;
+                                }
                             }
                         }
                     }
@@ -702,14 +708,14 @@ class CoursController extends CommonController
                     // on redirige vers la page du cours
                     $msg = 'monit';
                     return $this->redirect(['/cours/view', 'id' => $cours_id, 'msg' => $msg]);
-                    
+
                 } catch (Exception $e) {
                     $alerte = $e->getMessage();
                     $transaction->rollBack();
                 }
             }
         }
-        
+
         // préparation des data
         $arrayMoniteurs = [];
         $dejaMoniteurs = [];
@@ -721,17 +727,17 @@ class CoursController extends CommonController
                 $arrayData[$coursDate->cours_date_id]['moniteurs'][$moniteur->fk_moniteur] = $moniteur;
             }
         }
-        
+
         $modelMoniteurs = Personnes::find()->where(['fk_type' => Yii::$app->params['typeEncadrantActif']])->andWhere(['not in', 'personne_id', $dejaMoniteurs])->orderBy('nom, prenom')->all();
         foreach ($modelMoniteurs as $moniteur) {
             $dataMoniteurs[$moniteur->fkStatut->nom][$moniteur->personne_id] = $moniteur->NomPrenom . ' ' . $moniteur->getLetterBaremeFromDate(date('Y-m-d'));
         }
-        
+
         // on ajoute au tableau le nouveau moniteur choisi
         if (isset($newMoniteur)) {
             $arrayMoniteurs[$newMoniteur->fk_moniteur] = $newMoniteur;
         }
-        
+
         return $this->render('moniteurs', [
             'alerte' => $alerte,
             'model' => $model,
@@ -740,25 +746,26 @@ class CoursController extends CommonController
             'arrayData' => $arrayData,
         ]);
     }
-    
+
     /**
      * Affichage de la page de gestion globale des présences.
      * Permet la mise à jour des données des présences pour un cours
      * @param integer $id
      * @return mixed
      */
-    public function actionGestionpresences($cours_id) {
+    public function actionGestionpresences($cours_id)
+    {
         $model = $this->findModel($cours_id);
         $alerte = '';
-        
+
         if (!empty(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
-            
+
             $transaction = \Yii::$app->db->beginTransaction();
             try {
                 // on met toutes les présences à 0 pour les cours en question
                 foreach ($model->coursDates as $coursDate) {
-                    ClientsHasCoursDate::updateAll(['is_present' => 0], 'fk_cours_date = '.$coursDate->cours_date_id);
+                    ClientsHasCoursDate::updateAll(['is_present' => 0], 'fk_cours_date = ' . $coursDate->cours_date_id);
                 }
 
                 // on reconstruit la liste d'après la saisie
@@ -768,7 +775,7 @@ class CoursController extends CommonController
                         $myClientCours = ClientsHasCoursDate::find()->where('fk_personne = :personne_id AND fk_cours_date = :cours_date_id', ['personne_id' => $ids[1], 'cours_date_id' => $ids[0]])->one();
                         $myClientCours->is_present = 1;
                         if (!$myClientCours->save()) {
-                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la présence (IDs '.$ids[1].'|'.$ids[0].'.'));
+                            throw new Exception(Yii::t('app', 'Problème lors de la sauvegarde de la présence (IDs ' . $ids[1] . '|' . $ids[0] . '.'));
                         }
                     }
                 }
@@ -783,7 +790,7 @@ class CoursController extends CommonController
                 $transaction->rollBack();
             }
         }
-        
+
         // préparation des data
         foreach ($model->coursDates as $coursDate) {
             $arrayData[$coursDate->cours_date_id]['model'] = $coursDate;
@@ -792,9 +799,9 @@ class CoursController extends CommonController
                 $arrayData[$coursDate->cours_date_id]['participants'][$participant->fk_personne] = $participant;
             }
         }
-        
+
         return $this->render('presences', [
-	        'alerte' => $alerte,
+            'alerte' => $alerte,
             'model' => $model,
             'arrayParticipants' => $arrayParticipants,
             'arrayData' => $arrayData,
@@ -813,7 +820,7 @@ class CoursController extends CommonController
         // chargement du paramétrage
         $param = \app\models\Parametres::findOne(Yii::$app->params['colMaxPrint']);
         $nbmax = strip_tags($param->valeur);
-        
+
         // liste des dates de cours
         $listeCoursDate = [];
         $coursDate = CoursDate::find()->where(['fk_cours' => $model->cours_id])->orderBy('date');
@@ -835,20 +842,20 @@ class CoursController extends CommonController
         }
         $decoupage[] = $todec;
         $participants = Personnes::find()->distinct()->joinWith('clientsHasCours')->where(['IN', 'fk_cours', $model->cours_id])->orderBy('clients_has_cours.fk_statut ASC')->all();
-        
+
         // on cherche à définir le statut actuelle des participants
-        foreach($participants as $part) {
+        foreach ($participants as $part) {
             $toGroup = ClientsHasCours::findOne(['fk_personne' => $part->personne_id, 'fk_cours' => $model->cours_id]);
             $part->statutPart = $toGroup->fkStatut->nom;
-            
-            ${'allParticipants'.$toGroup->fk_statut}[] = $part;
+
+            ${'allParticipants' . $toGroup->fk_statut}[] = $part;
         }
-        
+
         $allParticipants = [];
         $lesStatuts = Parametres::find()->where(['class_key' => 9])->orderBy('tri')->all();
         foreach ($lesStatuts as $statut) {
-            if (isset(${'allParticipants'.$statut->parametre_id})) {
-                $allParticipants = array_merge($allParticipants, ${'allParticipants'.$statut->parametre_id});
+            if (isset(${'allParticipants' . $statut->parametre_id})) {
+                $allParticipants = array_merge($allParticipants, ${'allParticipants' . $statut->parametre_id});
             }
         }
 
@@ -888,7 +895,7 @@ class CoursController extends CommonController
             // call mPDF methods on the fly
             'methods' => [
 //                'SetHeader'=>[Yii::t('app', 'Liste des présences')],
-                'SetFooter'=>['{PAGENO}'],
+                'SetFooter' => ['{PAGENO}'],
             ]
         ]);
 
@@ -911,19 +918,20 @@ class CoursController extends CommonController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-    
+
     /**
      * Fonction API qui permet de retrouver la liste des cours à publier sur le
      * site internet
      * @return json La liste des cours
      */
-    public function actionGetcoursjson() {
+    public function actionGetcoursjson()
+    {
         $params = [
             'fk_statut' => Yii::$app->params['coursActif'],
             'is_publie' => 1,
         ];
         $arrayModelCours = Cours::findAll($params);
-        
+
         if (empty($arrayModelCours)) {
             $data = ["Aucune donnée trouvée"];
         } else {
@@ -956,8 +964,8 @@ class CoursController extends CommonController
                         if (empty($premierJourSession)) {
                             $premierJourSession = date('Y-m-d', strtotime($d->date));
                         }
-                        $dates[] = date('r', strtotime($d->date.' '.$d->heure_debut));
-                        $datesLieux[] = ['ident' =>  $d->cours_date_id, 'date' => date('r', strtotime($d->date.' '.$d->heure_debut)), 'lieu' => $d->fkLieu->nom];
+                        $dates[] = date('r', strtotime($d->date . ' ' . $d->heure_debut));
+                        $datesLieux[] = ['ident' => $d->cours_date_id, 'date' => date('r', strtotime($d->date . ' ' . $d->heure_debut)), 'lieu' => $d->fkLieu->nom];
                     }
                 }
                 $data[] = [
@@ -987,26 +995,27 @@ class CoursController extends CommonController
                     'description' => $c->description,
                     'offre_speciale' => $c->offre_speciale,
                     'categories' => $categories,
-                    'image_web' => ($c->image_web != '') ? Url::home(true).'/../../_files/images/'.$c->image_web : '',
+                    'image_web' => ($c->image_web != '') ? Url::home(true) . '/../../_files/images/' . $c->image_web : '',
                     'langue' => $c->fkLangue->nom,
                     'tri' => $c->fkNom->tri,
                     'tri_mise_en_avant' => $c->tri_internet,
                 ];
             }
         }
-        
+
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         header('Content-Type: application/json; charset=utf-8');
         return $data;
     }
-    
+
     /**
-     * 
+     *
      * @param array $arrayMoniteursBefore
      * @param array $arrayMoniteursAfter
      * @return void
      */
-    private function sendNotifications($dates, $arrayMoniteursBefore, $arrayMoniteursAfter) {
+    private function sendNotifications($dates, $arrayMoniteursBefore, $arrayMoniteursAfter)
+    {
         // suppression
         $arraySupprime = $this->checkDiffMulti($arrayMoniteursBefore, $arrayMoniteursAfter);
         // ajout
@@ -1028,7 +1037,7 @@ class CoursController extends CommonController
                 }
             }
         }
-        
+
         // on gère les ajouts
         foreach ($arrayAjoute as $parDate) {
             foreach ($parDate as $key => $v) {
