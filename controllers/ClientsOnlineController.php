@@ -427,10 +427,6 @@ class ClientsOnlineController extends CommonController
 
                 $infoAnniversaire = $model->informations . '
 ********************* INFO ANNIVERSAIRE *********************';
-                if ($rule) {
-                    $infoAnniversaire .= "
-** ANNIVERSAIRE AVEC NOUVEAUX TARIFS **";
-                }
                     $infoAnniversaire .= '
 * ' . Yii::t('app', 'Prénom de l\'enfant') . ' : ' . $model->prenom_enfant . '
 * ' . Yii::t('app', 'Date de naissance de l\'enfant') . ' : ' . $model->date_naissance_enfant . '
