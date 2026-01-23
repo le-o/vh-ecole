@@ -49,7 +49,7 @@ use leo\modules\UserManagement\models\User;
                     'expert_asse:date',
                     'prof_escalade:date',
                     [
-                        'label' => Yii::t('app', 'Formations'),
+                        'label' => Yii::t('app', 'Formations continues'),
                         'format' => 'raw',
                         'value' => function ($modelMoniteur) {
                             $display = [];

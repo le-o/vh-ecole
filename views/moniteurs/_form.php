@@ -181,13 +181,24 @@ use kartik\date\DatePicker;
             ]); ?>
         </div>
     </div>
+    <hr />
     <div class="row">
         <div class="col-sm-3">
-            <br />
             <?php
             $espaceOuRetour = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '<br />'];
             $i = 0;
-            foreach ((new \app\models\Parametres())->optsFormation() as $id => $formation) {
+            foreach ((new \app\models\Parametres())->optsFormationAsse() as $id => $formation) {
+                $isChecked = ($model->checkMoniteursHasOneFormation($model->moniteur_id, $id) ? true : false);
+                echo yii\bootstrap\BaseHtml::checkbox('formationsMoniteur[' . $id . ']', $isChecked);
+                echo ' <label class="control-label">' . $formation . '</label>' . $espaceOuRetour[$i % 2];
+                $i++;
+            } ?>
+        </div>
+        <div class="col-sm-3">
+            <?php
+            $espaceOuRetour = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '<br />'];
+            $i = 0;
+            foreach ((new \app\models\Parametres())->optsFormationJs() as $id => $formation) {
                 $isChecked = ($model->checkMoniteursHasOneFormation($model->moniteur_id, $id) ? true : false);
                 echo yii\bootstrap\BaseHtml::checkbox('formationsMoniteur[' . $id . ']', $isChecked);
                 echo ' <label class="control-label">' . $formation . '</label>' . $espaceOuRetour[$i % 2];
