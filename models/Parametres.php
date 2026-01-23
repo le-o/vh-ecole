@@ -304,11 +304,19 @@ class Parametres extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return array options pays for drop-down
+     * @return array options formation ASSE for drop-down
      */
-    public function optsFormation($selectedParam = null)
+    public function optsFormationAsse($selectedParam = null)
     {
         return $this->optsDropDown(22, $selectedParam, null, false);
+    }
+
+    /**
+     * @return array options formation JS for drop-down
+     */
+    public function optsFormationJs($selectedParam = null)
+    {
+        return $this->optsDropDown(23, $selectedParam, null, false);
     }
 
     /**
@@ -367,6 +375,7 @@ class Parametres extends \yii\db\ActiveRecord
             '20' => 'Pays',
             '21' => 'Sexe',
             '22' => 'Formation ASSE',
+            '23' => 'Formation JS',
         );
     }
     
