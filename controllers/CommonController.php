@@ -274,6 +274,10 @@ class CommonController extends Controller
                     $statutInscription, $montantAcompte30, $myCours->offre_speciale, $myCours->description, $myCours->extrait],
                 $content
             );
+
+            if ($myCours->fk_type == Yii::$app->params['coursUnique']) {
+                $setFrom = Yii::$app->params['anniversaireEmail'];
+            }
         }
         
         if (isset($emails) && !empty($emails)) {
