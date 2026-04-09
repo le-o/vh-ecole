@@ -502,7 +502,7 @@ class ClientsOnlineController extends CommonController
                         }
                         if (!empty($moniteurs)) {
                             $contenu = $this->generateMoniteurEmail($modelCoursDate, $moniteurs['noms'], 'birthday');
-                            $this->actionEmail($contenu, $moniteurs['emails']);
+                            $this->actionEmail($contenu, $moniteurs['emails'], false, Yii::$app->params['anniversaireEmail']);
                         }
                     } else {
                         $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInfoAnnivOnline'][Yii::$app->language]);
