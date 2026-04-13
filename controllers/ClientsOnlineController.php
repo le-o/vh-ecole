@@ -490,7 +490,7 @@ class ClientsOnlineController extends CommonController
                         $contenu['keyForMail'] = 'd|' . $modelCoursDate->cours_date_id;
                         foreach ($sendEmailTo as $personneID) {
                             $contenu['personne_id'] = $personneID;
-                            $this->actionEmail($contenu, [$model->email], true);
+                            $this->actionEmail($contenu, [$model->email], true, Yii::$app->params['anniversaireEmail']);
                         }
 
                         // on envoie aussi un email aux moniteurs de la date
@@ -502,11 +502,11 @@ class ClientsOnlineController extends CommonController
                         }
                         if (!empty($moniteurs)) {
                             $contenu = $this->generateMoniteurEmail($modelCoursDate, $moniteurs['noms'], 'birthday');
-                            $this->actionEmail($contenu, $moniteurs['emails']);
+                            $this->actionEmail($contenu, $moniteurs['emails'], false, Yii::$app->params['anniversaireEmail']);
                         }
                     } else {
                         $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInfoAnnivOnline'][Yii::$app->language]);
-                        $this->actionEmail($contenu, [$model->email], true);
+                        $this->actionEmail($contenu, [$model->email], true, Yii::$app->params['anniversaireEmail']);
                     }
 
                     return $this->render('confirmation');

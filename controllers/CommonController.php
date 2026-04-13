@@ -161,7 +161,7 @@ class CommonController extends Controller
      * @param array $adresses Liste de emails
      * @param bool $public True si on se trouve sur une page public
      */
-    public function actionEmail($mail, $adresses, $public = false)
+    public function actionEmail($mail, $adresses, $public = false, $setFrom = null)
     {
         $originEmails = [];
         foreach ($adresses as $a) {
@@ -274,19 +274,25 @@ class CommonController extends Controller
                     $statutInscription, $montantAcompte30, $myCours->offre_speciale, $myCours->description, $myCours->extrait],
                 $content
             );
+
+            if ($myCours->fk_type == Yii::$app->params['coursUnique']) {
+                $setFrom = Yii::$app->params['anniversaireEmail'];
+            }
         }
         
         if (isset($emails) && !empty($emails)) {
+            $from = $setFrom ?? Yii::$app->params['adminEmails'][Yii::$app->language];
+            $mailer = (is_null($setFrom)) ? Yii::$app->mailer : Yii::$app->maileranniversaire;
             if ($public || count($originEmails) == 1) {
-                $message = Yii::$app->mailer->compose()
-                    ->setFrom(Yii::$app->params['adminEmails'][Yii::$app->language])
+                $message = $mailer->compose()
+                    ->setFrom($from)
                     ->setTo($emails)
                     ->setSubject($mail['nom'])
                     ->setHtmlBody($content);
                 $bcc = '';
             } else {
-                $message = Yii::$app->mailer->compose()
-                    ->setFrom(Yii::$app->params['adminEmails'][Yii::$app->language])
+                $message = $mailer->compose()
+                    ->setFrom($from)
                     ->setTo(Yii::$app->params['noreplyEmail'])
                     ->setBcc($emails)
                     ->setSubject($mail['nom'])
@@ -297,7 +303,7 @@ class CommonController extends Controller
             // we send the message !
             if ($message->send()) {
                 $modelSentEmail = new SentEmail();
-                $modelSentEmail->from = Yii::$app->params['adminEmails'][Yii::$app->language];
+                $modelSentEmail->from = $from;
                 $modelSentEmail->to = implode(', ', $emails);
                 $modelSentEmail->bcc = $bcc;
                 $modelSentEmail->sent_date = date('Y-m-d H:i:s');
