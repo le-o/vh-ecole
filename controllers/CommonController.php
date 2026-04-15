@@ -275,7 +275,7 @@ class CommonController extends Controller
                 $content
             );
 
-            if ($myCours->fk_type == Yii::$app->params['coursUnique'] && Yii::$app->params['baltschieder'] != $myCours->fk_salle) {
+            if ($myCours->fk_type == Yii::$app->params['coursUnique']) {
                 $setFrom = Yii::$app->params['anniversaireEmail'];
             }
         }
