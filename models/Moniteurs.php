@@ -17,8 +17,11 @@ use Yii;
  * @property string $encadrant_asse
  * @property string $referent_asse
  * @property string $expert_asse
+ * @property string $moniteur_asse_bloc
+ * @property string $responsable_asse_bloc
  * @property string $parcours
  * @property string $methode_VCS
+ * @property string $methode_VCS_bloc
  * @property string $experience_cours
  * @property string $prof_escalade
  * @property string $js1_escalade
@@ -51,7 +54,9 @@ class Moniteurs extends \yii\db\ActiveRecord
             [['fk_personne'], 'required'],
             [['fk_personne', 'no_cresus'], 'integer'],
             [['remarque', 'diplome'], 'string'],
-            [['animateur_asse', 'instructeur_asse', 'encadrant_asse', 'referent_asse', 'expert_asse', 'parcours', 'methode_VCS', 'experience_cours', 'prof_escalade', 'js1_escalade', 'js2_escalade', 'js3_escalade', 'js_allround', 'js_expert'], 'safe'],
+            [['animateur_asse', 'instructeur_asse', 'encadrant_asse', 'referent_asse', 'expert_asse', 'moniteur_asse_bloc',
+                'responsable_asse_bloc', 'parcours', 'methode_VCS', 'methode_VCS_bloc', 'experience_cours', 'prof_escalade',
+                'js1_escalade', 'js2_escalade', 'js3_escalade', 'js_allround', 'js_expert'], 'safe'],
             [['fk_personne'], 'exist', 'skipOnError' => true, 'targetClass' => Personnes::class, 'targetAttribute' => ['fk_personne' => 'personne_id']],
         ];
     }
@@ -67,13 +72,16 @@ class Moniteurs extends \yii\db\ActiveRecord
             'no_cresus' => Yii::t('app', 'No Cresus'),
             'remarque' => Yii::t('app', 'Remarques'),
             'diplome' => Yii::t('app', 'Diplôme'),
-            'animateur_asse' => Yii::t('app', 'Animateur.rice ASSE'),
-            'instructeur_asse' => Yii::t('app', 'Instructeur.rice ASSE'),
-            'encadrant_asse' => Yii::t('app', 'Encadrant.e ASSE'),
-            'referent_asse' => Yii::t('app', 'Responsable de formation ASSE'),
+            'animateur_asse' => Yii::t('app', 'Animateur.rice ASSE Voie'),
+            'instructeur_asse' => Yii::t('app', 'Instructeur.rice ASSE Voie'),
+            'encadrant_asse' => Yii::t('app', 'Encadrant.e ASSE Voie'),
+            'referent_asse' => Yii::t('app', 'Resp. formation ASSE Voie'),
             'expert_asse' => Yii::t('app', 'Expert.e ASSE'),
+            'moniteur_asse_bloc' => Yii::t('app', 'Moniteur.rice ASSE Bloc'),
+            'responsable_asse_bloc' => Yii::t('app', 'Resp. formation ASSE Bloc'),
             'parcours' => Yii::t('app', 'Parcours/pendule'),
-            'methode_VCS' => Yii::t('app', 'Méthodologie VCS'),
+            'methode_VCS' => Yii::t('app', 'Méthodologie VCS Voie'),
+            'methode_VCS_bloc' => Yii::t('app', 'Méthodologie VCS Bloc'),
             'experience_cours' => Yii::t('app', 'Expérience de cours'),
             'prof_escalade' => Yii::t('app', 'Professeur.e d\'escalade'),
             'js1_escalade' => Yii::t('app', 'JS1 Escalade'),
@@ -96,6 +104,7 @@ class Moniteurs extends \yii\db\ActiveRecord
         $this->animateur_asse = ($this->animateur_asse == '' ? '' : date('d.m.Y', strtotime($this->animateur_asse)));
         $this->parcours = ($this->parcours == '') ? null : date('d.m.Y', strtotime($this->parcours));
         $this->methode_VCS = ($this->methode_VCS == '') ? null : date('d.m.Y', strtotime($this->methode_VCS));
+        $this->methode_VCS_bloc = ($this->methode_VCS_bloc == '') ? null : date('d.m.Y', strtotime($this->methode_VCS_bloc));
         $this->js_allround = ($this->js_allround == '') ? null : date('d.m.Y', strtotime($this->js_allround));
         $this->js1_escalade = ($this->js1_escalade == '') ? null : date('d.m.Y', strtotime($this->js1_escalade));
         $this->encadrant_asse = ($this->encadrant_asse == '') ? null : date('d.m.Y', strtotime($this->encadrant_asse));
@@ -103,6 +112,8 @@ class Moniteurs extends \yii\db\ActiveRecord
         $this->instructeur_asse = ($this->instructeur_asse == '') ? null : date('d.m.Y', strtotime($this->instructeur_asse));
         $this->referent_asse = ($this->referent_asse == '') ? null : date('d.m.Y', strtotime($this->referent_asse));
         $this->expert_asse = ($this->expert_asse == '') ? null : date('d.m.Y', strtotime($this->expert_asse));
+        $this->moniteur_asse_bloc = ($this->moniteur_asse_bloc == '') ? null : date('d.m.Y', strtotime($this->moniteur_asse_bloc));
+        $this->responsable_asse_bloc = ($this->responsable_asse_bloc == '') ? null : date('d.m.Y', strtotime($this->responsable_asse_bloc));
         $this->js2_escalade = ($this->js2_escalade == '') ? null : date('d.m.Y', strtotime($this->js2_escalade));
         $this->js3_escalade = ($this->js3_escalade == '') ? null : date('d.m.Y', strtotime($this->js3_escalade));
         $this->prof_escalade = ($this->prof_escalade == '') ? null : date('d.m.Y', strtotime($this->prof_escalade));
@@ -120,6 +131,7 @@ class Moniteurs extends \yii\db\ActiveRecord
             $this->animateur_asse = ($this->animateur_asse == '') ? null : date('Y-m-d', strtotime($this->animateur_asse));
             $this->parcours = ($this->parcours == '') ? null : date('Y-m-d', strtotime($this->parcours));
             $this->methode_VCS = ($this->methode_VCS == '') ? null : date('Y-m-d', strtotime($this->methode_VCS));
+            $this->methode_VCS_bloc = ($this->methode_VCS_bloc == '') ? null : date('Y-m-d', strtotime($this->methode_VCS_bloc));
             $this->js_allround = ($this->js_allround == '') ? null : date('Y-m-d', strtotime($this->js_allround));
             $this->js1_escalade = ($this->js1_escalade == '') ? null : date('Y-m-d', strtotime($this->js1_escalade));
             $this->encadrant_asse = ($this->encadrant_asse == '') ? null : date('Y-m-d', strtotime($this->encadrant_asse));
@@ -127,6 +139,8 @@ class Moniteurs extends \yii\db\ActiveRecord
             $this->instructeur_asse = ($this->instructeur_asse == '') ? null : date('Y-m-d', strtotime($this->instructeur_asse));
             $this->referent_asse = ($this->referent_asse == '') ? null : date('Y-m-d', strtotime($this->referent_asse));
             $this->expert_asse = ($this->expert_asse == '') ? null : date('Y-m-d', strtotime($this->expert_asse));
+            $this->responsable_asse_bloc = ($this->responsable_asse_bloc == '') ? null : date('Y-m-d', strtotime($this->responsable_asse_bloc));
+            $this->moniteur_asse_bloc = ($this->moniteur_asse_bloc == '') ? null : date('Y-m-d', strtotime($this->moniteur_asse_bloc));
             $this->js2_escalade = ($this->js2_escalade == '') ? null : date('Y-m-d', strtotime($this->js2_escalade));
             $this->js3_escalade = ($this->js3_escalade == '') ? null : date('Y-m-d', strtotime($this->js3_escalade));
             $this->prof_escalade = ($this->prof_escalade == '') ? null : date('Y-m-d', strtotime($this->prof_escalade));
@@ -152,7 +166,9 @@ class Moniteurs extends \yii\db\ActiveRecord
      */
     public function getMoniteursHasFormations()
     {
-        return $this->hasMany(MoniteursHasFormations::class, ['fk_moniteur' => 'moniteur_id']);
+        return $this->hasMany(MoniteursHasFormations::class, ['fk_moniteur' => 'moniteur_id'])
+            ->leftJoin('parametres', 'parametre_id = fk_formation')
+            ->orderBy(['parametres.tri' => SORT_ASC]);
     }
 
     /**
@@ -236,8 +252,16 @@ class Moniteurs extends \yii\db\ActiveRecord
             $dates = [$this->animateur_asse, $this->parcours];
             $bareme = 'animateur';
 
-            if (!empty($this->js1_escalade)) {
-                $dates[] = $this->js1_escalade;
+            if (!empty($this->js1_escalade) || (!empty($this->moniteur_asse_bloc) && !empty($this->methode_VCS_bloc))) {
+                if (!empty($this->js1_escalade)) {
+                    $dates[] = $this->js1_escalade;
+                }
+                if (!empty($this->moniteur_asse_bloc)) {
+                    $dates[] = $this->moniteur_asse_bloc;
+                }
+                if (!empty($this->methode_VCS_bloc)) {
+                    $dates[] = $this->methode_VCS_bloc;
+                }
                 $bareme = 'moniteur 1';
 
                 if (!empty($this->methode_VCS) && !empty($this->js_allround)) {
@@ -248,24 +272,23 @@ class Moniteurs extends \yii\db\ActiveRecord
                     if (!empty($this->experience_cours)) {
                         $dates[] = $this->experience_cours;
                         $bareme = 'moniteur 3';
+                    }
+                    if (!empty($this->instructeur_asse)) {
+                        $dates[] = $this->instructeur_asse;
+                        $bareme = 'moniteur 4';
 
-                        if (!empty($this->instructeur_asse)) {
-                            $dates[] = $this->instructeur_asse;
-                            $bareme = 'moniteur 4';
+                        if (!empty($this->js2_escalade)) {
+                            $dates[] = $this->js2_escalade;
+                            $bareme = 'moniteur 5';
 
-                            if (!empty($this->js2_escalade)) {
-                                $dates[] = $this->js2_escalade;
-                                $bareme = 'moniteur 5';
-
-                                if (!empty($this->js3_escalade) || !empty($this->prof_escalade)) {
-                                    $dates[] = $this->js3_escalade;
-                                    $dates[] = $this->prof_escalade;
-                                }
+                            if (!empty($this->js3_escalade) || !empty($this->prof_escalade)) {
+                                $dates[] = $this->js3_escalade;
+                                $dates[] = $this->prof_escalade;
                             }
-                        } elseif (!empty($this->prof_escalade)) {
-                            $dates[] = $this->prof_escalade;
-                            $bareme = 'moniteur 4';
                         }
+                    } elseif (!empty($this->prof_escalade)) {
+                        $dates[] = $this->prof_escalade;
+                        $bareme = 'moniteur 4';
                     }
                 } elseif (!empty($this->instructeur_asse) || !empty($this->js2_escalade) || !empty($this->js3_escalade)) {
                     $dates = [$this->instructeur_asse, $this->js2_escalade, $this->js3_escalade];
