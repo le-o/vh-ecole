@@ -282,6 +282,9 @@ class CommonController extends Controller
         
         if (isset($emails) && !empty($emails)) {
             $from = $setFrom ?? Yii::$app->params['adminEmails'][Yii::$app->language];
+            if (Yii::$app->params['baltschieder'] == $myCours->fk_salle) {
+                $from = Yii::$app->params['adminEmails'][Yii::$app->language];
+            }
             $mailer = (is_null($setFrom)) ? Yii::$app->mailer : Yii::$app->maileranniversaire;
             if ($public || count($originEmails) == 1) {
                 $message = $mailer->compose()
