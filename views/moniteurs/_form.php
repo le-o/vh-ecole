@@ -160,16 +160,6 @@ use kartik\date\DatePicker;
                     ]
             ]); ?>
         </div>
-        <div class="col-sm-3">
-            <?= $form->field($model, 'experience_cours')->widget(DatePicker::class, [
-                    'options' => ['placeholder' => 'jj.mm.aaaa'],
-                    'removeButton' => false,
-                    'pluginOptions' => [
-                            'autoclose'=>true,
-                            'format' => 'dd.mm.yyyy',
-                    ]
-            ]); ?>
-        </div>
     </div>
 
     <div class="row">
