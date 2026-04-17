@@ -16,7 +16,7 @@ $this->registerJs('
         displayMessage(jQuery("#choix_cours"), ' . implode(',', $selectedCours) . ');
     });
     function displayMessage(that, type) {
-        var arRegulier = [' . Cours::getCoursByType(Yii::$app->params['coursRegulie']) . '];
+        var arRegulier = [' . Cours::getCoursByType(Yii::$app->params['coursPlanifieS']) . '];
         var arDemande = [' . $params->optsNomCoursByType(Yii::$app->params['coursPonctuel']) . '];
         if (typeof type != \'undefined\') testType = parseInt(type);
         else testType = parseInt(that.val());
