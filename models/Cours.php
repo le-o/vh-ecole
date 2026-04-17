@@ -312,9 +312,11 @@ class Cours extends \yii\db\ActiveRecord
      * !! Only for javascript !!
      * @return string options id separate by ,
      */
-    public static function getCoursByType()
+    public static function getCoursByType($type)
     {
-        $cours = self::find()->where(['IN', 'fk_type', Yii::$app->params['coursRegulie']])->all();
+        $cours = self::find()
+            ->where(['IN', 'fk_type', $type])
+            ->all();
         $temp = [];
         foreach($cours as $c) {
             $temp[]= $c['cours_id'];
