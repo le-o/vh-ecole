@@ -394,6 +394,9 @@ class ClientsOnlineController extends CommonController
 
         if (Yii::$app->params['baltschieder'] == $modelCours->fk_salle) {
             Yii::$app->language = 'de-CH';
+            $setFrom = Yii::$app->params['adminEmails'][Yii::$app->language];
+        } else {
+            $setFrom = Yii::$app->params['anniversaireEmail'];
         }
 
         if ($model->load(Yii::$app->request->post())) {
@@ -490,7 +493,7 @@ class ClientsOnlineController extends CommonController
                         $contenu['keyForMail'] = 'd|' . $modelCoursDate->cours_date_id;
                         foreach ($sendEmailTo as $personneID) {
                             $contenu['personne_id'] = $personneID;
-                            $this->actionEmail($contenu, [$model->email], true, Yii::$app->params['anniversaireEmail']);
+                            $this->actionEmail($contenu, [$model->email], true, $setFrom);
                         }
 
                         // on envoie aussi un email aux moniteurs de la date
@@ -502,11 +505,11 @@ class ClientsOnlineController extends CommonController
                         }
                         if (!empty($moniteurs)) {
                             $contenu = $this->generateMoniteurEmail($modelCoursDate, $moniteurs['noms'], 'birthday');
-                            $this->actionEmail($contenu, $moniteurs['emails'], false, Yii::$app->params['anniversaireEmail']);
+                            $this->actionEmail($contenu, $moniteurs['emails'], false, $setFrom);
                         }
                     } else {
                         $contenu = \app\models\Parametres::findOne(Yii::$app->params['texteEmailInfoAnnivOnline'][Yii::$app->language]);
-                        $this->actionEmail($contenu, [$model->email], true, Yii::$app->params['anniversaireEmail']);
+                        $this->actionEmail($contenu, [$model->email], true, $setFrom);
                     }
 
                     return $this->render('confirmation');
