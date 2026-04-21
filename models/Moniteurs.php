@@ -246,11 +246,10 @@ class Moniteurs extends \yii\db\ActiveRecord
      * @return string
      */
     private function getBaremeSuggere(bool $withLabel): string {
-        $bareme = 'auxiliaire';
+        $bareme = 'animateur';
         $dates = [];
         if (!empty($this->animateur_asse) && !empty($this->parcours)) {
             $dates = [$this->animateur_asse, $this->parcours];
-            $bareme = 'animateur';
 
             if (!empty($this->js1_escalade) || (!empty($this->moniteur_asse_bloc) && !empty($this->methode_VCS_bloc))) {
                 if (!empty($this->js1_escalade)) {
@@ -290,11 +289,14 @@ class Moniteurs extends \yii\db\ActiveRecord
                         $dates[] = $this->prof_escalade;
                         $bareme = 'moniteur 4';
                     }
-                } elseif (!empty($this->instructeur_asse) || !empty($this->js2_escalade) || !empty($this->js3_escalade)) {
-                    $dates = [$this->instructeur_asse, $this->js2_escalade, $this->js3_escalade];
-                    $bareme = 'moniteur 2';
                 }
+            } elseif (!empty($this->instructeur_asse) || !empty($this->js2_escalade) || !empty($this->js3_escalade)) {
+                $dates = [$this->instructeur_asse, $this->js2_escalade, $this->js3_escalade];
+                $bareme = 'moniteur 2';
             }
+        } elseif (!empty($this->instructeur_asse) || !empty($this->js2_escalade) || !empty($this->js3_escalade)) {
+            $dates = [$this->instructeur_asse, $this->js2_escalade, $this->js3_escalade];
+            $bareme = 'moniteur 2';
         }
 
         $baremeSuggere = ($withLabel ? 'Barème suggéré : Barème ' . $bareme : ucfirst($bareme));
