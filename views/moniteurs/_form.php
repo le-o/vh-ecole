@@ -44,58 +44,38 @@ use kartik\date\DatePicker;
     </div>
 
     <div class="row">
-        <div class="col-sm-2">
-            <?= $form->field($model, 'animateur_asse')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
-            ]); ?>
-        </div>
-        <div class="col-sm-2">
+        <div class="col-sm-3">
             <?= $form->field($model, 'parcours')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-3">
             <?= $form->field($model, 'methode_VCS')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
-        <div class="col-sm-2">
-            <?= $form->field($model, 'js1_escalade')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+        <div class="col-sm-3">
+            <?= $form->field($model, 'methode_VCS_bloc')->widget(DatePicker::class, [
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
-        <div class="col-sm-2">
-            <?= $form->field($model, 'js_allround')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
-            ]); ?>
-        </div>
-        <div class="col-sm-2">
-            <?= $form->field($model, 'encadrant_asse')->widget(DatePicker::class, [
+        <div class="col-sm-3">
+            <?= $form->field($model, 'animateur_asse')->widget(DatePicker::class, [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
                 'removeButton' => false,
                 'pluginOptions' => [
@@ -108,7 +88,50 @@ use kartik\date\DatePicker;
 
     <div class="row">
         <div class="col-sm-3">
+            <?= $form->field($model, 'moniteur_asse_bloc')->widget(DatePicker::class, [
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
+            ]); ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'encadrant_asse')->widget(DatePicker::class, [
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
+            ]); ?>
+        </div>
+        <div class="col-sm-3">
             <?= $form->field($model, 'instructeur_asse')->widget(DatePicker::class, [
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
+            ]); ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $form->field($model, 'js_allround')->widget(DatePicker::class, [
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
+            ]); ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <?= $form->field($model, 'js1_escalade')->widget(DatePicker::class, [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
                 'removeButton' => false,
                 'pluginOptions' => [
@@ -119,57 +142,70 @@ use kartik\date\DatePicker;
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'js2_escalade')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'js3_escalade')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-3">
+            <?= $form->field($model, 'responsable_asse_bloc')->widget(DatePicker::class, [
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
+            ]); ?>
+        </div>
+        <div class="col-sm-3">
             <?= $form->field($model, 'referent_asse')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'expert_asse')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
         <div class="col-sm-3">
             <?= $form->field($model, 'js_expert')->widget(DatePicker::class, [
-                'options' => ['placeholder' => 'jj.mm.aaaa'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'dd.mm.yyyy',
-                ]
+                    'options' => ['placeholder' => 'jj.mm.aaaa'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                            'autoclose'=>true,
+                            'format' => 'dd.mm.yyyy',
+                    ]
             ]); ?>
         </div>
+    </div>
+
+    <div class="row">
         <div class="col-sm-3">
             <?= $form->field($model, 'prof_escalade')->widget(DatePicker::class, [
                 'options' => ['placeholder' => 'jj.mm.aaaa'],
@@ -181,13 +217,24 @@ use kartik\date\DatePicker;
             ]); ?>
         </div>
     </div>
+    <hr />
     <div class="row">
-        <div class="col-sm-3">
-            <br />
+        <div class="col-sm-4">
             <?php
             $espaceOuRetour = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '<br />'];
             $i = 0;
-            foreach ((new \app\models\Parametres())->optsFormation() as $id => $formation) {
+            foreach ((new \app\models\Parametres())->optsFormationAsse() as $id => $formation) {
+                $isChecked = ($model->checkMoniteursHasOneFormation($model->moniteur_id, $id) ? true : false);
+                echo yii\bootstrap\BaseHtml::checkbox('formationsMoniteur[' . $id . ']', $isChecked);
+                echo ' <label class="control-label">' . $formation . '</label>' . $espaceOuRetour[$i % 2];
+                $i++;
+            } ?>
+        </div>
+        <div class="col-sm-3">
+            <?php
+            $espaceOuRetour = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '<br />'];
+            $i = 0;
+            foreach ((new \app\models\Parametres())->optsFormationJs() as $id => $formation) {
                 $isChecked = ($model->checkMoniteursHasOneFormation($model->moniteur_id, $id) ? true : false);
                 echo yii\bootstrap\BaseHtml::checkbox('formationsMoniteur[' . $id . ']', $isChecked);
                 echo ' <label class="control-label">' . $formation . '</label>' . $espaceOuRetour[$i % 2];
